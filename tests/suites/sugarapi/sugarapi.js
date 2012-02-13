@@ -13,12 +13,12 @@ describe('SugarCRM Javascript API', function() {
         this.server = sinon.fakeServer.create();
         this.callbacks = {
             success: function(data){
-                console.log("sucess callback");
-                console.log("data");
-                console.log(data);
+                //console.log("sucess callback");
+                //console.log("data");
+                //console.log(data);
             },
             error: function(data){
-                console.log("error callback");
+                //console.log("error callback");
             }
         };
     });
@@ -74,7 +74,7 @@ describe('SugarCRM Javascript API', function() {
 
             //@arguments: method, URL, options
             this.api.call('get','/rest/v10/contacts', {}, {async:true});
-            console.log(spy.getCall(0));
+
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
@@ -219,14 +219,14 @@ describe('SugarCRM Javascript API', function() {
             this.callbacks.success.restore();
         });
 
-        xit('should update bean', function() {
-            //TODO
+        it('should update bean', function() {
+            //TODO need response from rest doc still
 
 
             var spy = sinon.spy(this.callbacks,'success');
             this.server.respondWith("PUT", "rest/v10/Contacts/",
                         [200, {  "Content-Type":"application/json"},
-                            JSON.stringify(this.fixtures["rest/v10/contact"].GET.response)]);
+                            ""]);
 
 
             var module = "Contacts";
@@ -235,7 +235,9 @@ describe('SugarCRM Javascript API', function() {
             this.api.update(module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
-            expect(spy.getCall(0).args[0]).toEqual("");
+            expect(spy.getCall(0).args[0]).toEqual(null);
+            expect(spy.getCall(0).args[2].status).toEqual(200);
+            expect(spy.getCall(0).args[2].responseText).toEqual("");
             this.callbacks.success.restore();
         });
 
@@ -260,28 +262,56 @@ describe('SugarCRM Javascript API', function() {
 
     });
 
-    describe('special actions', function() {
+    describe('sugar actions', function() {
         it('should retrieve metadata', function() {
             //TODO
+            var types =["vardefs","listviewdefs"];
+            var modules = ["Accounts", "Cases"];
             var metadata=this.api.getMetadata(types, modules, this.callbacks);
+            expect(metadata).toEqual("");
         });
 
         it('should retrieve sugarFields', function() {
             //TODO
+            var hash = "";
             var sugarFieldData=this.api.getSugarFields(hash, this.callbacks);
-
+            expect(sugarFieldData).toEqual("you still need an expectation here");
         });
 
         it('should login users with correct credentials', function() {
-            var loginResult=this.api.login(this.validUsername, this.validPassword);
+            var extraInfo =    {
+                "type": "text",
+               "client-info": {
+                  "uuid": "xyz",
+                  "model": "iPhone3,1",
+                  "osVersion": "5.0.1",
+                  "carrier": "att",
+                  "appVersion": "SugarMobile 1.0",
+                  "ismobile": true
+               }
+            };
+            var loginResult=this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
 
             expect(loginResult).toBeTruthy();
+            expect(loginResult).toBeEqual("you still need an expecation here");
         });
 
         it('should not login users with incorrect credentials', function() {
-            var loginResult=this.api.login(this.invalidUsername, this.invalidPassword);
+            var extraInfo =    {
+                "type": "text",
+               "client-info": {
+                  "uuid": "xyz",
+                  "model": "iPhone3,1",
+                  "osVersion": "5.0.1",
+                  "carrier": "att",
+                  "appVersion": "SugarMobile 1.0",
+                  "ismobile": true
+               }
+            };
+            var loginResult=this.api.login(this.invalidUsername, this.invalidPassword, extraInfo, this.callbacks);
 
             expect(loginResult).toBeFalsy();
+            expect(loginResult).toBeEqual("you still need an expecation here");
         });
 
         it('should check if user is authenticated', function() {
@@ -292,9 +322,12 @@ describe('SugarCRM Javascript API', function() {
         });
 
         it('should logout user', function() {
-            var logoutResult = this.api.logout();
+            var extraInfo =    {
+            };
+            var logoutResult=this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
 
             expect(logoutResult).toBeTruthy();
+            expect(logoutResult).toBeEqual("you still need an expecation here");
         });
     });
 
