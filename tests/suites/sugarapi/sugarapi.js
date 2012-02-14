@@ -358,15 +358,38 @@ describe('SugarCRM Javascript API', function() {
             var loginState = this.api.isAuthenticated();
 
             expect(loginState).toBeTruthy();
+            this.callbacks.success.restore();
         });
 
         it('should logout user', function() {
             var extraInfo =    {
+                "type": "text"
             };
-            var logoutResult=this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
 
-            expect(logoutResult).toBeTruthy();
-            expect(logoutResult).toBeEqual("you still need an expecation here");
+            var spy = sinon.spy(this.callbacks,'success');
+
+            this.server.respondWith("POST", "rest/v10/login/",
+                        [200, {"Content-Type":"application/json"},
+                            JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
+
+            var loginResult=this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
+            this.server.respond(); //tell server to respond to pending async call
+
+            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
+            expect(this.api.isAuthenticated()).toBeTruthy();
+
+            this.server.respondWith("POST", "rest/v10/logout/",
+                        [200, {"Content-Type":"application/json"},
+                            ""]);
+
+            var result=this.api.logout(this.callbacks);
+
+            this.server.respond(); //tell server to respond to pending async call
+
+            expect(result.status).toEqual(200);
+            expect(result.responseText).toEqual("");
+            expect(this.api.isAuthenticated()).toBeFalsy();
+            this.callbacks.success.restore();
         });
     });
 
