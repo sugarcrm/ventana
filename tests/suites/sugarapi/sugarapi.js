@@ -30,7 +30,7 @@ describe('SugarCRM Javascript API', function() {
 
     it('should return an api instance', function() {
         expect(typeof(this.api)).toBe('object');
-        expect(this.api.baseUrl).toEqual('rest/v10/');
+        expect(this.api.baseUrl).toEqual('/rest/v10/');
     });
 
     describe('requestHandler', function() {
@@ -39,14 +39,14 @@ describe('SugarCRM Javascript API', function() {
             var spy = sinon.spy(jQuery,'ajax');
 
             //@arguments: method, URL, options
-            this.api.call('get','rest/v10/contact');
+            this.api.call('get','/rest/v10/contact');
 
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
             // Check url property of first argument
             expect(spy.getCall(0).args[0].url)
-                .toEqual("rest/v10/contact");
+                .toEqual("/rest/v10/contact");
             // Restore jQuery.ajax to normal
             jQuery.ajax.restore();
         });
@@ -88,11 +88,11 @@ describe('SugarCRM Javascript API', function() {
 
         it('should handle successful responses', function() {
 
-            this.server.respondWith("GET", "rest/v10/contacts/1234/",
+            this.server.respondWith("GET", "/rest/v10/contacts/1234/",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
 
-            var result = this.api.call('get','rest/v10/contacts/1234/', {}, {}, this.callbacks);
+            var result = this.api.call('get','/rest/v10/contacts/1234/', {}, {}, this.callbacks);
             this.server.respond(); //tell server to respond to pending async call
 
             expect(result.responseText).toEqual(JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1]));
@@ -120,7 +120,7 @@ describe('SugarCRM Javascript API', function() {
             var params = [];
             var url = this.api.buildURL(module, action, attributes, params);
 
-            expect(url).toEqual('rest/v10/Contacts/');
+            expect(url).toEqual('/rest/v10/Contacts/');
         });
 
         it('should build resource URLs for resources with ids', function() {
@@ -130,7 +130,7 @@ describe('SugarCRM Javascript API', function() {
             var attributes = {module:'contacts', id:'1234'}
             var url = this.api.buildURL(module, action, attributes, params);
 
-            expect(url).toEqual('rest/v10/Contacts/1234/');
+            expect(url).toEqual('/rest/v10/Contacts/1234/');
         });
 
         it('should build resource URLs for resources with standard actions', function() {
@@ -140,7 +140,7 @@ describe('SugarCRM Javascript API', function() {
             var attributes = {module:'contacts', id:'1234', action:'Update'}
             var url = this.api.buildURL(module, action, attributes, params);
 
-            expect(url).toEqual('rest/v10/Contacts/1234/');
+            expect(url).toEqual('/rest/v10/Contacts/1234/');
         });
 
         it('should build resource URLs for resources with custom actions', function() {
@@ -150,7 +150,7 @@ describe('SugarCRM Javascript API', function() {
             var attributes = {module:'contacts', id:'1234'}
             var url = this.api.buildURL(module, action, attributes, params);
 
-            expect(url).toEqual('rest/v10/Contacts/1234/customAction/');
+            expect(url).toEqual('/rest/v10/Contacts/1234/customAction/');
         });
 
 
@@ -160,14 +160,14 @@ describe('SugarCRM Javascript API', function() {
             var params = [{key:"fields",value:"first_name,last_name"},{key:"timestamp",value:"NOW"}];
             var attributes = { id:'1234'}
             var url = this.api.buildURL(module, action, attributes, params);
-            expect(url).toEqual('rest/v10/Contacts/1234/?fields=first_name,last_name&timestamp=NOW');
+            expect(url).toEqual('/rest/v10/Contacts/1234/?fields=first_name,last_name&timestamp=NOW');
         });
     });
 
     describe('CRUD actions', function() {
         it('should get a bean', function() {
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("GET", "rest/v10/Contacts/1234/",
+            this.server.respondWith("GET", "/rest/v10/Contacts/1234/",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
 
@@ -184,7 +184,7 @@ describe('SugarCRM Javascript API', function() {
 
         it('should create bean', function() {
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("POST", "rest/v10/Contacts/",
+            this.server.respondWith("POST", "/rest/v10/Contacts/",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/contact"].PUT.response)]);
 
@@ -201,7 +201,7 @@ describe('SugarCRM Javascript API', function() {
 
         it('should get beans', function() {
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("GET", "rest/v10/Contacts/",
+            this.server.respondWith("GET", "/rest/v10/Contacts/",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/contact"].GET.response)]);
 
@@ -221,7 +221,7 @@ describe('SugarCRM Javascript API', function() {
 
 
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("PUT", "rest/v10/Contacts/",
+            this.server.respondWith("PUT", "/rest/v10/Contacts/",
                         [200, {  "Content-Type":"application/json"},
                             ""]);
 
@@ -241,7 +241,7 @@ describe('SugarCRM Javascript API', function() {
         it('should delete bean', function() {
             var spy1 = sinon.spy(this.callbacks,'error');
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("DELETE", "rest/v10/Contacts/1234/",
+            this.server.respondWith("DELETE", "/rest/v10/Contacts/1234/",
                         [200, {  "Content-Type":"application/json"}, ""]);
 
 
@@ -262,15 +262,31 @@ describe('SugarCRM Javascript API', function() {
     describe('sugar actions', function() {
         it('should retrieve metadata', function() {
             //TODO
-            var types =["vardefs","listviewdefs"];
-            var modules = ["Accounts", "Cases"];
+            var types =[];
+            var modules = ["Contacts"];
+            var callspy = sinon.spy(this.api,'call');
+            var ajaxspy = sinon.spy($,'ajax');
+            var spy = sinon.spy(this.callbacks,'success');
+            this.server.respondWith("GET", "/rest/v10/metadata/?type=&modules=Contacts",
+                        [200, {  "Content-Type":"application/json"},
+                            JSON.stringify(fixtures.metadata.Contacts)]);
+
             var metadata=this.api.getMetadata(types, modules, this.callbacks);
-            expect(metadata).toEqual("");
+
+            this.server.respond(); //tell server to respond to pending async call
+            expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.Contacts);
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata/?type=&modules=Contacts");
+            expect(ajaxspy).toHaveBeenCalledOnce();
+            this.api.call.restore();
+            $.ajax.restore();
+            this.callbacks.success.restore();
         });
 
         it('should retrieve sugarFields', function() {
+            var callspy = sinon.spy(this.api,'call');
+            var ajaxspy = sinon.spy($,'ajax');
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("GET", "rest/v10/sugarFields/?md5=asdf",
+            this.server.respondWith("GET", "/rest/v10/sugarFields/?md5=asdf",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures.sugarFields)]);
 
@@ -279,10 +295,16 @@ describe('SugarCRM Javascript API', function() {
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures.sugarFields);
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/sugarFields/?md5=asdf");
+            expect(ajaxspy).toHaveBeenCalledOnce();
+            this.api.call.restore();
+            $.ajax.restore();
             this.callbacks.success.restore();
         });
 
         it('should login users with correct credentials', function() {
+            var callspy = sinon.spy(this.api,'call');
+            var ajaxspy = sinon.spy($,'ajax');
             var extraInfo =    {
                 "type": "text",
                "client-info": {
@@ -297,17 +319,26 @@ describe('SugarCRM Javascript API', function() {
 
             var spy = sinon.spy(this.callbacks,'success');
 
-            this.server.respondWith("POST", "rest/v10/login/",
+            this.server.respondWith("POST", "/rest/v10/login/",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
             var loginResult=this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
+
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/login/");
+            expect(ajaxspy).toHaveBeenCalledOnce();
             expect(this.api.isAuthenticated()).toBeTruthy();
+
+            this.api.call.restore();
+            $.ajax.restore();
+            this.callbacks.success.restore();
         });
 
         it('should not login users with incorrect credentials', function() {
+            var callspy = sinon.spy(this.api,'call');
+            var ajaxspy = sinon.spy($,'ajax');
             var extraInfo =    {
                 "type": "text",
                "client-info": {
@@ -321,7 +352,7 @@ describe('SugarCRM Javascript API', function() {
             };
 
             var spy = sinon.spy(this.callbacks,'error');
-            this.server.respondWith("POST", "rest/v10/login/",
+            this.server.respondWith("POST", "/rest/v10/login/",
                         [500, {  "Content-Type":"application/json"},
                             ""]);
 
@@ -331,6 +362,10 @@ describe('SugarCRM Javascript API', function() {
 
             expect(spy.getCall(0).args[0].status).toEqual(500);
             expect(spy.getCall(0).args[0].responseText).toEqual("");
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/login/");
+            expect(ajaxspy).toHaveBeenCalledOnce();
+            this.api.call.restore();
+            $.ajax.restore();
         });
 
         it('should check if user is authenticated', function() {
@@ -346,29 +381,28 @@ describe('SugarCRM Javascript API', function() {
                }
             };
             var spy = sinon.spy(this.callbacks,'success');
-            this.server.respondWith("POST", "rest/v10/login/",
+            this.server.respondWith("POST", "/rest/v10/login/",
                         [200, {  "Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
             var loginResult=this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
             this.server.respond(); //tell server to respond to pending async call
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
-            expect(this.api.isAuthenticated()).toBeTruthy();
 
             var loginState = this.api.isAuthenticated();
 
             expect(loginState).toBeTruthy();
-            this.callbacks.success.restore();
         });
 
         it('should logout user', function() {
+            var callspy = sinon.spy(this.api,'call');
+            var ajaxspy = sinon.spy($,'ajax');
             var extraInfo =    {
                 "type": "text"
             };
-
+            // login
             var spy = sinon.spy(this.callbacks,'success');
 
-            this.server.respondWith("POST", "rest/v10/login/",
+            this.server.respondWith("POST", "/rest/v10/login/",
                         [200, {"Content-Type":"application/json"},
                             JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
@@ -377,19 +411,21 @@ describe('SugarCRM Javascript API', function() {
 
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
             expect(this.api.isAuthenticated()).toBeTruthy();
-
-            this.server.respondWith("POST", "rest/v10/logout/",
-                        [200, {"Content-Type":"application/json"},
-                            ""]);
+            // now check logout
+            this.server.respondWith("POST", "/rest/v10/logout/", [200, {"Content-Type":"application/json"},""]);
 
             var result=this.api.logout(this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
 
+            expect(callspy.getCall(1).args[1]).toEqual("/rest/v10/logout/");
+            expect(ajaxspy).toHaveBeenCalledTwice();
             expect(result.status).toEqual(200);
             expect(result.responseText).toEqual("");
             expect(this.api.isAuthenticated()).toBeFalsy();
             this.callbacks.success.restore();
+            this.api.call.restore();
+            $.ajax.restore();
         });
     });
 
