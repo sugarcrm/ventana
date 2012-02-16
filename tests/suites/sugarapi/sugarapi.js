@@ -195,12 +195,12 @@ describe('SugarCRM Javascript API', function () {
 
             this.server.respondWith("POST", "/rest/v10/Contacts/",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/contact"].PUT.response)]);
+                    JSON.stringify(this.fixtures["rest/v10/contact"].POST.response)]);
 
             this.api.create(module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].PUT.response);
+            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].POST.response);
 
             //restore spies
             this.callbacks.success.restore();
