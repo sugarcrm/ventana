@@ -167,7 +167,27 @@ describe('SugarCRM Javascript API', function () {
         });
     });
 
-    describe('CRUD actions', function () {
+    describe('CRUDS actions', function () {
+        it('search a module', function () {
+            var spy = sinon.spy(this.callbacks, 'success');
+            var module = "Contacts";
+            var query = "bob";
+            var fields = "first_name,last_name";
+
+            this.server.respondWith("GET", "/rest/v10/Contacts/search?q=bob&fields=first_name,last_name",
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
+
+            var collection = this.api.search(module, query, fields, this.callbacks);
+
+            this.server.respond(); //tell server to respond to pending async call
+
+            // expect success callback to have been called with the data from the response
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(this.fixtures["rest/v10/contact"].GET.response[1]);
+            //restore spies
+            this.callbacks.success.restore();
+        });
         it('should get a bean', function () {
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "Contacts";
