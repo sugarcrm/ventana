@@ -277,7 +277,7 @@ describe('SugarCRM Javascript API', function () {
             var callspy = sinon.spy(this.api, 'call');
             var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
-            this.api.debug=true;
+            //this.api.debug=true;
             this.server.respondWith("GET", "/rest/v10/metadata?type=&filter=Contacts",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.Contacts)]);
