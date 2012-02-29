@@ -6,7 +6,7 @@ describe('SugarCRM Javascript API', function () {
         this.invalidUserName = "invalid";
         this.invalidPassword = "invalid";
         //instantiating API Instance
-        this.api = SUGAR.Api.getInstance();
+        this.api = SUGAR.Api.getInstance({baseUrl:"/rest/v10"});
         //get fresh fixtures
         this.fixtures = fixtures.api;
         this.fixtures.sugarFields = sugarFieldsFixtures;
