@@ -246,6 +246,24 @@ describe('SugarCRM Javascript API', function () {
             this.callbacks.success.restore();
         });
 
+        it('should get relations', function () {
+            var spy = sinon.spy(this.callbacks, 'success');
+            var module = "opportunities";
+            var url = "rest/v10/opportunities/xyz/contacts";
+
+            this.server.respondWith("GET", "/" + url,
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify(this.fixtures[url].GET.response)]);
+
+            this.api.getRelations(module, "xyz", "contacts", undefined, this.callbacks);
+
+            this.server.respond();
+            expect(spy.getCall(0).args[0]).toEqual(this.fixtures[url].GET.response);
+
+            //restore spies
+            this.callbacks.success.restore();
+        });
+
         it('should update bean', function () {
             var module = "Contacts";
             var params = "";
