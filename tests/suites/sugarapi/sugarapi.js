@@ -25,7 +25,8 @@ describe('SugarCRM Javascript API', function () {
     });
 
     afterEach(function () {
-        this.server.restore();
+        if (this.server.restore) this.server.restore();
+        if (this.callbacks.success.restore) this.callbacks.success.restore();
     });
 
     it('should return an api instance', function () {
@@ -114,11 +115,18 @@ describe('SugarCRM Javascript API', function () {
 
     describe('urlBuilder', function () {
         it('should build resource URLs for resources without ids', function () {
-            var attributes = {};
             var module = "Contacts";
             var action = "create";
-            var params = [];
-            var url = this.api.buildURL(module, action, attributes, params);
+            var url = this.api.buildURL(module, action);
+
+            expect(url).toEqual('/rest/v10/Contacts');
+        });
+
+        it('should build resource URLs for resources without ids if id exists in attributes', function () {
+            var attributes = { id: "1" };
+            var module = "Contacts";
+            var action = "create";
+            var url = this.api.buildURL(module, action, attributes);
 
             expect(url).toEqual('/rest/v10/Contacts');
         });
@@ -126,9 +134,8 @@ describe('SugarCRM Javascript API', function () {
         it('should build resource URLs for resources with ids', function () {
             var module = "Contacts";
             var action = "update";
-            var params = [];
-            var attributes = {module:'contacts', id:'1234'};
-            var url = this.api.buildURL(module, action, attributes, params);
+            var attributes = { id:'1234' };
+            var url = this.api.buildURL(module, action, attributes);
 
             expect(url).toEqual('/rest/v10/Contacts/1234');
         });
@@ -136,9 +143,8 @@ describe('SugarCRM Javascript API', function () {
         it('should build resource URLs for resources with standard actions', function () {
             var module = "Contacts";
             var action = "update";
-            var params = [];
-            var attributes = {module:'contacts', id:'1234', action:'Update'};
-            var url = this.api.buildURL(module, action, attributes, params);
+            var attributes = { id:'1234' };
+            var url = this.api.buildURL(module, action, attributes);
 
             expect(url).toEqual('/rest/v10/Contacts/1234');
         });
@@ -146,11 +152,19 @@ describe('SugarCRM Javascript API', function () {
         it('should build resource URLs for resources with custom actions', function () {
             var module = "Contacts";
             var action = "customAction";
-            var params = [];
-            var attributes = {module:'contacts', id:'1234'};
-            var url = this.api.buildURL(module, action, attributes, params);
+            var attributes = { id:'1234' };
+            var url = this.api.buildURL(module, action, attributes);
 
             expect(url).toEqual('/rest/v10/Contacts/1234/customAction');
+        });
+
+        it('should build resource URLs for resources with link and related id', function () {
+            var module = "Contacts";
+            var action = "opportunities";
+            var attributes = { id:'1234', relatedId: '4567' };
+            var url = this.api.buildURL(module, action, attributes);
+
+            expect(url).toEqual('/rest/v10/Contacts/1234/opportunities/4567');
         });
 
 
@@ -167,7 +181,7 @@ describe('SugarCRM Javascript API', function () {
         });
     });
 
-    describe('CRUDS actions', function () {
+    describe('Bean CRUD actions', function () {
         it('search a module', function () {
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "Contacts";
@@ -178,15 +192,13 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
 
-            var collection = this.api.search(module, query, fields, this.callbacks);
+            this.api.search(module, query, fields, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
 
             // expect success callback to have been called with the data from the response
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(this.fixtures["rest/v10/contact"].GET.response[1]);
-            //restore spies
-            this.callbacks.success.restore();
         });
         it('should get a bean', function () {
             var spy = sinon.spy(this.callbacks, 'success');
@@ -198,13 +210,10 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
 
-            var bean = this.api.beans("read", module, attributes, params, this.callbacks);
+            this.api.beans("read", module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].GET.response[1]);
-
-            //restore spies
-            this.callbacks.success.restore();
         });
 
         it('should create bean', function () {
@@ -221,9 +230,6 @@ describe('SugarCRM Javascript API', function () {
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].POST.response);
-
-            //restore spies
-            this.callbacks.success.restore();
         });
 
 
@@ -237,31 +243,10 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].GET.response)]);
 
-            var bean = this.api.beans("read", module, attributes, params, this.callbacks);
+            this.api.beans("read", module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].GET.response);
-
-            //restore spies
-            this.callbacks.success.restore();
-        });
-
-        xit('should get relations', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "opportunities";
-            var url = "rest/v10/opportunities/xyz/contacts";
-
-            this.server.respondWith("GET", "/" + url,
-                [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures[url].GET.response)]);
-
-            this.api.getRelations(module, "xyz", "contacts", undefined, this.callbacks);
-
-            this.server.respond();
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures[url].GET.response);
-
-            //restore spies
-            this.callbacks.success.restore();
         });
 
         it('should update bean', function () {
@@ -280,9 +265,6 @@ describe('SugarCRM Javascript API', function () {
             expect(spy.getCall(0).args[0]).toEqual(null);
             expect(spy.getCall(0).args[2].status).toEqual(200);
             expect(spy.getCall(0).args[2].responseText).toEqual("");
-
-            //restore spies
-            this.callbacks.success.restore();
         });
 
         it('should delete bean', function () {
@@ -301,9 +283,101 @@ describe('SugarCRM Javascript API', function () {
             expect(spy.getCall(0).args[0]).toEqual(null);
             expect(spy.getCall(0).args[2].status).toEqual(200);
             expect(spy.getCall(0).args[2].responseText).toEqual("");
+        });
 
-            //restore spies
-            this.callbacks.success.restore();
+    });
+
+    describe('Relationship CRUD actions', function () {
+
+        it('should fetch relationships', function () {
+            var spy = sinon.spy(this.callbacks, 'success');
+            var module = "opportunities";
+            var attributes = {
+                id: "1",
+                link: "contacts"
+            };
+
+            this.server.respondWith("GET", "/rest/v10/opportunities/1/contacts",
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify(this.fixtures["rest/v10/opportunities/1/contacts"].GET.response)]);
+
+            var xhr = this.api.relationships("read", module, attributes, null, this.callbacks);
+
+            this.server.respond();
+            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/opportunities/1/contacts"].GET.response);
+
+        });
+
+
+        it('should create a relationship', function () {
+            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"];
+            var spy = sinon.spy(this.callbacks, 'success');
+            var module = "opportunities";
+            var attributes = {
+                id: '1',
+                link: "contacts",
+                related: {
+                    first_name: "Ronald",
+                    last_name: "McDonald",
+                    opportunity_role: "Influencer"
+                }
+            };
+
+            this.server.respondWith("POST", "/rest/v10/opportunities/1/contacts",
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify(fixture.POST.response)]);
+
+            this.api.relationships("create", module, attributes, null, this.callbacks);
+
+            this.server.respond();
+            expect(this.server.requests[0].requestBody).toEqual(fixture.POST.request);
+            expect(spy.getCall(0).args[0]).toEqual(fixture.POST.response);
+        });
+
+
+        it('should update a relationship', function () {
+            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"];
+            var module = "opportunities";
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var attributes = {
+                id: '1',
+                link: "contacts",
+                relatedId: "2",
+                related: {
+                    opportunity_role: "Primary Decision Maker"
+                }
+            };
+
+            this.server.respondWith("PUT", "/rest/v10/opportunities/1/contacts/2",
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(fixture.PUT.response)]);
+
+            this.api.relationships("update", module, attributes, null, this.callbacks);
+
+            this.server.respond();
+            expect(this.server.requests[0].requestBody).toEqual(fixture.PUT.request);
+            expect(spy.getCall(0).args[0]).toEqual(fixture.PUT.response);
+        });
+
+        it('should delete a relationship', function () {
+            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"];
+            var module = "opportunities";
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var attributes = {
+                id: '1',
+                link: "contacts",
+                relatedId: "2"
+            };
+
+            this.server.respondWith("DELETE", "/rest/v10/opportunities/1/contacts/2",
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(fixture.DELETE.response)]);
+
+            this.api.relationships("delete", module, attributes, null, this.callbacks);
+
+            this.server.respond();
+            expect(this.server.requests[0].requestBody).toBeNull();
+            expect(spy.getCall(0).args[0]).toEqual(fixture.DELETE.response);
         });
 
     });
