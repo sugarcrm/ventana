@@ -142,7 +142,7 @@ describe('SugarCRM Javascript API', function () {
 
         it('should build resource URLs for resources with standard actions', function () {
             var module = "Contacts";
-            var action = "update";
+            var action = "";
             var attributes = { id:'1234' };
             var url = this.api.buildURL(module, action, attributes);
 
