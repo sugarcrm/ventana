@@ -27,7 +27,10 @@ describe('SugarCRM Javascript API', function () {
     afterEach(function () {
         if (this.server.restore) this.server.restore();
         if (this.callbacks.success.restore) this.callbacks.success.restore();
+        if (this.api.call.restore) this.api.call.restore();
+        if (jQuery.ajax.restore) jQuery.ajax.restore();
     });
+
 
     it('should return an api instance', function () {
         expect(typeof(this.api)).toBe('object');
@@ -48,8 +51,6 @@ describe('SugarCRM Javascript API', function () {
             // Check url property of first argument
             expect(spy.getCall(0).args[0].url)
                 .toEqual("/rest/v10/contact");
-            // Restore jQuery.ajax to normal
-            jQuery.ajax.restore();
         });
 
         it('should set the right method on request', function () {
@@ -65,9 +66,6 @@ describe('SugarCRM Javascript API', function () {
             // Check url property of first argument
             expect(spy.getCall(0).args[0].type)
                 .toEqual("PUT");
-
-            // Restore jQuery.ajax to normal
-            jQuery.ajax.restore();
         });
 
         it('should set the right options on request', function () {
@@ -82,9 +80,6 @@ describe('SugarCRM Javascript API', function () {
 
             // Check url property of first argument
             expect(spy.getCall(0).args[0].async).toBeTruthy();
-
-            // Restore jQuery.ajax to normal
-            jQuery.ajax.restore();
         });
 
         it('should handle successful responses', function () {
@@ -115,29 +110,22 @@ describe('SugarCRM Javascript API', function () {
 
     describe('urlBuilder', function () {
         it('should build resource URLs for resources without ids', function () {
-            var module = "Contacts";
-            var action = "create";
-            var url = this.api.buildURL(module, action);
-
-            expect(url).toEqual('/rest/v10/Contacts');
+            var url = this.api.buildURL("contacts", "create");
+            expect(url).toEqual('/rest/v10/contacts');
         });
 
         it('should build resource URLs for resources without ids if id exists in attributes', function () {
             var attributes = { id: "1" };
-            var module = "Contacts";
-            var action = "create";
-            var url = this.api.buildURL(module, action, attributes);
+            var url = this.api.buildURL("contacts", "create", attributes);
 
-            expect(url).toEqual('/rest/v10/Contacts');
+            expect(url).toEqual('/rest/v10/contacts');
         });
 
-        it('should build resource URLs for resources with ids', function () {
-            var module = "Contacts";
-            var action = "update";
+        it('should build resource URLs for resources with ID and standard actions', function () {
             var attributes = { id:'1234' };
-            var url = this.api.buildURL(module, action, attributes);
+            var url = this.api.buildURL("contacts", "update", attributes);
 
-            expect(url).toEqual('/rest/v10/Contacts/1234');
+            expect(url).toEqual('/rest/v10/contacts/1234');
         });
 
         it('should build resource URLs for resources with standard actions', function () {
@@ -153,42 +141,44 @@ describe('SugarCRM Javascript API', function () {
             var module = "Contacts";
             var action = "customAction";
             var attributes = { id:'1234' };
-            var url = this.api.buildURL(module, action, attributes);
+            var url = this.api.buildURL("contacts", "customAction", attributes);
 
-            expect(url).toEqual('/rest/v10/Contacts/1234/customAction');
+            expect(url).toEqual('/rest/v10/contacts/1234/customAction');
         });
 
         it('should build resource URLs for resources with link and related id', function () {
-            var module = "Contacts";
-            var action = "opportunities";
-            var attributes = { id:'1234', relatedId: '4567' };
-            var url = this.api.buildURL(module, action, attributes);
+            var attributes = {
+                id:'1234',
+                relatedId: '4567'
+            };
+            var url = this.api.buildURL("contacts", "opportunities", attributes);
 
-            expect(url).toEqual('/rest/v10/Contacts/1234/opportunities/4567');
+            expect(url).toEqual('/rest/v10/contacts/1234/opportunities/4567');
         });
 
 
         it('should build resource URLs for resources with custom params', function () {
-            var module = "Contacts";
-            var action = "update";
-            var params = [
-                {key:"fields", value:"first_name,last_name"},
-                {key:"timestamp", value:"NOW"}
-            ];
+            var params = {
+                "fields": "first_name,last_name",
+                "timestamp": "NOW",
+                "funky_param": "hello world/%"
+            };
+
             var attributes = { id:'1234'};
-            var url = this.api.buildURL(module, action, attributes, params);
-            expect(url).toEqual('/rest/v10/Contacts/1234?fields=first_name,last_name&timestamp=NOW');
+            var url = this.api.buildURL("contacts", "update", attributes, params);
+            expect(url).toEqual('/rest/v10/contacts/1234?fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello%20world%2F%25');
         });
     });
 
     describe('Bean CRUD actions', function () {
+
         it('search a module', function () {
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "Contacts";
             var query = "bob";
             var fields = "first_name,last_name";
 
-            this.server.respondWith("GET", "/rest/v10/Contacts/search?q=bob&fields=first_name,last_name",
+            this.server.respondWith("GET", "/rest/v10/Contacts/search?q=bob&fields=first_name%2Clast_name",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
 
@@ -301,7 +291,7 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/opportunities/1/contacts"].GET.response)]);
 
-            var xhr = this.api.relationships("read", module, attributes, null, this.callbacks);
+            this.api.relationships("read", module, attributes, null, this.callbacks);
 
             this.server.respond();
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/opportunities/1/contacts"].GET.response);
@@ -383,6 +373,7 @@ describe('SugarCRM Javascript API', function () {
     });
 
     describe('sugar actions', function () {
+
         it('should retrieve metadata', function () {
             var types = [];
             var modules = ["Contacts"];
@@ -394,17 +385,12 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.modules.Contacts)]);
 
-            var metadata = this.api.getMetadata(types, modules, this.callbacks);
+            this.api.getMetadata(types, modules, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
             expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?type=&filter=Contacts");
             expect(ajaxspy).toHaveBeenCalledOnce();
-
-            //restore spies
-            this.api.call.restore();
-            $.ajax.restore();
-            this.callbacks.success.restore();
         });
 
         it('should retrieve sugarFields', function () {
@@ -417,17 +403,12 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures.sugarFields)]);
 
-            var sugarFieldData = this.api.getSugarFields(hash, this.callbacks);
+            this.api.getSugarFields(hash, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures.sugarFields);
             expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/sugarFields?md5=asdf");
             expect(ajaxspy).toHaveBeenCalledOnce();
-
-            //restore spies
-            this.api.call.restore();
-            $.ajax.restore();
-            this.callbacks.success.restore();
         });
 
         it('should login users with correct credentials', function () {
@@ -450,18 +431,13 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
-            var loginResult = this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
+            this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
             this.server.respond(); //tell server to respond to pending async call
 
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
             expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/login");
             expect(ajaxspy).toHaveBeenCalledOnce();
             expect(this.api.isAuthenticated()).toBeTruthy();
-
-            //restore spies
-            this.api.call.restore();
-            $.ajax.restore();
-            this.callbacks.success.restore();
         });
 
         it('should not login users with incorrect credentials', function () {
@@ -484,7 +460,7 @@ describe('SugarCRM Javascript API', function () {
                 [500, {  "Content-Type":"application/json"},
                     ""]);
 
-            var loginResult = this.api.login(this.invalidUsername, this.invalidPassword, extraInfo, this.callbacks);
+            this.api.login(this.invalidUsername, this.invalidPassword, extraInfo, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
 
@@ -492,10 +468,6 @@ describe('SugarCRM Javascript API', function () {
             expect(spy.getCall(0).args[0].responseText).toEqual("");
             expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/login");
             expect(ajaxspy).toHaveBeenCalledOnce();
-
-            //restore spies
-            this.api.call.restore();
-            $.ajax.restore();
         });
 
         it('should check if user is authenticated', function () {
@@ -516,7 +488,7 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
-            var loginResult = this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
+            this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
             this.server.respond(); //tell server to respond to pending async call
 
             var loginState = this.api.isAuthenticated();
@@ -538,7 +510,7 @@ describe('SugarCRM Javascript API', function () {
                 [200, {"Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
-            var loginResult = this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
+            this.api.login(this.validUsername, this.validPassword, extraInfo, this.callbacks);
             this.server.respond(); //tell server to respond to pending async call
 
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
@@ -555,11 +527,6 @@ describe('SugarCRM Javascript API', function () {
             expect(result.status).toEqual(200);
             expect(result.responseText).toEqual("");
             expect(this.api.isAuthenticated()).toBeFalsy();
-
-            //restore spies
-            this.callbacks.success.restore();
-            this.api.call.restore();
-            $.ajax.restore();
         });
     });
 
