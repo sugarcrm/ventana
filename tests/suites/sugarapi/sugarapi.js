@@ -128,7 +128,18 @@ describe('SugarCRM Javascript API', function () {
             expect(url).toEqual('/rest/v10/contacts/1234');
         });
 
-        it('should build resource URLs for resources with ID and custom actions', function () {
+        it('should build resource URLs for resources with standard actions', function () {
+            var module = "Contacts";
+            var action = "";
+            var attributes = { id:'1234' };
+            var url = this.api.buildURL(module, action, attributes);
+
+            expect(url).toEqual('/rest/v10/Contacts/1234');
+        });
+
+        it('should build resource URLs for resources with custom actions', function () {
+            var module = "Contacts";
+            var action = "customAction";
             var attributes = { id:'1234' };
             var url = this.api.buildURL("contacts", "customAction", attributes);
 
