@@ -9,7 +9,7 @@ describe('SugarCRM Javascript API', function () {
         this.api = SUGAR.Api.getInstance({baseUrl:"/rest/v10"});
         //get fresh fixtures
         this.fixtures = fixtures.api;
-        this.fixtures.sugarFields = sugarFieldsFixtures;
+        this.fixtures.sugarFields = fixtures.metadata.sugarFields;
         //create fakeserver to make requests
         this.server = sinon.fakeServer.create();
         this.callbacks = {
