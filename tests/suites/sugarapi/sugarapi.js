@@ -38,7 +38,19 @@ describe('SugarCRM Javascript API', function () {
     });
 
     it('should set oAuth Tokens', function () {
-        expect(typeof(this.api)).toBe('object');
+        var token = "1234";
+        this.api.setToken(token);
+
+        expect(this.api.isAuthenticated()).toBeTruthy();
+        this.api.setToken("");
+    });
+
+    it('should get oAuth tokens', function () {
+        var token = "1234";
+        this.api.setToken(token);
+
+        expect(this.api.getToken()).toEqual(token);
+        this.api.setToken("");
     });
 
     describe('requestHandler', function () {
