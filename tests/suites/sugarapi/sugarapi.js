@@ -37,6 +37,10 @@ describe('SugarCRM Javascript API', function () {
         expect(this.api.baseUrl).toEqual('/rest/v10');
     });
 
+    it('should set oAuth Tokens', function () {
+        expect(typeof(this.api)).toBe('object');
+    });
+
     describe('requestHandler', function () {
         it('should make a request with the correct request url', function () {
             // Spy on jQuery's ajax method
