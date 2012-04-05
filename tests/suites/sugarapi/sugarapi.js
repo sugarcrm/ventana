@@ -397,7 +397,7 @@ describe('SugarCRM Javascript API', function () {
             var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
-            this.server.respondWith("GET", "/rest/v10/metadata?type=&filter=Contacts",
+            this.server.respondWith("GET", "/rest/v10/metadata?typeFilter=&moduleFilter=Contacts",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.modules.Contacts)]);
 
@@ -405,7 +405,7 @@ describe('SugarCRM Javascript API', function () {
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?type=&filter=Contacts");
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?typeFilter=&moduleFilter=Contacts");
             expect(ajaxspy).toHaveBeenCalledOnce();
         });
 
