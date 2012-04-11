@@ -1,24 +1,9 @@
 describe('SugarCRM Javascript API', function () {
 
-    var storage = {};
-    var keyValueStore = {
-        set: function(key, value) {
-            storage[key] = value;
-        },
-        get: function(key) {
-            return storage[key];
-        },
-        cut: function(key) {
-            delete storage[key];
-        }
-    };
-
     beforeEach(function () {
-        this.storage = {};
-
         this.api = SUGAR.Api.createInstance({
             serverUrl:"/rest/v10",
-            keyValueStore: keyValueStore
+            keyValueStore: SugarTest.keyValueStore
         });
         //get fresh fixtures
         this.fixtures = fixtures.api;
@@ -42,9 +27,9 @@ describe('SugarCRM Javascript API', function () {
         if (this.callbacks.success.restore) this.callbacks.success.restore();
         if (this.api.call.restore) this.api.call.restore();
         if (jQuery.ajax.restore) jQuery.ajax.restore();
-        if (keyValueStore.set.restore) keyValueStore.set.restore();
-        if (keyValueStore.get.restore) keyValueStore.get.restore();
-        if (keyValueStore.cut.restore) keyValueStore.cut.restore();
+        if (SugarTest.keyValueStore.set.restore) SugarTest.keyValueStore.set.restore();
+        if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
+        if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
     });
 
 
@@ -56,13 +41,13 @@ describe('SugarCRM Javascript API', function () {
 
     it('should create an authenticated instance if storage has auth token set', function () {
 
-        storage.AuthAccessToken = "xyz";
-        var sspy = sinon.spy(keyValueStore, 'get');
+        SugarTest.storage.AuthAccessToken = "xyz";
+        var sspy = sinon.spy(SugarTest.keyValueStore, 'get');
 
         var api = SUGAR.Api.createInstance({
             serverUrl:"/rest/v10",
             platform: "portal",
-            keyValueStore: keyValueStore
+            keyValueStore: SugarTest.keyValueStore
         });
 
         expect(api.isAuthenticated()).toBeTruthy();
@@ -443,7 +428,7 @@ describe('SugarCRM Javascript API', function () {
             var callspy = sinon.spy(this.api, 'call');
             var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
-            var sspy = sinon.spy(keyValueStore, 'set');
+            var sspy = sinon.spy(SugarTest.keyValueStore, 'set');
             var extraInfo = {
                 "type":"text",
                 "client-info":{
@@ -471,7 +456,7 @@ describe('SugarCRM Javascript API', function () {
 
             expect(ajaxspy).toHaveBeenCalledOnce();
             expect(this.api.isAuthenticated()).toBeTruthy();
-            expect(storage["AuthAccessToken"]).toEqual("55000555");
+            expect(SugarTest.storage["AuthAccessToken"]).toEqual("55000555");
             expect(sspy).toHaveBeenCalled();
 
             // TODO: Check request body
@@ -481,7 +466,7 @@ describe('SugarCRM Javascript API', function () {
             var callspy = sinon.spy(this.api, 'call');
             var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'error');
-            var sspy = sinon.spy(keyValueStore, 'cut');
+            var sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
             this.server.respondWith("POST", "/rest/v10/login",
                 [401, {  "Content-Type":"application/json"},
                     ""]);
@@ -500,7 +485,7 @@ describe('SugarCRM Javascript API', function () {
             expect(ajaxspy).toHaveBeenCalledOnce();
 
             expect(this.api.isAuthenticated()).toBeFalsy();
-            expect(storage["AuthAccessToken"]).toBeUndefined();
+            expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
             expect(sspy).toHaveBeenCalled();
 
             // TODO: Check request body
@@ -510,7 +495,7 @@ describe('SugarCRM Javascript API', function () {
             var callspy = sinon.spy(this.api, 'call');
             var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
-            var sspy = sinon.spy(keyValueStore, 'cut');
+            var sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
 
             this.server.respondWith("POST", "/rest/v10/logout", [200, {"Content-Type":"application/json"}, ""]);
 
@@ -526,7 +511,7 @@ describe('SugarCRM Javascript API', function () {
             expect(ajaxspy).toHaveBeenCalled();
 
             expect(this.api.isAuthenticated()).toBeFalsy();
-            expect(storage["AuthAccessToken"]).toBeUndefined();
+            expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
             expect(sspy).toHaveBeenCalled();
 
             // TODO: Check request body
@@ -534,4 +519,3 @@ describe('SugarCRM Javascript API', function () {
     });
 
 });
-
