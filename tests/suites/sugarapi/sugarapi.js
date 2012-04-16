@@ -66,14 +66,14 @@ describe('SugarCRM Javascript API', function () {
             var spy = sinon.spy(jQuery, 'ajax');
 
             //@arguments: method, URL, options
-            this.api.call('read', '/rest/v10/contact');
+            this.api.call('read', '/rest/v10/contact', { date_modified: "2012-02-08 19:18:25" });
 
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
-            // Check url property of first argument
-            expect(spy.getCall(0).args[0].url)
-                .toEqual("/rest/v10/contact");
+            var args = spy.getCall(0).args[0];
+            expect(args.url).toEqual("/rest/v10/contact");
+            expect(args.headers["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
         });
 
         it('should set the right method on request', function () {
@@ -86,9 +86,9 @@ describe('SugarCRM Javascript API', function () {
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
-            // Check url property of first argument
-            expect(spy.getCall(0).args[0].type)
-                .toEqual("PUT");
+            var args = spy.getCall(0).args[0];
+            expect(args.type).toEqual("PUT");
+            expect(args.headers["If-Modified-Since"]).toBeUndefined();
         });
 
         it('should set the right options on request', function () {
@@ -101,8 +101,9 @@ describe('SugarCRM Javascript API', function () {
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
-            // Check url property of first argument
-            expect(spy.getCall(0).args[0].async).toBeTruthy();
+            var args = spy.getCall(0).args[0];
+            expect(args.async).toBeTruthy();
+            expect(args.headers["If-Modified-Since"]).toBeUndefined();
         });
 
         it('should handle successful responses', function () {
@@ -192,7 +193,7 @@ describe('SugarCRM Javascript API', function () {
         });
     });
 
-    describe('Bean CRUD actions', function () {
+    describe('Record CRUD actions', function () {
 
         it('search a module', function () {
             var spy = sinon.spy(this.callbacks, 'success');
@@ -213,23 +214,22 @@ describe('SugarCRM Javascript API', function () {
             expect(spy).toHaveBeenCalledWith(this.fixtures["rest/v10/contact"].GET.response[1]);
         });
 
-        it('should get a bean', function () {
+        it('should get a record', function () {
             var spy = sinon.spy(this.callbacks, 'success');
-            var module = "Contacts";
-            var params = "";
-            var attributes = {id:"1234"};
+            var attributes = {id:"1234", date_modified: "2012-02-08 19:18:25"};
 
             this.server.respondWith("GET", "/rest/v10/Contacts/1234",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].GET.response[1])]);
 
-            this.api.beans("read", module, attributes, params, this.callbacks);
+            this.api.records("read", "Contacts", attributes, null, this.callbacks);
+            this.server.respond();
 
-            this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].GET.response[1]);
+            expect(this.server.requests[0].requestHeaders["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
         });
 
-        it('should create bean', function () {
+        it('should create record', function () {
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "Contacts";
             var params = "";
@@ -239,14 +239,14 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].POST.response)]);
 
-            this.api.beans("create", module, attributes, params, this.callbacks);
+            this.api.records("create", module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].POST.response);
             // TODO: Check request body
         });
 
-        it('should get beans', function () {
+        it('should get records', function () {
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "Contacts";
             var params = "";
@@ -256,13 +256,13 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/contact"].GET.response)]);
 
-            this.api.beans("read", module, attributes, params, this.callbacks);
+            this.api.records("read", module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].GET.response);
         });
 
-        it('should update bean', function () {
+        it('should update record', function () {
             var module = "Contacts";
             var params = "";
             var attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"1234123", description:"This dude is cool."};
@@ -272,7 +272,7 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     ""]);
 
-            this.api.beans("update", module, attributes, params, this.callbacks);
+            this.api.records("update", module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(null);
@@ -281,7 +281,7 @@ describe('SugarCRM Javascript API', function () {
             // TODO: Check request body
         });
 
-        it('should delete bean', function () {
+        it('should delete record', function () {
             var spy1 = sinon.spy(this.callbacks, 'error');
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "Contacts";
@@ -291,7 +291,7 @@ describe('SugarCRM Javascript API', function () {
             this.server.respondWith("DELETE", "/rest/v10/Contacts/1234",
                 [200, {  "Content-Type":"application/json"}, ""]);
 
-            this.api.beans("delete", module, attributes, params, this.callbacks);
+            this.api.records("delete", module, attributes, params, this.callbacks);
 
             this.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(null);
