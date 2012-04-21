@@ -5,26 +5,16 @@ describe('SugarCRM Javascript API', function () {
             serverUrl:"/rest/v10",
             keyValueStore: SugarTest.keyValueStore
         });
-        //get fresh fixtures
         this.fixtures = fixtures.api;
         this.fixtures.sugarFields = fixtures.metadata.sugarFields;
-        //create fakeserver to make requests
         SugarTest.seedFakeServer();
-        //this.server = sinon.fakeServer.create();
         this.callbacks = {
-            success:function (data) {
-                //console.log("sucess callback");
-                //console.log("data");
-                //console.log(data);
-            },
-            error:function (data) {
-                //console.log("error callback");
-            }
+            success:function (data) {},
+            error:function (data) {}
         };
     });
 
     afterEach(function () {
-        //if (this.server.restore) this.server.restore();
         if (this.callbacks.success.restore) this.callbacks.success.restore();
         if (this.api.call.restore) this.api.call.restore();
         if (jQuery.ajax.restore) jQuery.ajax.restore();
@@ -32,7 +22,6 @@ describe('SugarCRM Javascript API', function () {
         if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
     });
-
 
     it('should create a default api instance', function () {
         var api = SUGAR.Api.createInstance();
@@ -198,75 +187,82 @@ describe('SugarCRM Javascript API', function () {
     describe('Record CRUD actions', function () {
 
         it('search a module', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "Contacts";
-            var query = "bob";
-            var fields = "first_name,last_name";
+            var spy = sinon.spy(this.callbacks, 'success'),
+                module = "Contacts",
+                query = "bob",
+                recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1];
+                fields = "first_name,last_name";
 
             SugarTest.server.respondWith("GET", "/rest/v10/Contacts/search?q=bob&fields=first_name%2Clast_name",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/contact"].GET.response.records[1])]);
+                    JSON.stringify(recordOne)]);
 
             this.api.search(module, query, fields, this.callbacks);
 
-            SugarTest.server.respond(); //tell server to respond to pending async call
-
-            // expect success callback to have been called with the data from the response
+            SugarTest.server.respond(); 
             expect(spy).toHaveBeenCalledOnce();
-            expect(spy).toHaveBeenCalledWith(this.fixtures["rest/v10/contact"].GET.response.records[1]);
+            expect(spy).toHaveBeenCalledWith(recordOne);
         });
 
         it('should get a record', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var attributes = {id:"1234", date_modified: "2012-02-08 19:18:25"};
+            var spy = sinon.spy(this.callbacks, 'success'),
+                attributes = {id:"1234", date_modified: "2012-02-08 19:18:25"},
+                recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1];
 
             SugarTest.server.respondWith("GET", "/rest/v10/Contacts/1234",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/contact"].GET.response.records[1])]);
+                    JSON.stringify(recordOne)]);
 
             this.api.records("read", "Contacts", attributes, null, this.callbacks);
             SugarTest.server.respond();
 
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].GET.response.records[1]);
+            expect(spy.getCall(0).args[0]).toEqual(recordOne);
             expect(SugarTest.server.requests[0].requestHeaders["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
         });
 
         it('should create record', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "Contacts";
-            var params = "";
-            var attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"0980987", description:"This dude is cool."};
+            var spy = sinon.spy(this.callbacks, 'success'),
+                module = "Contacts", params = "", req = null,
+                attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"0980987", description:"This dude is cool."},
+                postResponse = this.fixtures["rest/v10/contact"].POST.response;
 
             SugarTest.server.respondWith("POST", "/rest/v10/Contacts",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/contact"].POST.response)]);
+                    JSON.stringify(postResponse)]);
 
             this.api.records("create", module, attributes, params, this.callbacks);
+            SugarTest.server.respond(); 
 
-            SugarTest.server.respond(); //tell server to respond to pending async call
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].POST.response);
-            // TODO: Check request body
+            expect(spy.getCall(0).args[0]).toEqual(postResponse);
+            req = SugarTest.server.requests[0];
+            expect(req.responseText).toMatch(/^{.guid/);
+            expect(req.requestBody).toEqual('{"first_name":"Ronald","last_name":"McDonald","phone_work":"0980987","description":"This dude is cool."}');
         });
 
         it('should get records', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "Contacts";
-            var params = "";
-            var attributes = {};
+            var spy = sinon.spy(this.callbacks, 'success'), 
+                module = "Contacts",
+                params = "", data = null, req = null, attributes = {},
+                records = this.fixtures["rest/v10/contact"].GET.response.records;
 
             SugarTest.server.respondWith("GET", "/rest/v10/Contacts",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/contact"].GET.response.records)]);
+                    JSON.stringify(records)]);
 
             this.api.records("read", module, attributes, params, this.callbacks);
+            SugarTest.server.respond(); 
 
-            SugarTest.server.respond(); //tell server to respond to pending async call
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/contact"].GET.response.records);
+            expect(spy.getCall(0).args[0]).toEqual(records);
+            req  = SugarTest.server.requests[0];
+            expect(req.requestBody).toBeNull();
+            data = JSON.parse(req.responseText);
+            expect(data.length).toEqual(2);
         });
 
         it('should update record', function () {
             var module = "Contacts";
             var params = "";
+            var req = null;
             var attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"1234123", description:"This dude is cool."};
             var spy = sinon.spy(this.callbacks, 'success');
 
@@ -275,12 +271,13 @@ describe('SugarCRM Javascript API', function () {
                     ""]);
 
             this.api.records("update", module, attributes, params, this.callbacks);
+            SugarTest.server.respond(); 
 
-            SugarTest.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(null);
             expect(spy.getCall(0).args[2].status).toEqual(200);
             expect(spy.getCall(0).args[2].responseText).toEqual("");
-            // TODO: Check request body
+            req  = SugarTest.server.requests[0];
+            expect(req.requestBody).toEqual(JSON.stringify(attributes));
         });
 
         it('should delete record', function () {
@@ -294,41 +291,44 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"}, ""]);
 
             this.api.records("delete", module, attributes, params, this.callbacks);
+            SugarTest.server.respond(); 
 
-            SugarTest.server.respond(); //tell server to respond to pending async call
             expect(spy.getCall(0).args[0]).toEqual(null);
             expect(spy.getCall(0).args[2].status).toEqual(200);
             expect(spy.getCall(0).args[2].responseText).toEqual("");
         });
-
     });
 
     describe('Relationship CRUD actions', function () {
 
         it('should fetch relationships', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "opportunities";
-            var attributes = {
-                id: "1",
-                link: "contacts"
-            };
+            var spy = sinon.spy(this.callbacks, 'success'),
+                module = "opportunities", data = null,
+                attributes = {
+                    id: "1",
+                    link: "contacts"
+                },
+                respFixture = this.fixtures["rest/v10/opportunities/1/contacts"].GET.response;
 
             SugarTest.server.respondWith("GET", "/rest/v10/opportunities/1/contacts",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/opportunities/1/contacts"].GET.response)]);
+                    JSON.stringify(respFixture)]);
 
             this.api.relationships("read", module, attributes, null, this.callbacks);
-
             SugarTest.server.respond();
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/opportunities/1/contacts"].GET.response);
-
+            
+            expect(spy.getCall(0).args[0]).toEqual(respFixture);
+            data = JSON.parse(SugarTest.server.requests[0].responseText);
+            expect(data.records.length).toEqual(3);
+            expect(data.next_offset).toEqual(2);
         });
 
 
         it('should create a relationship', function () {
-            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"];
+            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"].POST.response;
             var spy = sinon.spy(this.callbacks, 'success');
             var module = "opportunities";
+            var req = null, record = null;
             var attributes = {
                 id: '1',
                 link: "contacts",
@@ -341,19 +341,25 @@ describe('SugarCRM Javascript API', function () {
 
             SugarTest.server.respondWith("POST", "/rest/v10/opportunities/1/contacts",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(fixture.POST.response)]);
+                    JSON.stringify(fixture)]);
 
             this.api.relationships("create", module, attributes, null, this.callbacks);
 
             SugarTest.server.respond();
-            expect(SugarTest.server.requests[0].requestBody).toEqual(fixture.POST.request);
-            expect(spy.getCall(0).args[0]).toEqual(fixture.POST.response);
+
+            req = SugarTest.server.requests[0];
+            expect(JSON.parse(req.requestBody)).toEqual(attributes.related);
+            expect(spy.getCall(0).args[0]).toEqual(fixture);
+            expect(req.requestBody).toEqual(JSON.stringify(attributes.related));
+            record = JSON.parse(req.responseText).record;
+            expect(record.name).toEqual(fixture.record.name);
         });
 
 
         it('should update a relationship', function () {
-            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"];
+            var respFixture = this.fixtures["rest/v10/opportunities/1/contacts"].PUT.response;
             var module = "opportunities";
+            var requestBody = null;
             var spy = sinon.spy(this.callbacks, 'success');
 
             var attributes = {
@@ -366,13 +372,14 @@ describe('SugarCRM Javascript API', function () {
             };
 
             SugarTest.server.respondWith("PUT", "/rest/v10/opportunities/1/contacts/2",
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(fixture.PUT.response)]);
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(respFixture)]);
 
             this.api.relationships("update", module, attributes, null, this.callbacks);
 
             SugarTest.server.respond();
-            expect(SugarTest.server.requests[0].requestBody).toEqual(fixture.PUT.request);
-            expect(spy.getCall(0).args[0]).toEqual(fixture.PUT.response);
+            expect(spy.getCall(0).args[0]).toEqual(respFixture);
+            requestBody = SugarTest.server.requests[0].requestBody;
+            expect(requestBody).toEqual(JSON.stringify(attributes.related));
         });
 
         it('should delete a relationship', function () {
@@ -400,36 +407,41 @@ describe('SugarCRM Javascript API', function () {
 
     describe('Metadata actions', function () {
 
+        it('should delegate to the call method', function () {
+            var callspy = sinon.spy(this.api, 'call');
+
+            SugarTest.server.respondWith("GET", "/rest/v10/metadata?typeFilter=&moduleFilter=Contacts",
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify(fixtures.metadata.modules.Contacts)]);
+            this.api.getMetadata([], ['Contacts'], this.callbacks);
+            SugarTest.server.respond(); 
+
+            expect(callspy).toHaveBeenCalled();
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?typeFilter=&moduleFilter=Contacts");
+        });
+
         it('should retrieve metadata', function () {
             var types = [];
             var modules = ["Contacts"];
-            var callspy = sinon.spy(this.api, 'call');
-            var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
             SugarTest.server.respondWith("GET", "/rest/v10/metadata?typeFilter=&moduleFilter=Contacts",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.modules.Contacts)]);
 
-            var xhr = this.api.getMetadata(types, modules, this.callbacks);
-
+            this.api.getMetadata(types, modules, this.callbacks);
             SugarTest.server.respond(); //tell server to respond to pending async call
+
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
-
-            expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?typeFilter=&moduleFilter=Contacts");
-
-            expect(ajaxspy).toHaveBeenCalledOnce();
         });
 
     });
 
     describe("Authentication", function() {
         it('should login users with correct credentials', function () {
-            var callspy = sinon.spy(this.api, 'call');
-            var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
+            var requestBody = null;
             var sspy = sinon.spy(SugarTest.keyValueStore, 'set');
             var extraInfo = {
                 "type":"text",
@@ -447,76 +459,58 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
 
-            var xhr = this.api.login({ username: "admin", password: "password" }, extraInfo, this.callbacks);
+            this.api.login({ username: "admin", password: "password" }, extraInfo, this.callbacks);
             SugarTest.server.respond();
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
 
-            expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/login");
-
-            expect(ajaxspy).toHaveBeenCalledOnce();
             expect(this.api.isAuthenticated()).toBeTruthy();
             expect(SugarTest.storage["AuthAccessToken"]).toEqual("55000555");
             expect(sspy).toHaveBeenCalled();
 
-            // TODO: Check request body
+            requestBody = JSON.parse(SugarTest.server.requests[0].requestBody);
+            expect(requestBody['client-info'].uuid).toEqual(extraInfo['client-info'].uuid);
+            expect(requestBody.username).toEqual('admin');
         });
 
         it('should not login users with incorrect credentials', function () {
-            var callspy = sinon.spy(this.api, 'call');
-            var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'error');
             var sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
+
             SugarTest.server.respondWith("POST", "/rest/v10/login",
                 [401, {  "Content-Type":"application/json"},
                     ""]);
-
-            var xhr = this.api.login({ username:"invalid", password:"invalid" }, null, this.callbacks);
-
+            this.api.login({ username:"invalid", password:"invalid" }, null, this.callbacks);
             SugarTest.server.respond();
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0].status).toEqual(401);
             expect(spy.getCall(0).args[0].responseText).toEqual("");
 
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/login");
-            expect(callspy).toHaveBeenCalled();
-
-            expect(ajaxspy).toHaveBeenCalledOnce();
-
             expect(this.api.isAuthenticated()).toBeFalsy();
             expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
             expect(sspy).toHaveBeenCalled();
 
-            // TODO: Check request body
+            requestBody = JSON.parse(SugarTest.server.requests[0].requestBody);
+            expect(requestBody.username).toEqual('invalid');
+            expect(requestBody.password).toEqual('invalid');
         });
 
         it('should logout user', function () {
-            var callspy = sinon.spy(this.api, 'call');
-            var ajaxspy = sinon.spy($, 'ajax');
             var spy = sinon.spy(this.callbacks, 'success');
             var sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
 
             SugarTest.server.respondWith("POST", "/rest/v10/logout", [200, {"Content-Type":"application/json"}, ""]);
 
-            var xhr = this.api.logout(this.callbacks);
-
+            this.api.logout(this.callbacks);
             SugarTest.server.respond();
 
             expect(spy).toHaveBeenCalled();
 
-            expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/logout");
-
-            expect(ajaxspy).toHaveBeenCalled();
-
             expect(this.api.isAuthenticated()).toBeFalsy();
             expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
             expect(sspy).toHaveBeenCalled();
-
-            // TODO: Check request body
         });
     });
 
