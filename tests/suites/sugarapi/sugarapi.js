@@ -32,13 +32,12 @@ describe('SugarCRM Javascript API', function () {
     it('should create an authenticated instance if storage has auth token set', function () {
 
         SugarTest.storage.AuthAccessToken = "xyz";
-        var sspy = sinon.spy(SugarTest.keyValueStore, 'get');
-
-        var api = SUGAR.Api.createInstance({
-            serverUrl:"/rest/v10",
-            platform: "portal",
-            keyValueStore: SugarTest.keyValueStore
-        });
+        var sspy = sinon.spy(SugarTest.keyValueStore, 'get'),
+            api = SUGAR.Api.createInstance({
+                serverUrl:"/rest/v10",
+                platform: "portal",
+                keyValueStore: SugarTest.keyValueStore
+            });
 
         expect(api.isAuthenticated()).toBeTruthy();
         expect(sspy).toHaveBeenCalled();
@@ -53,7 +52,7 @@ describe('SugarCRM Javascript API', function () {
     describe('Request Handler', function () {
         it('should make a request with the correct request url', function () {
             // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax');
+            var spy = sinon.spy(jQuery, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contact', { date_modified: "2012-02-08 19:18:25" });
@@ -61,14 +60,14 @@ describe('SugarCRM Javascript API', function () {
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
-            var args = spy.getCall(0).args[0];
+            args = spy.getCall(0).args[0];
             expect(args.url).toEqual("/rest/v10/contact");
             expect(args.headers["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
         });
 
         it('should set the right method on request', function () {
             // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax');
+            var spy = sinon.spy(jQuery, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('update', '/rest/v10/contacts');
@@ -76,14 +75,14 @@ describe('SugarCRM Javascript API', function () {
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
-            var args = spy.getCall(0).args[0];
+            args = spy.getCall(0).args[0];
             expect(args.type).toEqual("PUT");
             expect(args.headers["If-Modified-Since"]).toBeUndefined();
         });
 
         it('should set the right options on request', function () {
             // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax');
+            var spy = sinon.spy(jQuery, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contacts', null, null, {async:true});
@@ -91,14 +90,14 @@ describe('SugarCRM Javascript API', function () {
             // Spy was called
             expect(spy).toHaveBeenCalled();
 
-            var args = spy.getCall(0).args[0];
+            args = spy.getCall(0).args[0];
             expect(args.async).toBeTruthy();
             expect(args.headers["If-Modified-Since"]).toBeUndefined();
         });
 
         it('should handle successful responses', function () {
-            var aContact = this.fixtures["rest/v10/contact"].GET.response.records[1];
-            var uri = "/rest/v10/contacts/1234", result;
+            var aContact = this.fixtures["rest/v10/contact"].GET.response.records[1],
+                uri = "/rest/v10/contacts/1234", result;
 
             SugarTest.server.respondWith("GET", uri,
                 [200, {  "Content-Type":"application/json"},
@@ -129,43 +128,43 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should build resource URLs for resources without ids if id exists in attributes', function () {
-            var attributes = { id: "1" };
-            var url = this.api.buildURL("contacts", "create", attributes);
+            var attributes = { id: "1" },
+                url = this.api.buildURL("contacts", "create", attributes);
 
             expect(url).toEqual('/rest/v10/contacts');
         });
 
         it('should build resource URLs for resources with ID and standard actions', function () {
-            var attributes = { id:'1234' };
-            var url = this.api.buildURL("contacts", "update", attributes);
+            var attributes = { id:'1234' },
+                url = this.api.buildURL("contacts", "update", attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234');
         });
 
         it('should build resource URLs for resources with standard actions', function () {
-            var module = "Contacts";
-            var action = "";
-            var attributes = { id:'1234' };
-            var url = this.api.buildURL(module, action, attributes);
+            var module = "Contacts",
+                action = "",
+                attributes = { id:'1234' },
+                url = this.api.buildURL(module, action, attributes);
 
             expect(url).toEqual('/rest/v10/Contacts/1234');
         });
 
         it('should build resource URLs for resources with custom actions', function () {
-            var module = "Contacts";
-            var action = "customAction";
-            var attributes = { id:'1234' };
-            var url = this.api.buildURL("contacts", "customAction", attributes);
+            var module = "Contacts",
+                action = "customAction",
+                attributes = { id:'1234' },
+                url = this.api.buildURL("contacts", "customAction", attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234/customAction');
         });
 
         it('should build resource URLs for resources with link and related id', function () {
             var attributes = {
-                id:'1234',
-                relatedId: '4567'
-            };
-            var url = this.api.buildURL("contacts", "opportunities", attributes);
+                    id:'1234',
+                    relatedId: '4567'
+                },
+                url = this.api.buildURL("contacts", "opportunities", attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234/opportunities/4567');
         });
@@ -173,13 +172,12 @@ describe('SugarCRM Javascript API', function () {
 
         it('should build resource URLs for resources with custom params', function () {
             var params = {
-                "fields": "first_name,last_name",
-                "timestamp": "NOW",
-                "funky_param": "hello world/%"
-            };
-
-            var attributes = { id:'1234'};
-            var url = this.api.buildURL("contacts", "update", attributes, params);
+                    "fields": "first_name,last_name",
+                    "timestamp": "NOW",
+                    "funky_param": "hello world/%"
+                },
+                attributes = { id:'1234'},
+                url = this.api.buildURL("contacts", "update", attributes, params);
             expect(url).toEqual('/rest/v10/contacts/1234?fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello+world%2F%25');
         });
     });
@@ -190,7 +188,7 @@ describe('SugarCRM Javascript API', function () {
             var spy = sinon.spy(this.callbacks, 'success'),
                 module = "Contacts",
                 query = "bob",
-                recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1];
+                recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 fields = "first_name,last_name";
 
             SugarTest.server.respondWith("GET", "/rest/v10/Contacts/search?q=bob&fields=first_name%2Clast_name",
@@ -235,7 +233,7 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy.getCall(0).args[0]).toEqual(postResponse);
             req = SugarTest.server.requests[0];
-            expect(req.responseText).toMatch(/^{.guid/);
+            expect(req.responseText).toMatch(/^\{.guid/);
             expect(req.requestBody).toEqual('{"first_name":"Ronald","last_name":"McDonald","phone_work":"0980987","description":"This dude is cool."}');
         });
 
@@ -260,11 +258,11 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should update record', function () {
-            var module = "Contacts";
-            var params = "";
-            var req = null;
-            var attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"1234123", description:"This dude is cool."};
-            var spy = sinon.spy(this.callbacks, 'success');
+            var module = "Contacts",
+                params = "",
+                req = null,
+                attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"1234123", description:"This dude is cool."},
+                spy = sinon.spy(this.callbacks, 'success');
 
             SugarTest.server.respondWith("PUT", "/rest/v10/Contacts",
                 [200, {  "Content-Type":"application/json"},
@@ -281,11 +279,11 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should delete record', function () {
-            var spy1 = sinon.spy(this.callbacks, 'error');
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "Contacts";
-            var params = "";
-            var attributes = {id:"1234"};
+            var spy1 = sinon.spy(this.callbacks, 'error'),
+                spy = sinon.spy(this.callbacks, 'success'),
+                module = "Contacts",
+                params = "",
+                attributes = {id:"1234"};
 
             SugarTest.server.respondWith("DELETE", "/rest/v10/Contacts/1234",
                 [200, {  "Content-Type":"application/json"}, ""]);
@@ -325,19 +323,19 @@ describe('SugarCRM Javascript API', function () {
 
 
         it('should create a relationship', function () {
-            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"].POST.response;
-            var spy = sinon.spy(this.callbacks, 'success');
-            var module = "opportunities";
-            var req = null, record = null;
-            var attributes = {
-                id: '1',
-                link: "contacts",
-                related: {
-                    first_name: "Ronald",
-                    last_name: "McDonald",
-                    opportunity_role: "Influencer"
-                }
-            };
+            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"].POST.response,
+                spy = sinon.spy(this.callbacks, 'success'),
+                module = "opportunities",
+                req = null, record = null,
+                attributes = {
+                    id: '1',
+                    link: "contacts",
+                    related: {
+                        first_name: "Ronald",
+                        last_name: "McDonald",
+                        opportunity_role: "Influencer"
+                    }
+                };
 
             SugarTest.server.respondWith("POST", "/rest/v10/opportunities/1/contacts",
                 [200, {  "Content-Type":"application/json"},
@@ -357,19 +355,18 @@ describe('SugarCRM Javascript API', function () {
 
 
         it('should update a relationship', function () {
-            var respFixture = this.fixtures["rest/v10/opportunities/1/contacts"].PUT.response;
-            var module = "opportunities";
-            var requestBody = null;
-            var spy = sinon.spy(this.callbacks, 'success');
-
-            var attributes = {
-                id: '1',
-                link: "contacts",
-                relatedId: "2",
-                related: {
-                    opportunity_role: "Primary Decision Maker"
-                }
-            };
+            var respFixture = this.fixtures["rest/v10/opportunities/1/contacts"].PUT.response,
+                module = "opportunities",
+                requestBody = null,
+                spy = sinon.spy(this.callbacks, 'success'),
+                attributes = {
+                    id: '1',
+                    link: "contacts",
+                    relatedId: "2",
+                    related: {
+                        opportunity_role: "Primary Decision Maker"
+                    }
+                };
 
             SugarTest.server.respondWith("PUT", "/rest/v10/opportunities/1/contacts/2",
                 [200, {  "Content-Type":"application/json"}, JSON.stringify(respFixture)]);
@@ -383,15 +380,14 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should delete a relationship', function () {
-            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"];
-            var module = "opportunities";
-            var spy = sinon.spy(this.callbacks, 'success');
-
-            var attributes = {
-                id: '1',
-                link: "contacts",
-                relatedId: "2"
-            };
+            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"],
+                module = "opportunities",
+                spy = sinon.spy(this.callbacks, 'success'),
+                attributes = {
+                    id: '1',
+                    link: "contacts",
+                    relatedId: "2"
+                };
 
             SugarTest.server.respondWith("DELETE", "/rest/v10/opportunities/1/contacts/2",
                 [200, {  "Content-Type":"application/json"}, JSON.stringify(fixture.DELETE.response)]);
@@ -421,9 +417,9 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should retrieve metadata', function () {
-            var types = [];
-            var modules = ["Contacts"];
-            var spy = sinon.spy(this.callbacks, 'success');
+            var types = [],
+                modules = ["Contacts"],
+                spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
             SugarTest.server.respondWith("GET", "/rest/v10/metadata?typeFilter=&moduleFilter=Contacts",
                 [200, {  "Content-Type":"application/json"},
@@ -440,20 +436,20 @@ describe('SugarCRM Javascript API', function () {
 
     describe("Authentication", function() {
         it('should login users with correct credentials', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var requestBody = null;
-            var sspy = sinon.spy(SugarTest.keyValueStore, 'set');
-            var extraInfo = {
-                "type":"text",
-                "client-info":{
-                    "uuid":"xyz",
-                    "model":"iPhone3,1",
-                    "osVersion":"5.0.1",
-                    "carrier":"att",
-                    "appVersion":"SugarMobile 1.0",
-                    "ismobile":true
-                }
-            };
+            var spy = sinon.spy(this.callbacks, 'success'),
+                requestBody = null,
+                sspy = sinon.spy(SugarTest.keyValueStore, 'set'),
+                extraInfo = {
+                    "type":"text",
+                    "client-info":{
+                        "uuid":"xyz",
+                        "model":"iPhone3,1",
+                        "osVersion":"5.0.1",
+                        "carrier":"att",
+                        "appVersion":"SugarMobile 1.0",
+                        "ismobile":true
+                    }
+                };
 
             SugarTest.server.respondWith("POST", "/rest/v10/login",
                 [200, {  "Content-Type":"application/json"},
@@ -475,8 +471,8 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should not login users with incorrect credentials', function () {
-            var spy = sinon.spy(this.callbacks, 'error');
-            var sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
+            var spy = sinon.spy(this.callbacks, 'error'),
+                sspy = sinon.spy(SugarTest.keyValueStore, 'cut'), requestBody;
 
             SugarTest.server.respondWith("POST", "/rest/v10/login",
                 [401, {  "Content-Type":"application/json"},
@@ -498,8 +494,8 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should logout user', function () {
-            var spy = sinon.spy(this.callbacks, 'success');
-            var sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
+            var spy = sinon.spy(this.callbacks, 'success'),
+                sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
 
             SugarTest.server.respondWith("POST", "/rest/v10/logout", [200, {"Content-Type":"application/json"}, ""]);
 
