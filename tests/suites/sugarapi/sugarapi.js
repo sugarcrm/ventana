@@ -180,6 +180,13 @@ describe('SugarCRM Javascript API', function () {
                 url = this.api.buildURL("contacts", "update", attributes, params);
             expect(url).toEqual('/rest/v10/contacts/1234?fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello+world%2F%25');
         });
+
+        it('should build resource URLs for fetching a link', function() {
+            var params = { maxresult: 20 },
+            attributes = { id:'seed_jim_id', link:'reportees', related: null, relatedId: undefined },
+            url = this.api.buildURL("Users", "reportees", attributes, params);
+            expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?maxresult=20');
+        });
     });
 
     describe('Record CRUD actions', function () {
