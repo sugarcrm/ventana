@@ -313,9 +313,9 @@ describe('SugarCRM Javascript API', function () {
                     id: "1",
                     link: "contacts"
                 },
-                respFixture = this.fixtures["rest/v10/opportunities/1/contacts"].GET.response;
+                respFixture = this.fixtures["rest/v10/opportunities/1/link/contacts"].GET.response;
 
-            SugarTest.server.respondWith("GET", "/rest/v10/opportunities/1/contacts",
+            SugarTest.server.respondWith("GET", "/rest/v10/opportunities/1/link/contacts",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(respFixture)]);
 
@@ -330,7 +330,7 @@ describe('SugarCRM Javascript API', function () {
 
 
         it('should create a relationship', function () {
-            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"].POST.response,
+            var fixture = this.fixtures["rest/v10/opportunities/1/link/contacts"].POST.response,
                 spy = sinon.spy(this.callbacks, 'success'),
                 module = "opportunities",
                 req = null, record = null,
@@ -344,7 +344,7 @@ describe('SugarCRM Javascript API', function () {
                     }
                 };
 
-            SugarTest.server.respondWith("POST", "/rest/v10/opportunities/1/contacts",
+            SugarTest.server.respondWith("POST", "/rest/v10/opportunities/1/link/contacts",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixture)]);
 
@@ -362,7 +362,7 @@ describe('SugarCRM Javascript API', function () {
 
 
         it('should update a relationship', function () {
-            var respFixture = this.fixtures["rest/v10/opportunities/1/contacts"].PUT.response,
+            var respFixture = this.fixtures["rest/v10/opportunities/1/link/contacts"].PUT.response,
                 module = "opportunities",
                 requestBody = null,
                 spy = sinon.spy(this.callbacks, 'success'),
@@ -375,7 +375,7 @@ describe('SugarCRM Javascript API', function () {
                     }
                 };
 
-            SugarTest.server.respondWith("PUT", "/rest/v10/opportunities/1/contacts/2",
+            SugarTest.server.respondWith("PUT", "/rest/v10/opportunities/1/link/contacts/2",
                 [200, {  "Content-Type":"application/json"}, JSON.stringify(respFixture)]);
 
             this.api.relationships("update", module, attributes, null, this.callbacks);
@@ -387,7 +387,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should delete a relationship', function () {
-            var fixture = this.fixtures["rest/v10/opportunities/1/contacts"],
+            var fixture = this.fixtures["rest/v10/opportunities/1/link/contacts"],
                 module = "opportunities",
                 spy = sinon.spy(this.callbacks, 'success'),
                 attributes = {
@@ -396,7 +396,7 @@ describe('SugarCRM Javascript API', function () {
                     relatedId: "2"
                 };
 
-            SugarTest.server.respondWith("DELETE", "/rest/v10/opportunities/1/contacts/2",
+            SugarTest.server.respondWith("DELETE", "/rest/v10/opportunities/1/link/contacts/2",
                 [200, {  "Content-Type":"application/json"}, JSON.stringify(fixture.DELETE.response)]);
 
             this.api.relationships("delete", module, attributes, null, this.callbacks);
