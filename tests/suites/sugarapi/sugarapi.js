@@ -182,10 +182,10 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should build resource URLs for fetching a link', function() {
-            var params = { maxresult: 20 },
+            var params = { max_num: 20 },
             attributes = { id:'seed_jim_id', link:'reportees', related: null, relatedId: undefined },
             url = this.api.buildURL("Users", "reportees", attributes, params);
-            expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?maxresult=20');
+            expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?max_num=20');
         });
     });
 
