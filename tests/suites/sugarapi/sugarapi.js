@@ -197,12 +197,11 @@ describe('SugarCRM Javascript API', function () {
                 query = "bob",
                 recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 fields = "first_name,last_name";
-
-                SugarTest.server.respondWith("GET", "/rest/v10/search?q=bob&fields=Contacts%2C+Bugs%2C+Leads&moduleList=first_name%2Clast_name&max_num=20",
+                SugarTest.server.respondWith("GET", /.*\/rest\/v10\/search\?.*q=bob/,
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
-            this.api.search(query, modules, fields, 20, this.callbacks);
+            this.api.search({query:query, moduleList: modules, fields: fields, maxNum:20}, this.callbacks);
             SugarTest.server.respond(); 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(recordOne);
