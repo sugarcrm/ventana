@@ -6,7 +6,7 @@ describe('SugarCRM Javascript API', function () {
             keyValueStore: SugarTest.keyValueStore
         });
         this.fixtures = fixtures.api;
-        this.fixtures.sugarFields = fixtures.metadata.sugarFields;
+        this.fixtures.fields = fixtures.metadata.fields;
         SugarTest.seedFakeServer();
         this.callbacks = {
             success:function (data) {},
