@@ -6,7 +6,7 @@ describe('SugarCRM Javascript API', function () {
             keyValueStore: SugarTest.keyValueStore
         });
         this.fixtures = fixtures.api;
-        this.fixtures.sugarFields = fixtures.metadata.sugarFields;
+        this.fixtures.fields = fixtures.metadata.fields;
         SugarTest.seedFakeServer();
         this.callbacks = {
             success:function (data) {},
@@ -193,17 +193,15 @@ describe('SugarCRM Javascript API', function () {
 
         it('search a module', function () {
             var spy = sinon.spy(this.callbacks, 'success'),
-                module = "Contacts",
+                modules = "Contacts, Bugs, Leads",
                 query = "bob",
                 recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 fields = "first_name,last_name";
-
-            SugarTest.server.respondWith("GET", "/rest/v10/Contacts/search?q=bob&fields=first_name%2Clast_name",
+                SugarTest.server.respondWith("GET", /.*\/rest\/v10\/search\?.*q=bob/,
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
-            this.api.search(module, query, fields, this.callbacks);
-
+            this.api.search({query:query, moduleList: modules, fields: fields, maxNum:20}, this.callbacks);
             SugarTest.server.respond(); 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(recordOne);
@@ -458,15 +456,15 @@ describe('SugarCRM Javascript API', function () {
                     }
                 };
 
-            SugarTest.server.respondWith("POST", "/rest/v10/login",
+            SugarTest.server.respondWith("POST", "/rest/v10/oauth2/token",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(this.fixtures["rest/v10/login"].POST.response)]);
+                    JSON.stringify(this.fixtures["/rest/v10/oauth2/token"].POST.response)]);
 
             this.api.login({ username: "admin", password: "password" }, extraInfo, this.callbacks);
             SugarTest.server.respond();
 
             expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["rest/v10/login"].POST.response);
+            expect(spy.getCall(0).args[0]).toEqual(this.fixtures["/rest/v10/oauth2/token"].POST.response);
 
             expect(this.api.isAuthenticated()).toBeTruthy();
             expect(SugarTest.storage["AuthAccessToken"]).toEqual("55000555");
@@ -481,7 +479,7 @@ describe('SugarCRM Javascript API', function () {
             var spy = sinon.spy(this.callbacks, 'error'),
                 sspy = sinon.spy(SugarTest.keyValueStore, 'cut'), requestBody;
 
-            SugarTest.server.respondWith("POST", "/rest/v10/login",
+            SugarTest.server.respondWith("POST", "/rest/v10/oauth2/token",
                 [401, {  "Content-Type":"application/json"},
                     ""]);
             this.api.login({ username:"invalid", password:"invalid" }, null, this.callbacks);
@@ -504,7 +502,7 @@ describe('SugarCRM Javascript API', function () {
             var spy = sinon.spy(this.callbacks, 'success'),
                 sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
 
-            SugarTest.server.respondWith("POST", "/rest/v10/logout", [200, {"Content-Type":"application/json"}, ""]);
+            SugarTest.server.respondWith("POST", "/rest/v10/oauth2/logout", [200, {"Content-Type":"application/json"}, ""]);
 
             this.api.logout(this.callbacks);
             SugarTest.server.respond();
