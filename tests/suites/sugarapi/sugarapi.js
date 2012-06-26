@@ -187,6 +187,13 @@ describe('SugarCRM Javascript API', function () {
             url = this.api.buildURL("Users", "reportees", attributes, params);
             expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?max_num=20');
         });
+
+        it('should build resource URLs to access the File API', function() {
+            var params = { format: "sugar-html-json" },
+            attributes = { id:'note_id', fileField: 'fileField', link:'notes' },
+            url = this.api.buildURL("Notes", "file", attributes, params);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
+        });
     });
 
     describe('Record CRUD actions', function () {
