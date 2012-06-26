@@ -189,10 +189,17 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should build resource URLs to access the File API', function() {
-            var params = { format: "sugar-html-json" },
-            attributes = { id:'note_id', fileField: 'fileField', link:'notes' },
-            url = this.api.buildURL("Notes", "file", attributes, params);
+            var attributes = { module: 'Notes', id: 'note_id', field: 'fileField' },
+            options = { passOAuthToken: false },
+            url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
+
+            url = this.api.buildFileURL(attributes);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&oauth_token=undefined');
+
+            options = { passOAuthToken: false, htmlJsonFormat: false };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
         });
     });
 
