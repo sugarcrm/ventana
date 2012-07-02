@@ -111,7 +111,8 @@ describe('SugarCRM Javascript API', function () {
 
         it('should handle successful responses', function () {
             var aContact = this.fixtures["rest/v10/contact"].GET.response.records[1],
-                uri = "/rest/v10/contacts/1234", result;
+                uri = "/rest/v10/Contacts/1234", 
+                result;
 
             SugarTest.server.respondWith("GET", uri,
                 [200, {  "Content-Type":"application/json"},
