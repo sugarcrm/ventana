@@ -1,5 +1,16 @@
 describe('SugarCRM Javascript API', function () {
 
+    function restoreApiSingleton() {
+        // Essentially, this will go back to an API instance per user's config file
+        SUGAR.Api.createInstance({
+            serverUrl: SUGAR.App.config.serverUrl,
+            platform: SUGAR.App.config.platform,
+            timeout: SUGAR.App.config.serverTimeout,
+            keyValueStore: SUGAR.App[SUGAR.App.config.authStore || "cache"],
+            clientID: SUGAR.App.config.clientID
+        });
+    }
+
     beforeEach(function () {
         this.api = SUGAR.Api.createInstance({
             serverUrl:"/rest/v10",
@@ -21,6 +32,9 @@ describe('SugarCRM Javascript API', function () {
         if (SugarTest.keyValueStore.set.restore) SugarTest.keyValueStore.set.restore();
         if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
+
+        // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
+        restoreApiSingleton();
     });
 
     it('should create a default api instance', function () {
