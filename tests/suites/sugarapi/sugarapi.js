@@ -230,7 +230,7 @@ describe('SugarCRM Javascript API', function () {
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
-            this.api.search({query:query, moduleList: modules, fields: fields, maxNum:20}, this.callbacks);
+            this.api.search({q:query, moduleList: modules, fields: fields, max_num:20}, this.callbacks);
             SugarTest.server.respond(); 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(recordOne);
