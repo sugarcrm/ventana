@@ -477,9 +477,22 @@ describe('SugarCRM Javascript API', function () {
     });
 
     describe("Authentication", function() {
+
+        it("should be able to detect when to refresh auth token", function() {
+            this.api.setRefreshingToken(true);
+            expect(this.api.needRefreshAuthToken()).toBeFalsy();
+
+            this.api.setRefreshingToken(false);
+            expect(this.api.needRefreshAuthToken("/rest/v10/Accounts/xyz", "need_login")).toBeFalsy();
+            expect(this.api.needRefreshAuthToken("Accounts/xyz", "conflict")).toBeFalsy();
+            expect(this.api.needRefreshAuthToken("/rest/v10/oauth2/token", "invalid_grant")).toBeFalsy();
+            expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/oauth2/logout", "invalid_grant")).toBeFalsy();
+            expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/Contacts", "invalid_grant")).toBeTruthy();
+            expect(this.api.needRefreshAuthToken("../sugarcrm/rest/v10/search", "invalid_grant")).toBeTruthy();
+        });
+
         it('should login users with correct credentials', function () {
             var spy = sinon.spy(this.callbacks, 'success'),
-                requestBody = null,
                 sspy = sinon.spy(SugarTest.keyValueStore, 'set'),
                 extraInfo = {
                     "type":"text",
@@ -527,7 +540,7 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0].status).toEqual(401);
-            expect(spy.getCall(0).args[0].oAuthCode).toEqual("need_login");
+            expect(spy.getCall(0).args[0].code).toEqual("need_login");
 
             expect(this.api.isAuthenticated()).toBeFalsy();
             expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
@@ -565,7 +578,7 @@ describe('SugarCRM Javascript API', function () {
                     status = 401;
                     responseText = JSON.stringify(response);
                 }
-                xhr.respond(status, null, responseText);
+                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
             });
 
             var request = this.api.records("read", "Accounts", null, null, this.callbacks);
@@ -606,7 +619,7 @@ describe('SugarCRM Javascript API', function () {
                     responseText = JSON.stringify(response);
                 }
                 num++;
-                xhr.respond(status, null, responseText);
+                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
             });
 
             var request = this.api.records("read", "Accounts", null, null, this.callbacks);
@@ -635,7 +648,7 @@ describe('SugarCRM Javascript API', function () {
                 var status = 401;
                 var responseText = JSON.stringify(response);
                 num++;
-                xhr.respond(status, null, responseText);
+                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
             });
 
             var request = this.api.records("read", "Accounts", null, null, this.callbacks);
@@ -659,7 +672,7 @@ describe('SugarCRM Javascript API', function () {
             var response = {"error": "invalid_grant", "error_description": "some desc"};
 
             SugarTest.server.respondWith(function(xhr) {
-                xhr.respond(400, null, JSON.stringify(response));
+                xhr.respond(400, {"Content-Type": "application/json"}, JSON.stringify(response));
             });
 
             var request = this.api.login({ username: "a", password: "b"}, null, this.callbacks);
@@ -706,67 +719,37 @@ describe('SugarCRM Javascript API', function () {
             expect(error.responseText).toEqual("response text");
             expect(error.textStatus).toEqual("text status");
             expect(error.errorThrown).toEqual("error thrown");
-            expect(error.oAuthCode).toBeUndefined();
-            expect(error.isAuthTokenExpired()).toBeFalsy();
+            expect(error.code).toBeUndefined();
         });
 
-        it("should be able parse OAuth code", function() {
+        it("should be able parse error code", function() {
             var xhr, error;
             xhr = {
                 status: 401,
-                responseText: JSON.stringify({"error": "invalid_grant", "error_description": "some desc"})
+                responseText: JSON.stringify({"error": "invalid_grant", "error_description": "some desc"}),
+                getResponseHeader: function() { return "application/json"; }
             };
 
             error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
-            expect(error.oAuthCode).toEqual("invalid_grant");
-            expect(error.isAuthTokenExpired()).toBeTruthy();
+            expect(error.status).toEqual(401);
+            expect(error.code).toEqual("invalid_grant");
+            expect(error.description).toEqual("some desc");
 
             xhr = {
-                status: 400,
-                responseText: JSON.stringify({"error": "invalid_grant", "error_description": "some desc"})
+                status: 500,
+                responseText: "Something really bad happened",
+                getResponseHeader: function() { return "text/html; charset=iso-8859-1"; }
             };
 
             error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
-            expect(error.oAuthCode).toEqual("invalid_grant");
-            expect(error.isAuthTokenExpired()).toBeTruthy();
-
-            xhr = {
-                status: 400,
-                responseText: JSON.stringify({"error": "need_login", "error_description": "some desc"})
-            };
-
-            error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
-            expect(error.oAuthCode).toEqual("need_login");
-            expect(error.isAuthTokenExpired()).toBeFalsy();
-
+            expect(error.status).toEqual(500);
+            expect(error.code).toBeUndefined();
+            expect(error.description).toBeUndefined();
         });
 
     });
 
     describe("HttpRequest", function() {
-
-        it("should be able to detect auth request", function() {
-            var request;
-
-            request = new SUGAR.Api.HttpRequest({
-                url: "http://localhost:8888/sugarcrm/rest/v10/Accounts"
-            });
-
-            expect(request.isOAuth()).toBeFalsy();
-
-            request = new SUGAR.Api.HttpRequest({
-                url: "http://localhost:8888/sugarcrm/rest/v10/oauth2/token"
-            });
-
-            expect(request.isOAuth()).toBeTruthy();
-
-            request = new SUGAR.Api.HttpRequest({
-                url: "http://localhost:8888/sugarcrm/rest/v10/oauth2/logout"
-            });
-
-            expect(request.isOAuth()).toBeTruthy();
-
-        });
 
         it("should be able to set oauth header before executing ajax request", function() {
             var request;
