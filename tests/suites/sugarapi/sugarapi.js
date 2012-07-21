@@ -494,16 +494,14 @@ describe('SugarCRM Javascript API', function () {
         it('should login users with correct credentials', function () {
             var spy = sinon.spy(this.callbacks, 'success'),
                 sspy = sinon.spy(SugarTest.keyValueStore, 'set'),
+                requestBody,
                 extraInfo = {
-                    "type":"text",
-                    "client-info":{
-                        "uuid":"xyz",
-                        "model":"iPhone3,1",
-                        "osVersion":"5.0.1",
-                        "carrier":"att",
-                        "appVersion":"SugarMobile 1.0",
-                        "ismobile":true
-                    }
+                    "uuid":"xyz",
+                    "model":"iPhone3,1",
+                    "osVersion":"5.0.1",
+                    "carrier":"att",
+                    "appVersion":"SugarMobile 1.0",
+                    "ismobile":true
                 };
 
             SugarTest.server.respondWith("POST", "/rest/v10/oauth2/token",
@@ -521,7 +519,8 @@ describe('SugarCRM Javascript API', function () {
             expect(sspy).toHaveBeenCalled();
 
             requestBody = JSON.parse(SugarTest.server.requests[0].requestBody);
-            expect(requestBody['client-info'].uuid).toEqual(extraInfo['client-info'].uuid);
+            expect(requestBody['client_info']).toBeDefined();
+            expect(requestBody['client_info'].uuid).toEqual(extraInfo.uuid);
             expect(requestBody.username).toEqual('admin');
         });
 
