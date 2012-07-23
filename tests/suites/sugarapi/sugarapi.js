@@ -711,7 +711,8 @@ describe('SugarCRM Javascript API', function () {
         it("should be able properly instantiate itself", function() {
             var xhr = {
                 status: 404,
-                responseText: "response text"
+                responseText: "response text",
+                getResponseHeader: function() { return "application/json" }
             };
 
             var error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
