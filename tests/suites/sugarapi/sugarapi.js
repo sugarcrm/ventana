@@ -36,7 +36,7 @@ describe('SugarCRM Javascript API', function () {
         if (this.callbacks.error.restore) this.callbacks.error.restore();
         if (this.callbacks.complete.restore) this.callbacks.complete.restore();
         if (this.api.call.restore) this.api.call.restore();
-        if (jQuery.ajax.restore) jQuery.ajax.restore();
+        if ($.ajax.restore) $.ajax.restore();
         if (SugarTest.keyValueStore.set.restore) SugarTest.keyValueStore.set.restore();
         if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
@@ -73,8 +73,7 @@ describe('SugarCRM Javascript API', function () {
 
     describe('Request Handler', function () {
         it('should make a request with the correct request url', function () {
-            // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax'), args;
+            var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contact', { date_modified: "2012-02-08 19:18:25" });
@@ -88,8 +87,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should set the right method on request', function () {
-            // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax'), args;
+            var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('update', '/rest/v10/contacts');
@@ -104,8 +102,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should set the right options on request', function () {
-            // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax'), args;
+            var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contacts', null, null, {async:true});
@@ -765,7 +762,7 @@ describe('SugarCRM Javascript API', function () {
     describe("HttpRequest", function() {
 
         it("should be able to set oauth header before executing ajax request", function() {
-            var request, spy = sinon.spy(jQuery, 'ajax');
+            var request, spy = sinon.spy($, 'ajax');
             request = new SUGAR.Api.HttpRequest({});
 
             request.execute("xyz");
@@ -776,7 +773,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it("should count the number of current requests", function() {
-            var request, spy = sinon.spy(jQuery, 'ajax');
+            var request, spy = sinon.spy($, 'ajax');
             request = new SUGAR.Api.HttpRequest({});
             expect(SUGAR.Api.getCallsInProgressCount()).toBe(0);
             request.execute("xyz");
