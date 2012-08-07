@@ -460,17 +460,13 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should handle options params', function () {
-            var callspy = sinon.spy(this.api, 'call');
+            var callstub = sinon.stub(this.api, 'call');
 
-            SugarTest.server.respondWith("GET", "/rest/v10/metadata?typeFilter=&moduleFilter=Contacts",
-                [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(fixtures.metadata.modules.Contacts)]);
             this.api.getMetadata("hash", [], ['Contacts'], this.callbacks, {params:{lang:"en_us"}});
-            SugarTest.server.respond();
 
-            expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&typeFilter=&moduleFilter=Contacts&_hash=hash");
-            callspy.restore();
+            expect(callstub).toHaveBeenCalled();
+            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&typeFilter=&moduleFilter=Contacts&_hash=hash");
+            callstub.restore();
         });
 
         it('should retrieve metadata', function () {
