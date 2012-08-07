@@ -456,6 +456,17 @@ describe('SugarCRM Javascript API', function () {
 
             expect(callspy).toHaveBeenCalled();
             expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?typeFilter=&moduleFilter=Contacts&_hash=hash");
+            callspy.restore();
+        });
+
+        it('should handle options params', function () {
+            var callstub = sinon.stub(this.api, 'call');
+
+            this.api.getMetadata("hash", [], ['Contacts'], this.callbacks, {params:{lang:"en_us"}});
+
+            expect(callstub).toHaveBeenCalled();
+            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&typeFilter=&moduleFilter=Contacts&_hash=hash");
+            callstub.restore();
         });
 
         it('should retrieve metadata', function () {
