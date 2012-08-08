@@ -93,6 +93,7 @@ describe('SugarCRM Javascript API', function () {
 
             //@arguments: method, URL, options
             this.api.call('update', '/rest/v10/contacts');
+            SugarTest.server.respond(); //Must respond to prevent hanging requests.
 
             // Spy was called
             expect(spy).toHaveBeenCalled();
@@ -108,6 +109,7 @@ describe('SugarCRM Javascript API', function () {
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contacts', null, null, {async:true});
+            SugarTest.server.respond(); //Must respond to prevent hanging requests.
 
             // Spy was called
             expect(spy).toHaveBeenCalled();
@@ -763,16 +765,25 @@ describe('SugarCRM Javascript API', function () {
     describe("HttpRequest", function() {
 
         it("should be able to set oauth header before executing ajax request", function() {
-            var request;
-
-            var stub = sinon.stub($, "ajax", function() { return true; });
+            var request, spy = sinon.spy(jQuery, 'ajax');
             request = new SUGAR.Api.HttpRequest({});
 
             request.execute("xyz");
             expect(request.params.headers["OAuth-Token"]).toEqual("xyz");
-            expect(stub).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalled();
             expect(request.xhr).toBeDefined();
-            stub.restore();
+            spy.restore();
+        });
+
+        it("should count the number of current requests", function() {
+            var request, spy = sinon.spy(jQuery, 'ajax');
+            request = new SUGAR.Api.HttpRequest({});
+            expect(SUGAR.Api.getCallsInProgressCount()).toBe(0);
+            request.execute("xyz");
+            expect(SUGAR.Api.getCallsInProgressCount()).toBe(1);
+            SugarTest.server.respond();
+            expect(SUGAR.Api.getCallsInProgressCount()).toBe(0);
+            spy.restore();
         });
 
     });
