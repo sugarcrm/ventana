@@ -225,6 +225,15 @@ describe('SugarCRM Javascript API', function () {
             options = { passOAuthToken: false, htmlJsonFormat: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
+
+            attributes = { module: 'Notes', id: 'note_id' };
+            options = { passOAuthToken: false };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file');
+
+            options = { passOAuthToken: true };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
         });
     });
 
@@ -323,8 +332,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should delete record', function () {
-            var spy1 = sinon.spy(this.callbacks, 'error'),
-                spy = sinon.spy(this.callbacks, 'success'),
+            var spy = sinon.spy(this.callbacks, 'success'),
                 module = "Contacts",
                 params = "",
                 attributes = {id:"1234"};
@@ -485,6 +493,60 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
+        });
+
+    });
+
+    describe('File actions', function() {
+
+        it("should fetch list of files", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var response = {
+              "filename": {
+                "content-type": "application\/pdf",
+                "content-length": 64869,
+                "name": "10.1.1.56.4713.pdf",
+                "uri": "http:\/\/localhost:8888\/sugarcrm\/rest\/v10\/Notes\/1234\/file\/filename"
+              }
+            };
+
+            var resp = JSON.stringify(response);
+
+            SugarTest.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file.*/,
+                [200, {  "Content-Type":"application/json"}, resp]);
+
+            this.api.file("read", {
+                module: "Notes",
+                id: "1234"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy.getCall(0).args[0]).toBeDefined();
+            expect(spy.getCall(0).args[0].filename).toBeDefined();
+
+        });
+
+        it("should fetch a file", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file\/filename.*/,
+                [200, {  "Content-Type":"application/json"}, ""]);
+
+            this.api.file("read", {
+                module: "Notes",
+                id: "1234",
+                field: "filename"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy.getCall(0).args[0]).toBeDefined();
+        });
+
+        xit("should upload files", function() {
+            // TODO: Implement
         });
 
     });
