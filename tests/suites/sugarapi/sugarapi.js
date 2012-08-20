@@ -445,6 +445,27 @@ describe('SugarCRM Javascript API', function () {
 
     });
 
+    describe('Password update', function () {
+
+        it('should update password', function () {
+            var callspy = sinon.spy(this.api, 'call');
+
+            SugarTest.server.respondWith("PUT", "/rest/v10/me/password",
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify({current_user: {valid: true}})]);
+            this.api.updatePassword("old", "new", null);
+            
+            SugarTest.server.respond(); 
+
+            expect(callspy).toHaveBeenCalled();
+            expect(callspy.getCall(0).args[0]).toEqual("update");
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/me/password");
+            expect(callspy.getCall(0).args[2].new_password).toEqual("new");
+            expect(callspy.getCall(0).args[2].old_password).toEqual("old");
+            callspy.restore();
+        });
+    });
+    
     describe('Metadata actions', function () {
 
         it('should delegate to the call method', function () {
