@@ -36,7 +36,7 @@ describe('SugarCRM Javascript API', function () {
         if (this.callbacks.error.restore) this.callbacks.error.restore();
         if (this.callbacks.complete.restore) this.callbacks.complete.restore();
         if (this.api.call.restore) this.api.call.restore();
-        if (jQuery.ajax.restore) jQuery.ajax.restore();
+        if ($.ajax.restore) $.ajax.restore();
         if (SugarTest.keyValueStore.set.restore) SugarTest.keyValueStore.set.restore();
         if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
@@ -73,8 +73,7 @@ describe('SugarCRM Javascript API', function () {
 
     describe('Request Handler', function () {
         it('should make a request with the correct request url', function () {
-            // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax'), args;
+            var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contact', { date_modified: "2012-02-08 19:18:25" });
@@ -88,8 +87,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should set the right method on request', function () {
-            // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax'), args;
+            var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('update', '/rest/v10/contacts');
@@ -104,8 +102,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should set the right options on request', function () {
-            // Spy on jQuery's ajax method
-            var spy = sinon.spy(jQuery, 'ajax'), args;
+            var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
             this.api.call('read', '/rest/v10/contacts', null, null, {async:true});
@@ -225,6 +222,15 @@ describe('SugarCRM Javascript API', function () {
             options = { passOAuthToken: false, htmlJsonFormat: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
+
+            attributes = { module: 'Notes', id: 'note_id' };
+            options = { passOAuthToken: false };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file');
+
+            options = { passOAuthToken: true };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
         });
     });
 
@@ -323,8 +329,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should delete record', function () {
-            var spy1 = sinon.spy(this.callbacks, 'error'),
-                spy = sinon.spy(this.callbacks, 'success'),
+            var spy = sinon.spy(this.callbacks, 'success'),
                 module = "Contacts",
                 params = "",
                 attributes = {id:"1234"};
@@ -485,6 +490,60 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
+        });
+
+    });
+
+    describe('File actions', function() {
+
+        it("should fetch list of files", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var response = {
+              "filename": {
+                "content-type": "application\/pdf",
+                "content-length": 64869,
+                "name": "10.1.1.56.4713.pdf",
+                "uri": "http:\/\/localhost:8888\/sugarcrm\/rest\/v10\/Notes\/1234\/file\/filename"
+              }
+            };
+
+            var resp = JSON.stringify(response);
+
+            SugarTest.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file.*/,
+                [200, {  "Content-Type":"application/json"}, resp]);
+
+            this.api.file("read", {
+                module: "Notes",
+                id: "1234"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy.getCall(0).args[0]).toBeDefined();
+            expect(spy.getCall(0).args[0].filename).toBeDefined();
+
+        });
+
+        it("should fetch a file", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file\/filename.*/,
+                [200, {  "Content-Type":"application/json"}, ""]);
+
+            this.api.file("read", {
+                module: "Notes",
+                id: "1234",
+                field: "filename"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy.getCall(0).args[0]).toBeDefined();
+        });
+
+        xit("should upload files", function() {
+            // TODO: Implement
         });
 
     });
@@ -765,7 +824,7 @@ describe('SugarCRM Javascript API', function () {
     describe("HttpRequest", function() {
 
         it("should be able to set oauth header before executing ajax request", function() {
-            var request, spy = sinon.spy(jQuery, 'ajax');
+            var request, spy = sinon.spy($, 'ajax');
             request = new SUGAR.Api.HttpRequest({});
 
             request.execute("xyz");
@@ -776,7 +835,7 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it("should count the number of current requests", function() {
-            var request, spy = sinon.spy(jQuery, 'ajax');
+            var request, spy = sinon.spy($, 'ajax');
             request = new SUGAR.Api.HttpRequest({});
             expect(SUGAR.Api.getCallsInProgressCount()).toBe(0);
             request.execute("xyz");
