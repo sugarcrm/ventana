@@ -548,6 +548,26 @@ describe('SugarCRM Javascript API', function () {
 
     });
 
+    describe('Misc actions', function() {
+        it("should fetch server info", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith("GET", /\/rest\/v10\/ServerInfo.*/,
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify({
+                      "flavor": "ENT",
+                      "version": "6.6"
+                    })
+                ]);
+
+            this.api.info(this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy.getCall(0).args[0]).toBeDefined();
+        });
+    });
+
     describe("Authentication", function() {
 
         it("should be able to detect when to refresh auth token", function() {
