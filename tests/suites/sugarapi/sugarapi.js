@@ -647,7 +647,9 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.storage.AuthAccessToken = "xyz"; //55000555
             SugarTest.storage.AuthRefreshToken = "qwe";
 
-            var spy = sinon.spy(this.callbacks, "success");
+            var sspy = sinon.spy(this.callbacks, "success");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var espy = sinon.spy(this.callbacks, "error");
             var response = {"error": "invalid_grant", "error_description": "some desc"};
 
             var authed = false;
@@ -680,14 +682,18 @@ describe('SugarCRM Javascript API', function () {
             expect(SugarTest.storage.AuthAccessToken).toEqual("55000555");
             expect(SugarTest.storage.AuthRefreshToken).toEqual("abc");
             expect(rspy).toHaveBeenCalledOnce();
-            expect(spy).toHaveBeenCalled();
+            expect(cspy).toHaveBeenCalledOnce();
+            expect(espy).not.toHaveBeenCalled();
+            expect(sspy).toHaveBeenCalledOnce();
         });
 
         it("should pass error to original callback in case of invalid_grant response happens and the original request fails", function() {
             SugarTest.storage.AuthAccessToken = "xyz"; //55000555
             SugarTest.storage.AuthRefreshToken = "qwe";
 
-            var spy = sinon.spy(this.callbacks, "error");
+            var espy = sinon.spy(this.callbacks, "error");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var sspy = sinon.spy(this.callbacks, "success");
             var response = {"error": "invalid_grant", "error_description": "some desc"};
 
             var authed = false;
@@ -721,7 +727,9 @@ describe('SugarCRM Javascript API', function () {
             expect(SugarTest.storage.AuthAccessToken).toEqual("55000555");
             expect(SugarTest.storage.AuthRefreshToken).toEqual("abc");
             expect(rspy).toHaveBeenCalledOnce();
-            expect(spy).toHaveBeenCalled();
+            expect(espy).toHaveBeenCalledOnce();
+            expect(cspy).toHaveBeenCalledOnce();
+            expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(404);
         });
@@ -730,7 +738,9 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.storage.AuthAccessToken = "xyz"; //55000555
             SugarTest.storage.AuthRefreshToken = "qwe";
 
-            var spy = sinon.spy(this.callbacks, "error");
+            var espy = sinon.spy(this.callbacks, "error");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var sspy = sinon.spy(this.callbacks, "success");
             var response = {"error": "invalid_grant", "error_description": "some desc"};
 
             var num = 0;
@@ -750,7 +760,9 @@ describe('SugarCRM Javascript API', function () {
             expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
             expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
             expect(rspy).not.toHaveBeenCalled();
-            expect(spy).toHaveBeenCalled();
+            expect(espy).toHaveBeenCalledOnce();
+            expect(cspy).toHaveBeenCalledOnce();
+            expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
         });
@@ -759,7 +771,9 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.storage.AuthAccessToken = "xyz"; //55000555
             SugarTest.storage.AuthRefreshToken = "qwe";
 
-            var spy = sinon.spy(this.callbacks, "error");
+            var espy = sinon.spy(this.callbacks, "error");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var sspy = sinon.spy(this.callbacks, "success");
             var response = {"error": "invalid_grant", "error_description": "some desc"};
 
             SugarTest.server.respondWith(function(xhr) {
@@ -774,7 +788,9 @@ describe('SugarCRM Javascript API', function () {
             expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
             expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
             expect(rspy).not.toHaveBeenCalled();
-            expect(spy).toHaveBeenCalled();
+            expect(espy).toHaveBeenCalledOnce();
+            expect(cspy).toHaveBeenCalledOnce();
+            expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(400);
         });
