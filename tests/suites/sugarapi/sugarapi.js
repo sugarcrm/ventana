@@ -873,7 +873,7 @@ describe('SugarCRM Javascript API', function () {
             var xhr, error;
             xhr = {
                 status: 401,
-                responseText: JSON.stringify({"error": "invalid_grant", "error_description": "some desc"}),
+                responseText: JSON.stringify({"error": "invalid_grant", "error_description": "some desc", "error_message": "some message"}),
                 getResponseHeader: function() { return "application/json"; }
             };
 
@@ -881,6 +881,7 @@ describe('SugarCRM Javascript API', function () {
             expect(error.status).toEqual(401);
             expect(error.code).toEqual("invalid_grant");
             expect(error.description).toEqual("some desc");
+            expect(error.message).toEqual("some message");
 
             xhr = {
                 status: 500,
