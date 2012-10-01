@@ -3,6 +3,7 @@ describe('SugarCRM Javascript API', function () {
     function restoreApiSingleton() {
         // Essentially, this will go back to an API instance per user's config file
         SUGAR.Api.createInstance({
+            reset: true,
             serverUrl: SUGAR.App.config.serverUrl,
             platform: SUGAR.App.config.platform,
             timeout: SUGAR.App.config.serverTimeout,
@@ -726,6 +727,56 @@ describe('SugarCRM Javascript API', function () {
             expect(sspy).toHaveBeenCalledOnce();
         });
 
+        it("should handle multiple requests and refresh token in case of invalid_grant response", function() {
+            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
+            SugarTest.storage.AuthRefreshToken = "qwe";
+
+            var sspy = sinon.spy(this.callbacks, "success");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var espy = sinon.spy(this.callbacks, "error");
+            var response = {"error": "invalid_grant", "error_description": "some desc"};
+
+            var authed = false;
+            var self = this;
+            var num = 0;
+            SugarTest.server.respondWith(function(xhr) {
+                if (++num > 7) throw new Error("Too many requests. Possible infinite loop");
+                var status, responseText;
+                if (xhr.url.indexOf("oauth2") > -1) {
+                    status = 200;
+                    responseText = JSON.stringify(self.fixtures["/rest/v10/oauth2/token"].POST.response);
+                    authed = true;
+                }
+                else if (authed) {
+                    status = 200;
+                    responseText = JSON.stringify({});
+                }
+                else {
+                    status = 401;
+                    responseText = JSON.stringify(response);
+                }
+                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
+            });
+
+            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
+            var rspy = sinon.spy(request, "execute");
+            var request2 = this.api.records("read", "Cases", null, null, this.callbacks);
+            var rspy2 = sinon.spy(request2, "execute");
+            var request3 = this.api.records("read", "Opportunities", null, null, this.callbacks);
+            var rspy3 = sinon.spy(request3, "execute");
+
+            SugarTest.server.respond();
+
+            expect(SugarTest.storage.AuthAccessToken).toEqual("55000555");
+            expect(SugarTest.storage.AuthRefreshToken).toEqual("abc");
+            expect(rspy).toHaveBeenCalledOnce();
+            expect(rspy2).toHaveBeenCalledOnce();
+            expect(rspy3).toHaveBeenCalledOnce();
+            expect(cspy.callCount).toEqual(3);
+            expect(espy).not.toHaveBeenCalled();
+            expect(sspy.callCount).toEqual(3);
+        });
+
         it("should pass error to original callback in case of invalid_grant response happens and the original request fails", function() {
             SugarTest.storage.AuthAccessToken = "xyz"; //55000555
             SugarTest.storage.AuthRefreshToken = "qwe";
@@ -801,6 +852,44 @@ describe('SugarCRM Javascript API', function () {
             expect(rspy).not.toHaveBeenCalled();
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
+            expect(sspy).not.toHaveBeenCalled();
+            expect(this.httpError).not.toBeNull();
+            expect(this.httpError.status).toEqual(401);
+        });
+
+        it("should handle multiple requests and stop refreshing in case of invalid_grant response happens more than once in a row", function() {
+            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
+            SugarTest.storage.AuthRefreshToken = "qwe";
+
+            var espy = sinon.spy(this.callbacks, "error");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var sspy = sinon.spy(this.callbacks, "success");
+            var response = {"error": "invalid_grant", "error_description": "some desc"};
+
+            var num = 0;
+            SugarTest.server.respondWith(function(xhr) {
+                if (++num > 4) throw new Error("Too many requests. Possible infinite loop");
+                var status = 401;
+                var responseText = JSON.stringify(response);
+                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
+            });
+
+            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
+            var rspy = sinon.spy(request, "execute");
+            var request2 = this.api.records("read", "Contacts", null, null, this.callbacks);
+            var rspy2 = sinon.spy(request2, "execute");
+            var request3 = this.api.records("read", "Meetings", null, null, this.callbacks);
+            var rspy3 = sinon.spy(request3, "execute");
+
+            SugarTest.server.respond();
+
+            expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
+            expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
+            expect(rspy).not.toHaveBeenCalled();
+            expect(rspy2).not.toHaveBeenCalled();
+            expect(rspy3).not.toHaveBeenCalled();
+            expect(espy.callCount).toEqual(3);
+            expect(cspy.callCount).toEqual(3);
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
