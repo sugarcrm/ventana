@@ -85,6 +85,7 @@ describe('SugarCRM Javascript API', function () {
             args = spy.getCall(0).args[0];
             expect(args.url).toEqual("/rest/v10/contact");
             expect(args.headers["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
+            expect(args.headers["OAuth-Token"]).toBeDefined();
         });
 
         it('should set the right method on request', function () {
@@ -100,6 +101,17 @@ describe('SugarCRM Javascript API', function () {
             args = spy.getCall(0).args[0];
             expect(args.type).toEqual("PUT");
             expect(args.headers["If-Modified-Since"]).toBeUndefined();
+        });
+
+        it('should not set oauth header for auth requests', function () {
+            var spy = sinon.spy($, 'ajax'), args;
+
+            this.api.call('create', '/rest/v10/oauth2/token');
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            args = spy.getCall(0).args[0];
+            expect(args.headers["OAuth-Token"]).toBeUndefined();
         });
 
         it('should set the right options on request', function () {
