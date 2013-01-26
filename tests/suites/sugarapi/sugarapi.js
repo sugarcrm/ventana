@@ -245,6 +245,19 @@ describe('SugarCRM Javascript API', function () {
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
         });
+
+        it('should build resource URLs to access the Export API', function() {
+            var module = 'Notes',
+                attributes = { module: module, uid: ['note_id', 'note2_id']},
+                oauth_token = this.api.getOAuthToken(),
+                options = { passOAuthToken: false },
+                url = this.api.buildExportURL(attributes);
+            expect(url).toEqual('/rest/v10/Notes/export?uid%5B%5D=note_id&uid%5B%5D=note2_id&oauth_token='+oauth_token);
+
+            attributes = { module: module, filter: {a: 'b'}};
+            url = this.api.buildExportURL(attributes,options);
+            expect(url).toEqual('/rest/v10/Notes/export?filter%5Ba%5D=b');
+        });
     });
 
     describe('Record CRUD actions', function () {
