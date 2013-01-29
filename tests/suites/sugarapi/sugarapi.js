@@ -50,6 +50,7 @@ describe('SugarCRM Javascript API', function () {
         var api = SUGAR.Api.createInstance();
         expect(api.serverUrl).toEqual('/rest/v10');
         expect(api.isAuthenticated()).toBeFalsy();
+        expect(api.timeout).toEqual(30000);
     });
 
     it('should create an authenticated instance if storage has auth token set', function () {
