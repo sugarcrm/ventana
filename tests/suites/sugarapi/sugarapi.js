@@ -646,8 +646,73 @@ describe('SugarCRM Javascript API', function () {
             expect(spy.getCall(0).args[0]).toBeDefined();
         });
 
-        xit("should upload files", function() {
-            // TODO: Implement
+        it("should upload files", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var resp = this.fixtures["rest/v10/Contacts/1/file/picture"].POST.response;
+            SugarTest.server.respondWith("POST", /rest\/v10\/Contacts\/1\/file\/picture.*/,
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+
+            this.api.file("create", {
+                module: "Contacts",
+                id: "1",
+                field: "picture"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(resp);
+        });
+
+        it("should delete files", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var resp = this.fixtures["rest/v10/Contacts/1/file/picture"].DELETE.response;
+            SugarTest.server.respondWith("DELETE", /rest\/v10\/Contacts\/1\/file\/picture.*/,
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+
+            this.api.file("delete", {
+                module: "Contacts",
+                id: "1",
+                field: "picture"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(resp);
+        });
+
+        it("should upload temporary files", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var resp = this.fixtures["rest/v10/Contacts/temp/file/picture"].POST.response;
+            SugarTest.server.respondWith("POST", /rest\/v10\/Contacts\/temp\/file\/picture.*/,
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+
+            this.api.file("create", {
+                module: "Contacts",
+                id: "temp",
+                field: "picture"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(resp);
+        });
+
+        it("should retrieve a temporary file", function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            var resp = this.fixtures["rest/v10/Contacts/temp/file/picture/1"].GET.response;
+            SugarTest.server.respondWith("GET", /rest\/v10\/Contacts\/temp\/file\/picture\/1.*/,
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+
+            this.api.file("read", {
+                module: "Contacts",
+                id: "temp",
+                field: "picture",
+                fileId: "1"
+            }, null, this.callbacks);
+            SugarTest.server.respond();
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(resp);
         });
 
     });
