@@ -254,9 +254,14 @@ describe('SugarCRM Javascript API', function () {
                 url = this.api.buildExportURL(attributes);
             expect(url).toEqual('/rest/v10/Notes/export?uid%5B%5D=note_id&uid%5B%5D=note2_id&oauth_token='+oauth_token);
 
-            attributes = { module: module, filter: {a: 'b'}};
+            attributes = { module: module, filter: [{a: 'b'}]};
             url = this.api.buildExportURL(attributes,options);
-            expect(url).toEqual('/rest/v10/Notes/export?filter%5Ba%5D=b');
+            expect(url).toEqual('/rest/v10/Notes/export?filter%5B0%5D%5Ba%5D=b');
+
+            // does entire override uid?
+            attributes = { module: module, entire: true, uid: ['a','b']};
+            url = this.api.buildExportURL(attributes,options);
+            expect(url).toEqual('/rest/v10/Notes/export?entire=true');
         });
     });
 
