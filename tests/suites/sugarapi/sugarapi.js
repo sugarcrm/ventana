@@ -263,6 +263,13 @@ describe('SugarCRM Javascript API', function () {
             url = this.api.buildExportURL(attributes,options);
             expect(url).toEqual('/rest/v10/Notes/export?entire=true');
         });
+
+        it('should build resource URLs for fetching a link with a filter param', function() {
+            var params = { max_num: 20, filter: [{'name': 'Jim'}] },
+            attributes = { id:'guidguidguid', link:'contacts', related: null, relatedId: undefined },
+            url = this.api.buildURL("Accounts", "contacts", attributes, params);
+            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts/filter?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
+        });
     });
 
     describe('Record CRUD actions', function () {
