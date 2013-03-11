@@ -323,6 +323,29 @@ describe('SugarCRM Javascript API', function () {
         });
     });
 
+    describe("Enum API", function(){
+        it("should fetch enum options for a field", function(){
+            var spy = sinon.spy(this.callbacks, 'success'),
+                apispy = sinon.spy(this.api, 'call'),
+                module = "Bugs",
+                field ="fixed_in_release",
+                options = {"":"","caf2f716-7fed-12fb-8ce7-5138c8999447":"3.14"};
+
+            SugarTest.server.respondWith("GET", "/rest/v10/Bugs/enum/fixed_in_release",
+                [200, {  "Content-Type":"application/json"}, JSON.stringify(options)]);
+
+            this.api.enum(module, field, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy.getCall(0).args[0]).toEqual(options);
+            expect(spy.getCall(0).args[2].status).toEqual(200);
+            expect(apispy.getCall(0).args[1]).toContain("Bugs/enum/fixed_in_release");
+            spy.restore();
+            apispy.restore();
+        });
+    });
+
     describe('Record CRUD actions', function () {
 
         it('search a module', function () {
