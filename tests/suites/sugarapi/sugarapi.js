@@ -85,7 +85,7 @@ describe('SugarCRM Javascript API', function () {
 
             args = spy.getCall(0).args[0];
             expect(args.url).toEqual("/rest/v10/contact");
-            expect(args.headers["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
+            expect(args.headers["If-Modified-Since"]).toBeUndefined();
             expect(args.headers["OAuth-Token"]).toBeDefined();
         });
 
@@ -280,7 +280,7 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(recordOne);
-            expect(SugarTest.server.requests[0].requestHeaders["If-Modified-Since"]).toEqual("2012-02-08 19:18:25");
+            expect(SugarTest.server.requests[0].requestHeaders["If-Modified-Since"]).toBeUndefined();
         });
 
         it('should create record', function () {
