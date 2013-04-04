@@ -321,6 +321,14 @@ describe('SugarCRM Javascript API', function () {
             url = this.api.buildURL("Accounts", "contacts", attributes, params);
             expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts/filter?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
         });
+
+        it('eliminates null and undefined params from the querystring', function() {
+            var params = { bad: null, worse: undefined},
+                attributes = { id:'1234' };
+            url = this.api.buildURL('Accounts','read',attributes,params);
+            expect(url).toEqual('/rest/v10/Accounts/1234');
+
+        });
     });
 
     describe("Enum API", function(){
