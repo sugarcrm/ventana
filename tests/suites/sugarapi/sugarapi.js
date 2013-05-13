@@ -30,6 +30,8 @@ describe('SugarCRM Javascript API', function () {
             complete: function() {}
         };
         this.httpError = null;
+        //Override the normal app sync after refresh
+        this.api.setRefreshTokenSuccessCallback(function(c){c();});
     });
 
     afterEach(function () {
