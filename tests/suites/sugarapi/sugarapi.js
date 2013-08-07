@@ -343,7 +343,7 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respondWith("GET", "/rest/v10/Bugs/enum/fixed_in_release",
                 [200, {  "Content-Type":"application/json"}, JSON.stringify(options)]);
 
-            this.api.enum(module, field, this.callbacks);
+            this.api.enumOptions(module, field, this.callbacks);
             SugarTest.server.respond();
 
             expect(spy).toHaveBeenCalled();
