@@ -343,12 +343,10 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respondWith("GET", "/rest/v10/Bugs/enum/fixed_in_release",
                 [200, {  "Content-Type":"application/json"}, JSON.stringify(options)]);
 
-            this.api.enumOptions(module, field, this.callbacks);
+            var request = this.api.enumOptions(module, field, this.callbacks);
             SugarTest.server.respond();
 
-            expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toEqual(options);
-            expect(spy.getCall(0).args[2].status).toEqual(200);
+            expect(spy).toHaveBeenCalledWith(options, request);
             expect(apispy.getCall(0).args[1]).toContain("Bugs/enum/fixed_in_release");
             spy.restore();
             apispy.restore();
@@ -435,19 +433,18 @@ describe('SugarCRM Javascript API', function () {
             var module = "Contacts",
                 params = "",
                 attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"1234123", description:"This dude is cool."},
-                spy = sinon.spy(this.callbacks, 'success');
+                spy = sinon.spy(this.callbacks, 'success'),
+                cspy = sinon.spy(this.callbacks, 'complete');
 
             SugarTest.server.respondWith("PUT", "/rest/v10/Contacts",
                 [200, {  "Content-Type":"application/json"},
                     ""]);
 
-            this.api.records("update", module, attributes, params, this.callbacks);
+            var request = this.api.records("update", module, attributes, params, this.callbacks);
             SugarTest.server.respond();
 
-            expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toEqual(null);
-            expect(spy.getCall(0).args[2].status).toEqual(200);
-            expect(spy.getCall(0).args[2].responseText).toEqual("");
+            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(cspy).toHaveBeenCalledWith(request);
             req  = SugarTest.server.requests[0];
             expect(req.requestBody).toEqual(JSON.stringify(attributes));
         });
@@ -461,13 +458,11 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respondWith("DELETE", "/rest/v10/Contacts/1234",
                 [200, {  "Content-Type":"application/json"}, ""]);
 
-            this.api.records("delete", module, attributes, params, this.callbacks);
+            var request = this.api.records("delete", module, attributes, params, this.callbacks);
             SugarTest.server.respond();
 
-            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(null, request);
             expect(spy.getCall(0).args[0]).toEqual(null);
-            expect(spy.getCall(0).args[2].status).toEqual(200);
-            expect(spy.getCall(0).args[2].responseText).toEqual("");
         });
 
         it('should favorite record', function () {
@@ -478,13 +473,10 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respondWith("PUT", "/rest/v10/Contacts/1234/favorite",
                 [200, {  "Content-Type":"application/json"}, ""]);
 
-            this.api.favorite(module, id, true, this.callbacks);
+            var request = this.api.favorite(module, id, true, this.callbacks);
             SugarTest.server.respond();
 
-            expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toEqual(null);
-            expect(spy.getCall(0).args[2].status).toEqual(200);
-            expect(spy.getCall(0).args[2].responseText).toEqual("");
+            expect(spy).toHaveBeenCalledWith(null, request);
         });
 
         it('should unfavorite record', function () {
@@ -495,13 +487,10 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respondWith("PUT", "/rest/v10/Contacts/1234/unfavorite",
                 [200, {  "Content-Type":"application/json"}, ""]);
 
-            this.api.favorite(module, id, false, this.callbacks);
+            var request = this.api.favorite(module, id, false, this.callbacks);
             SugarTest.server.respond();
 
-            expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toEqual(null);
-            expect(spy.getCall(0).args[2].status).toEqual(200);
-            expect(spy.getCall(0).args[2].responseText).toEqual("");
+            expect(spy).toHaveBeenCalledWith(null, request);
         });
 
     });
