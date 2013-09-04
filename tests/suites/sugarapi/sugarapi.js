@@ -1224,4 +1224,53 @@ describe('SugarCRM Javascript API', function () {
 
     });
 
+    describe("Hash of requests", function() {
+
+        it("should clean hash of requests", function() {
+
+            var cspy = sinon.stub(this.callbacks, "complete", function() {
+                SugarTest.setWaitFlag();
+            });
+
+            SugarTest.server.respondWith(function(xhr) {
+                xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify({}));
+            });
+
+            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
+
+            expect(this.api.getRequest(request.uid)).toBeDefined();
+
+            SugarTest.server.respond();
+
+            SugarTest.wait();
+
+            runs(function(){
+                expect(this.api.getRequest(request.uid)).not.toBeDefined();
+            })
+        });
+
+        it("should abort request by id", function() {
+
+            var cspy = sinon.stub(this.callbacks, "complete", function(xhr, status) {
+
+                expect(request.aborted).toBeTruthy();
+
+                SugarTest.setWaitFlag();
+            });
+
+            SugarTest.server.respondWith(function(xhr) {
+                xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify({}));
+            });
+
+            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
+
+            expect(this.api.getRequest(request.uid)).toBeDefined();
+
+            this.api.abortRequest(request.uid);
+
+            SugarTest.server.respond();
+
+        });
+
+    });
 });
