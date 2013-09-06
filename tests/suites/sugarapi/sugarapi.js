@@ -296,6 +296,28 @@ describe('SugarCRM Javascript API', function () {
             options = { passOAuthToken: true };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+
+            options = { passOAuthToken: false, htmlJsonFormat: false };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file');
+
+            options = { passOAuthToken: false, htmlJsonFormat: false, forceDownload: true };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=1');
+
+            options = { passOAuthToken: false, htmlJsonFormat: false, forceDownload: false };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
+
+            //cleanCache url
+            options = { passOAuthToken: false, cleanCache: true };
+            url = this.api.buildFileURL(attributes, options);
+            var clock = sinon.useFakeTimers();
+            //waiting for next time request
+            clock.tick(100);
+            var nextUrl = this.api.buildFileURL(attributes, options);
+            expect(url).not.toBe(nextUrl);
+            clock.restore();
         });
 
         it('should build resource URLs to access the Export API', function() {
