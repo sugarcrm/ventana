@@ -321,21 +321,24 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should build resource URLs to access the Export API', function() {
-            var module = 'Notes',
-                attributes = { module: module, uid: ['note_id', 'note2_id']},
-                oauth_token = this.api.getOAuthToken(),
-                options = { passOAuthToken: false },
-                url = this.api.buildExportURL(attributes);
-            expect(url).toEqual('/rest/v10/Notes/export?uid%5B%5D=note_id&uid%5B%5D=note2_id&oauth_token='+oauth_token);
+            SugarTest.server.respondWith("POST", "/rest/v10/Accounts/record_list",
+                [200, { "Content-Type":"application/json" },
+                 '{"id":"12345-67890-11-12","records":["a","b","c"],"module_name":"Accounts"}']);
+            var fileDownloadStub = sinon.stub(this.api, 'fileDownload');
+            var result = this.api.exportRecords(
+                {
+                    'module':'Accounts',
+                    'uid':['a','b','c']
+                }, 
+                'fakeEl',
+                'fakeCallbacks',
+                []);
 
-            attributes = { module: module, filter: [{a: 'b'}]};
-            url = this.api.buildExportURL(attributes,options);
-            expect(url).toEqual('/rest/v10/Notes/export?filter%5B0%5D%5Ba%5D=b');
+            SugarTest.server.respond(); //tell server to respond to pending async call
 
-            // does entire override uid?
-            attributes = { module: module, entire: true, uid: ['a','b']};
-            url = this.api.buildExportURL(attributes,options);
-            expect(url).toEqual('/rest/v10/Notes/export?entire=true');
+            expect(fileDownloadStub).toHaveBeenCalled();
+            expect(fileDownloadStub.getCall(0).args[0]).toEqual("/rest/v10/Accounts/export/12345-67890-11-12");
+            fileDownloadStub.restore();
         });
 
         it('should build resource URLs for fetching a link with a filter param', function() {
