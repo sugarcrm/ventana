@@ -277,40 +277,39 @@ describe('SugarCRM Javascript API', function () {
 
         it('should build resource URLs to access the File API', function() {
             var attributes = { module: 'Notes', id: 'note_id', field: 'fileField' },
-            options = { passOAuthToken: false },
-            url = this.api.buildFileURL(attributes, options);
+            url = this.api.buildFileURL(attributes);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
 
-            url = this.api.buildFileURL(attributes);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&oauth_token=xyz');
+            options = { platform: "base" };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&platform=base');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false };
+            options = { htmlJsonFormat: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
 
             attributes = { module: 'Notes', id: 'note_id' };
-            options = { passOAuthToken: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
-            options = { passOAuthToken: true };
+            options = { platform: 'mobile' };
             url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=mobile');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false };
+            options = { htmlJsonFormat: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false, forceDownload: true };
+            options = { htmlJsonFormat: false, forceDownload: true };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=1');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false, forceDownload: false };
+            options = { htmlJsonFormat: false, forceDownload: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
 
             //cleanCache url
-            options = { passOAuthToken: false, cleanCache: true };
+            options = { cleanCache: true };
             url = this.api.buildFileURL(attributes, options);
             var clock = sinon.useFakeTimers();
             //waiting for next time request
