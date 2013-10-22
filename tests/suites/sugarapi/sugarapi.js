@@ -277,40 +277,39 @@ describe('SugarCRM Javascript API', function () {
 
         it('should build resource URLs to access the File API', function() {
             var attributes = { module: 'Notes', id: 'note_id', field: 'fileField' },
-            options = { passOAuthToken: false },
-            url = this.api.buildFileURL(attributes, options);
+            url = this.api.buildFileURL(attributes);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
 
-            url = this.api.buildFileURL(attributes);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&oauth_token=xyz');
+            options = { platform: "base" };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&platform=base');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false };
+            options = { htmlJsonFormat: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
 
             attributes = { module: 'Notes', id: 'note_id' };
-            options = { passOAuthToken: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
-            options = { passOAuthToken: true };
+            options = { platform: 'mobile' };
             url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=mobile');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false };
+            options = { htmlJsonFormat: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false, forceDownload: true };
+            options = { htmlJsonFormat: false, forceDownload: true };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=1');
 
-            options = { passOAuthToken: false, htmlJsonFormat: false, forceDownload: false };
+            options = { htmlJsonFormat: false, forceDownload: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
 
             //cleanCache url
-            options = { passOAuthToken: false, cleanCache: true };
+            options = { cleanCache: true };
             url = this.api.buildFileURL(attributes, options);
             var clock = sinon.useFakeTimers();
             //waiting for next time request
@@ -321,21 +320,24 @@ describe('SugarCRM Javascript API', function () {
         });
 
         it('should build resource URLs to access the Export API', function() {
-            var module = 'Notes',
-                attributes = { module: module, uid: ['note_id', 'note2_id']},
-                oauth_token = this.api.getOAuthToken(),
-                options = { passOAuthToken: false },
-                url = this.api.buildExportURL(attributes);
-            expect(url).toEqual('/rest/v10/Notes/export?uid%5B%5D=note_id&uid%5B%5D=note2_id&oauth_token='+oauth_token);
+            SugarTest.server.respondWith("POST", "/rest/v10/Accounts/record_list",
+                [200, { "Content-Type":"application/json" },
+                 '{"id":"12345-67890-11-12","records":["a","b","c"],"module_name":"Accounts"}']);
+            var fileDownloadStub = sinon.stub(this.api, 'fileDownload');
+            var result = this.api.exportRecords(
+                {
+                    'module':'Accounts',
+                    'uid':['a','b','c']
+                }, 
+                'fakeEl',
+                'fakeCallbacks',
+                []);
 
-            attributes = { module: module, filter: [{a: 'b'}]};
-            url = this.api.buildExportURL(attributes,options);
-            expect(url).toEqual('/rest/v10/Notes/export?filter%5B0%5D%5Ba%5D=b');
+            SugarTest.server.respond(); //tell server to respond to pending async call
 
-            // does entire override uid?
-            attributes = { module: module, entire: true, uid: ['a','b']};
-            url = this.api.buildExportURL(attributes,options);
-            expect(url).toEqual('/rest/v10/Notes/export?entire=true');
+            expect(fileDownloadStub).toHaveBeenCalled();
+            expect(fileDownloadStub.getCall(0).args[0]).toEqual("/rest/v10/Accounts/export/12345-67890-11-12");
+            fileDownloadStub.restore();
         });
 
         it('should build resource URLs for fetching a link with a filter param', function() {
@@ -672,7 +674,7 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respond();
 
             expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?type_filter=&module_filter=Contacts&_hash=hash");
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?type_filter=&module_filter=Contacts");
             callspy.restore();
         });
 
@@ -682,7 +684,7 @@ describe('SugarCRM Javascript API', function () {
             this.api.getMetadata("hash", [], ['Contacts'], this.callbacks, {params:{lang:"en_us"}});
 
             expect(callstub).toHaveBeenCalled();
-            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&type_filter=&module_filter=Contacts&_hash=hash");
+            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&type_filter=&module_filter=Contacts");
             callstub.restore();
         });
 
@@ -691,7 +693,7 @@ describe('SugarCRM Javascript API', function () {
                 modules = ["Contacts"],
                 spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
-            SugarTest.server.respondWith("GET", "/rest/v10/metadata?type_filter=&module_filter=Contacts&_hash=hash",
+            SugarTest.server.respondWith("GET", "/rest/v10/metadata?type_filter=&module_filter=Contacts",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.modules.Contacts)]);
 
