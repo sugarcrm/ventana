@@ -15,6 +15,7 @@ describe('SugarCRM Javascript API', function () {
     beforeEach(function () {
         SugarTest.storage.AuthAccessToken = "xyz";
         SugarTest.storage.AuthRefreshToken = "abc";
+        SugarTest.storage.DownloadToken = "zxc";
 
         this.api = SUGAR.Api.createInstance({
             serverUrl:"/rest/v10",
@@ -277,7 +278,9 @@ describe('SugarCRM Javascript API', function () {
 
         it('should build resource URLs to access the File API', function() {
             var attributes = { module: 'Notes', id: 'note_id', field: 'fileField' },
-            url = this.api.buildFileURL(attributes);
+                url = this.api.buildFileURL(attributes),
+                options;
+
             expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
 
             options = { platform: "base" };
@@ -307,6 +310,14 @@ describe('SugarCRM Javascript API', function () {
             options = { htmlJsonFormat: false, forceDownload: false };
             url = this.api.buildFileURL(attributes, options);
             expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
+
+            options = { passOAuthToken: true };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+
+            options = { passDownloadToken: true };
+            url = this.api.buildFileURL(attributes, options);
+            expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=zxc');
 
             //cleanCache url
             options = { cleanCache: true };
@@ -885,6 +896,8 @@ describe('SugarCRM Javascript API', function () {
 
             expect(this.api.isAuthenticated()).toBeTruthy();
             expect(SugarTest.storage["AuthAccessToken"]).toEqual("55000555");
+            expect(SugarTest.storage["AuthRefreshToken"]).toEqual("abc");
+            expect(SugarTest.storage["DownloadToken"]).toEqual("qwerty");
             expect(sspy).toHaveBeenCalled();
 
             requestBody = JSON.parse(SugarTest.server.requests[0].requestBody);
@@ -913,7 +926,8 @@ describe('SugarCRM Javascript API', function () {
             expect(this.api.isAuthenticated()).toBeFalsy();
             expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
             expect(SugarTest.storage["AuthRefreshToken"]).toBeUndefined();
-            expect(sspy).toHaveBeenCalledTwice();
+            expect(SugarTest.storage["DownloadToken"]).toBeUndefined();
+            expect(sspy).toHaveBeenCalledThrice();
             // this spy is created after the method gets called
             // so, this assertion means that 'executes' is not called the second time
             expect(rspy).not.toHaveBeenCalled();
@@ -1174,7 +1188,8 @@ describe('SugarCRM Javascript API', function () {
             expect(this.api.isAuthenticated()).toBeFalsy();
             expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
             expect(SugarTest.storage["AuthRefreshToken"]).toBeUndefined();
-            expect(sspy).toHaveBeenCalledTwice();
+            expect(SugarTest.storage["DownloadToken"]).toBeUndefined();
+            expect(sspy).toHaveBeenCalledThrice();
         });
     });
 
