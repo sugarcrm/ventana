@@ -837,6 +837,7 @@ describe('SugarCRM Javascript API', function () {
     });
 
     describe('Misc actions', function() {
+
         it("should fetch server info", function() {
             var spy = sinon.spy(this.callbacks, 'success');
 
@@ -854,6 +855,31 @@ describe('SugarCRM Javascript API', function () {
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toBeDefined();
         });
+
+        it('should ping server', function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith('GET', /.*\/rest\/v10\/ping/,
+                [200, { 'Content-Type': 'application/json'}, '']);
+
+            this.api.ping(null, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should ping server with an action', function() {
+            var spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith('GET', /.*\/rest\/v10\/ping\/some_action/,
+                [200, { 'Content-Type': 'application/json'}, '']);
+
+            this.api.ping('some_action', this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalled();
+        });
+
     });
 
     describe("Authentication", function() {
