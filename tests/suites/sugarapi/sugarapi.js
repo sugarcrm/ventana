@@ -1200,6 +1200,42 @@ describe('SugarCRM Javascript API', function () {
             expect(this.httpError.status).toEqual(400);
         });
 
+        it("should not refresh token in case of invalid_grant while retrying queued requests", function() {
+            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
+            SugarTest.storage.AuthRefreshToken = "qwe";
+
+            var espy = sinon.spy(this.callbacks, "error");
+            var cspy = sinon.spy(this.callbacks, "complete");
+            var sspy = sinon.spy(this.callbacks, "success");
+            var response = {"error": "invalid_grant", "error_description": "some desc"};
+            var self = this;
+
+            var num = 0;
+            SugarTest.server.respondWith(function(xhr) {
+                if (++num > 3) throw new Error("Too many requests. Possible infinite loop");
+                //fake a server that fails all non-token requests
+                var status = 401;
+                var responseText = JSON.stringify(response);
+                if (xhr.url.indexOf("oauth2") > -1) {
+                    status = 200;
+                    responseText = JSON.stringify(self.fixtures["/rest/v10/oauth2/token"].POST.response);
+                }
+                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
+            });
+
+            this.api.records("read", "Accounts", null, null, this.callbacks);
+
+            SugarTest.server.respond();
+
+            expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
+            expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
+            expect(espy).toHaveBeenCalledOnce();
+            expect(cspy).toHaveBeenCalledOnce();
+            expect(sspy).not.toHaveBeenCalled();
+            expect(this.httpError).not.toBeNull();
+            expect(this.httpError.status).toEqual(401);
+        });
+
         it('should logout user', function () {
             var spy = sinon.spy(this.callbacks, 'success'),
                 sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
