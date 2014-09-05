@@ -752,7 +752,7 @@ describe('SugarCRM Javascript API', function () {
             var spy = sinon.spy(this.callbacks, 'success');
 
             SugarTest.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file\/filename.*/,
-                [200, {  "Content-Type":"application/json"}, ""]);
+                [200, {  "Content-Type":"application/json"}, "{}"]);
 
             this.api.file("read", {
                 module: "Notes",
