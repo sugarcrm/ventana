@@ -1346,7 +1346,7 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.wait();
 
             runs(function(){
-                expect(this.api.getRequest(request.uid)).not.toBeDefined();
+                expect(this.api.getRequest(request.uid)).toBeNull();
             })
         });
 
