@@ -272,7 +272,7 @@ describe('SugarCRM Javascript API', function () {
         it('should build resource URLs for fetching a link', function() {
             var params = { max_num: 20 },
             attributes = { id:'seed_jim_id', link:'reportees', related: null, relatedId: undefined },
-            url = this.api.buildURL("Users", "reportees", attributes, params);
+            url = this.api.buildURL("Users", null, attributes, params);
             expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?max_num=20');
         });
 
@@ -351,11 +351,11 @@ describe('SugarCRM Javascript API', function () {
             fileDownloadStub.restore();
         });
 
-        it('should build resource URLs for fetching a link with a filter param', function() {
+        it('should build resource URLs for fetching a link with a filter definition', function() {
             var params = { max_num: 20, filter: [{'name': 'Jim'}] },
             attributes = { id:'guidguidguid', link:'contacts', related: null, relatedId: undefined },
-            url = this.api.buildURL("Accounts", "contacts", attributes, params);
-            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts/filter?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
+            url = this.api.buildURL("Accounts", null, attributes, params);
+            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
         });
 
         it('eliminates null and undefined params from the querystring', function() {
