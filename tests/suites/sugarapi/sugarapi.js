@@ -272,7 +272,7 @@ describe('SugarCRM Javascript API', function () {
         it('should build resource URLs for fetching a link', function() {
             var params = { max_num: 20 },
             attributes = { id:'seed_jim_id', link:'reportees', related: null, relatedId: undefined },
-            url = this.api.buildURL("Users", "reportees", attributes, params);
+            url = this.api.buildURL("Users", null, attributes, params);
             expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?max_num=20');
         });
 
@@ -351,11 +351,11 @@ describe('SugarCRM Javascript API', function () {
             fileDownloadStub.restore();
         });
 
-        it('should build resource URLs for fetching a link with a filter param', function() {
+        it('should build resource URLs for fetching a link with a filter definition', function() {
             var params = { max_num: 20, filter: [{'name': 'Jim'}] },
             attributes = { id:'guidguidguid', link:'contacts', related: null, relatedId: undefined },
-            url = this.api.buildURL("Accounts", "contacts", attributes, params);
-            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts/filter?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
+            url = this.api.buildURL("Accounts", null, attributes, params);
+            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
         });
 
         it('eliminates null and undefined params from the querystring', function() {
@@ -1373,5 +1373,140 @@ describe('SugarCRM Javascript API', function () {
 
         });
 
+    });
+
+    describe("Bulk Requests", function() {
+        it("should queue rather than call when bulk is set to an ID", function() {
+            var ajaxStub = sinon.spy($, 'ajax');
+            SugarTest.server.respondWith(function(xhr) {
+                xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify({}));
+            });
+            this.api.call("read", "/rest/v10/ping", null, null, {bulk:true});
+            expect(ajaxStub.called).toBeFalsy();
+
+            ajaxStub.restore();
+            this.api.clearBulkQueue();
+        });
+
+        it("should queue hit the bulk API endpoint", function() {
+            this.api.clearBulkQueue();
+            SugarTest.server.respondWith(function(xhr) {
+                if (xhr.url == "/rest/v10/bulk") {
+                    xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify([{
+                        contents: "pong",
+                        headers: {},
+                        status: 200
+                    }]));
+                } else {
+                    xhr.respond(404, {"Content-Type": "application/json"}, "");
+                }
+            });
+            var response = "";
+            this.api.call("read", "/rest/v10/ping", null, {success:function(o){
+               response = o;
+            }}, {bulk:true});
+            this.api.triggerBulkCall();
+            SugarTest.server.respond();
+
+            expect(response).toEqual("pong");
+        });
+
+        it("should return a valid xhr object", function() {
+            this.api.clearBulkQueue();
+            SugarTest.server.respondWith(function(xhr) {
+                if (xhr.url == "/rest/v10/bulk") {
+                    xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify([{
+                        contents: "pong",
+                        headers: {
+                            "Cache-Control": "max-age=0, private",
+                            "ETag": "28b71fa23e3bb1239251291fd518610b"
+                        },
+                        status: 200,
+                        status_text: "OK"
+                    }]));
+                } else {
+                    xhr.respond(404, {"Content-Type": "application/json"}, "");
+                }
+            });
+            var response = "",
+                eTag = "",
+                allHeaders = "",
+                complete = false;
+            this.api.call("read", "/rest/v10/ping", null, {
+                success: function(o, req) {
+                    response = o;
+                    eTag = req.xhr.getResponseHeader("ETag");
+                    allHeaders = req.xhr.getAllResponseHeaders();
+                    expect(req.xhr.status).toEqual(200);
+                    expect(req.xhr.statusText).toEqual("OK");
+                    expect(req.xhr.responseText).toEqual("pong");
+                    expect(req.xhr.readyState).toEqual(4);
+                },
+                complete: function(req) {
+                    complete = true;
+                    expect(req.status).toEqual("success");
+                }
+            }, {bulk: true});
+            this.api.triggerBulkCall();
+            SugarTest.server.respond();
+
+            expect(response).toEqual("pong");
+            expect(eTag).toEqual("28b71fa23e3bb1239251291fd518610b");
+            expect(allHeaders).toEqual("Cache-Control: max-age=0, private\nETag: 28b71fa23e3bb1239251291fd518610b\n");
+            expect(complete).toBeTruthy();
+        });
+
+        it("should pass errors through to the request error handler", function() {
+            this.api.clearBulkQueue();
+            var payload = {
+                error: "no_method",
+                error_message: "Could not find a route with 1 elements"
+            };
+            SugarTest.server.respondWith(function(xhr) {
+                if (xhr.url == "/rest/v10/bulk") {
+                    xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify([{
+                        contents: payload,
+                        headers: {
+                            "Cache-Control": "no-store",
+                            "Content-Type": "application/json"
+                        },
+                        status: 404,
+                        status_text: "Not Found"
+                    }]));
+                } else {
+                    xhr.respond(500, {"Content-Type": "application/json"}, "");
+                }
+            });
+            var success = false,
+                complete = false,
+                errorCalled = false;
+            this.api.call("read", "/rest/v10/ping", null, {
+                success: function(o) {
+                    success = true;
+                },
+                error: function(error) {
+                    errorCalled = true;
+                    expect(error.code).toEqual("no_method");
+                    expect(error.errorThrown).toEqual("Not Found");
+                    expect(error.message).toEqual("Could not find a route with 1 elements");
+                    expect(error.status).toEqual(404);
+                    expect(error.textStatus).toEqual("error");
+                    expect(error.payload).toEqual(payload);
+                    expect(error.request.xhr.status).toEqual(404);
+                    expect(error.request.xhr.responseText).toEqual(JSON.stringify(payload));
+                    expect(error.request.xhr.statusText).toEqual("Not Found");
+                },
+                complete: function(req) {
+                    complete = true;
+                    expect(req.status).toEqual("error");
+                }
+            }, {bulk: true});
+            this.api.triggerBulkCall();
+            SugarTest.server.respond();
+
+            expect(success).toBeFalsy();
+            expect(errorCalled).toBeTruthy();
+            expect(complete).toBeTruthy();
+        });
     });
 });
