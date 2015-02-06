@@ -257,6 +257,25 @@ describe('SugarCRM Javascript API', function () {
             expect(url).toEqual('/rest/v10/contacts/1234/opportunities/4567');
         });
 
+        it('should build resource URLs for resources with link and link name', function () {
+            var attributes = {
+                    id:'1234',
+                    link: 'opportunities'
+                },
+                url = this.api.buildURL("contacts", null, attributes);
+
+            expect(url).toEqual('/rest/v10/contacts/1234/link/opportunities');
+        });
+
+        it('should build resource URLs for resources to create links', function () {
+            var attributes = {
+                    id:'1234',
+                    link: true
+                },
+                url = this.api.buildURL("contacts", null, attributes);
+
+            expect(url).toEqual('/rest/v10/contacts/1234/link');
+        });
 
         it('should build resource URLs for resources with custom params', function () {
             var params = {
