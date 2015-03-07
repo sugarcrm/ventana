@@ -415,7 +415,7 @@ describe('SugarCRM Javascript API', function () {
                 query = "bob",
                 recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 fields = "first_name,last_name";
-                SugarTest.server.respondWith("GET", /.*\/rest\/v10\/search\?.*q=bob/,
+                SugarTest.server.respondWith("GET", /.*\/rest\/v10\/globalsearch\?.*q=bob/,
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
