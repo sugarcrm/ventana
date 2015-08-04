@@ -355,7 +355,7 @@ describe('SugarCRM Javascript API', function () {
             var params = { max_num: 20, filter: [{'name': 'Jim'}] },
             attributes = { id:'guidguidguid', link:'contacts', related: null, relatedId: undefined },
             url = this.api.buildURL("Accounts", null, attributes, params);
-            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts/filter?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
+            expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
         });
 
         it('eliminates null and undefined params from the querystring', function() {
