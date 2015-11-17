@@ -257,6 +257,25 @@ describe('SugarCRM Javascript API', function () {
             expect(url).toEqual('/rest/v10/contacts/1234/opportunities/4567');
         });
 
+        it('should build resource URLs for resources with link and link name', function () {
+            var attributes = {
+                    id:'1234',
+                    link: 'opportunities'
+                },
+                url = this.api.buildURL("contacts", null, attributes);
+
+            expect(url).toEqual('/rest/v10/contacts/1234/link/opportunities');
+        });
+
+        it('should build resource URLs for resources to create links', function () {
+            var attributes = {
+                    id:'1234',
+                    link: true
+                },
+                url = this.api.buildURL("contacts", null, attributes);
+
+            expect(url).toEqual('/rest/v10/contacts/1234/link');
+        });
 
         it('should build resource URLs for resources with custom params', function () {
             var params = {
@@ -396,11 +415,11 @@ describe('SugarCRM Javascript API', function () {
                 query = "bob",
                 recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 fields = "first_name,last_name";
-                SugarTest.server.respondWith("GET", /.*\/rest\/v10\/search\?.*q=bob/,
+                SugarTest.server.respondWith("GET", /.*\/rest\/v10\/globalsearch\?.*q=bob/,
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
-            this.api.search({q:query, module_list: modules, fields: fields, max_num:20}, this.callbacks);
+            this.api.search({q:query, module_list: modules, fields: fields, max_num:20}, this.callbacks, {useNewApi: true});
             SugarTest.server.respond();
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(recordOne);
