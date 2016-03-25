@@ -929,7 +929,7 @@ describe('SugarCRM Javascript API', function () {
                     "ismobile":true
                 };
 
-            SugarTest.server.respondWith("POST", "/rest/v10/oauth2/token",
+            SugarTest.server.respondWith("POST", "/rest/v10/oauth2/token?platform=",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["/rest/v10/oauth2/token"].POST.response)]);
 
@@ -1365,7 +1365,7 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.wait();
 
             runs(function(){
-                expect(this.api.getRequest(request.uid)).not.toBeDefined();
+                expect(this.api.getRequest(request.uid)).toBeNull();
             })
         });
 
