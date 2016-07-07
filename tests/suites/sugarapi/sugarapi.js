@@ -380,7 +380,7 @@ describe('SugarCRM Javascript API', function () {
         it('eliminates null and undefined params from the querystring', function() {
             var params = { bad: null, worse: undefined},
                 attributes = { id:'1234' };
-            url = this.api.buildURL('Accounts','read',attributes,params);
+            var url = this.api.buildURL('Accounts','read',attributes,params);
             expect(url).toEqual('/rest/v10/Accounts/1234');
 
         });
@@ -499,7 +499,7 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy).toHaveBeenCalledWith(null, request);
             expect(cspy).toHaveBeenCalledWith(request);
-            req  = SugarTest.server.requests[0];
+            var req = SugarTest.server.requests[0];
             expect(req.requestBody).toEqual(JSON.stringify(attributes));
         });
 
