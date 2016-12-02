@@ -711,37 +711,43 @@ describe('SugarCRM Javascript API', function () {
         it('should delegate to the call method', function () {
             var callspy = sinon.spy(this.api, 'call');
 
-            SugarTest.server.respondWith("GET", "/rest/v10/metadata?type_filter=&module_filter=Contacts&module_dependencies=1",
+            SugarTest.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.modules.Contacts)]);
-            this.api.getMetadata('hash', [], ['Contacts'], this.callbacks);
+            this.api.getMetadata({modules: ['Contacts'], callbacks: this.callbacks});
             SugarTest.server.respond();
 
             expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?type_filter=&module_filter=Contacts&module_dependencies=1");
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?module_filter=Contacts&module_dependencies=1");
             callspy.restore();
         });
 
         it('should handle options params', function () {
             var callstub = sinon.stub(this.api, 'call');
 
-            this.api.getMetadata('hash', [], ['Contacts'], this.callbacks, {params:{lang:"en_us"}});
+            this.api.getMetadata({
+                modules: ['Contacts'],
+                callbacks: this.callbacks,
+                params: {lang: 'en_us'},
+            });
 
             expect(callstub).toHaveBeenCalled();
-            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&type_filter=&module_filter=Contacts&module_dependencies=1");
+            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&module_filter=Contacts&module_dependencies=1");
             callstub.restore();
         });
 
         it('should retrieve metadata', function () {
-            var types = [],
-                modules = ["Contacts"],
+            var modules = ["Contacts"],
                 spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
-            SugarTest.server.respondWith("GET", "/rest/v10/metadata?type_filter=&module_filter=Contacts&module_dependencies=1",
+            SugarTest.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(fixtures.metadata.modules.Contacts)]);
 
-            this.api.getMetadata('hash', types, modules, this.callbacks);
+            this.api.getMetadata({
+                modules: modules,
+                callbacks: this.callbacks
+            });
             SugarTest.server.respond(); //tell server to respond to pending async call
 
             expect(spy).toHaveBeenCalled();
