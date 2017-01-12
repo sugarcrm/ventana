@@ -27,6 +27,9 @@ describe('SugarCRM Javascript API', function () {
         SugarTest.storage.AuthRefreshToken = "abc";
         SugarTest.storage.DownloadToken = "zxc";
 
+        // TODO add tests for crosstab support
+        this.crosstabSupport = crosstab.supported;
+        crosstab.supported = false;
         this.api = SUGAR.Api.createInstance({
             serverUrl:"/rest/v10",
             keyValueStore: SugarTest.keyValueStore
@@ -57,6 +60,7 @@ describe('SugarCRM Javascript API', function () {
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
 
         // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
+        crosstab.supported = this.crosstabSupport;
         restoreApiSingleton();
     });
 
@@ -1007,7 +1011,6 @@ describe('SugarCRM Javascript API', function () {
             // so, this assertion means that 'executes' is not called the second time
             expect(rspy).not.toHaveBeenCalled();
         });
-
 
         it("should attempt refresh in case of invalid_grant response", function() {
             SugarTest.storage.AuthAccessToken = "xyz"; //55000555
