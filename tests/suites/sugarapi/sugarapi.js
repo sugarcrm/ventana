@@ -28,8 +28,11 @@ describe('SugarCRM Javascript API', function () {
         SugarTest.storage.DownloadToken = "zxc";
 
         // TODO add tests for crosstab support
-        this.crosstabSupport = crosstab.supported;
-        crosstab.supported = false;
+        if (window.crosstab) {
+            this.crosstabSupport = crosstab.supported;
+            crosstab.supported = false;
+        }
+
         this.api = SUGAR.Api.createInstance({
             serverUrl:"/rest/v10",
             keyValueStore: SugarTest.keyValueStore
@@ -60,7 +63,10 @@ describe('SugarCRM Javascript API', function () {
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
 
         // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
-        crosstab.supported = this.crosstabSupport;
+        if (window.crosstab) {
+            crosstab.supported = this.crosstabSupport;
+        }
+
         restoreApiSingleton();
     });
 
