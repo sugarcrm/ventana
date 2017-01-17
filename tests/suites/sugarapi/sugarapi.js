@@ -8,11 +8,14 @@
  *
  * Copyright (C) SugarCRM Inc. All rights reserved.
  */
+
+const Api = require('../../../lib/sugarapi/sugarapi');
+
 describe('SugarCRM Javascript API', function () {
 
     function restoreApiSingleton() {
         // Essentially, this will go back to an API instance per user's config file
-        SUGAR.Api.createInstance({
+        Api.createInstance({
             reset: true,
             serverUrl: SUGAR.App.config.serverUrl,
             platform: SUGAR.App.config.platform,
@@ -33,7 +36,7 @@ describe('SugarCRM Javascript API', function () {
             crosstab.supported = false;
         }
 
-        this.api = SUGAR.Api.createInstance({
+        this.api = Api.createInstance({
             serverUrl:"/rest/v10",
             keyValueStore: SugarTest.keyValueStore
         });
@@ -72,7 +75,7 @@ describe('SugarCRM Javascript API', function () {
 
     describe('Sugar Api Creation', function () {
         it('should create a default api instance', function () {
-            var api = SUGAR.Api.createInstance();
+            var api = Api.createInstance();
             expect(api.serverUrl).toEqual('/rest/v10');
             expect(api.isAuthenticated()).toBeFalsy();
         });
@@ -81,7 +84,7 @@ describe('SugarCRM Javascript API', function () {
 
             SugarTest.storage.AuthAccessToken = "xyz";
             var sspy = sinon.spy(SugarTest.keyValueStore, 'get'),
-                api = SUGAR.Api.createInstance({
+                api = Api.createInstance({
                     serverUrl:"/rest/v10",
                     platform: "portal",
                     keyValueStore: SugarTest.keyValueStore
@@ -93,7 +96,7 @@ describe('SugarCRM Javascript API', function () {
 
         it('should fail to create an instance if key/value store is invalid', function () {
             expect(function() {
-                SUGAR.Api.createInstance({ keyValueStore: {} });
+                Api.createInstance({ keyValueStore: {} });
             }).toThrow("Failed to initialize Sugar API: key/value store provider is invalid");
         });
 
@@ -103,7 +106,7 @@ describe('SugarCRM Javascript API', function () {
 
         it('should create instance taking an "on error" fallback http handler', function () {
             var stubHttpErrorHandler = sinon.stub(),
-                api = SUGAR.Api.createInstance({
+                api = Api.createInstance({
                     defaultErrorHandler: stubHttpErrorHandler
                 });
             expect(api.defaultErrorHandler).toEqual(stubHttpErrorHandler);
@@ -111,7 +114,7 @@ describe('SugarCRM Javascript API', function () {
 
         it("should use default fallback http handler", function() {
             var stubHttpErrorHandler = sinon.stub(),
-                api = SUGAR.Api.createInstance({
+                api = Api.createInstance({
                     defaultErrorHandler: stubHttpErrorHandler
                 });
             var response = {"error": "invalid_grant", "error_description": "some desc"};
@@ -129,7 +132,7 @@ describe('SugarCRM Javascript API', function () {
         it("should favor callback.error over the default fallback http handler", function() {
             var stubHttpErrorHandler = sinon.stub(),
                 callbackError = sinon.stub(),
-                api = SUGAR.Api.createInstance({
+                api = Api.createInstance({
                     defaultErrorHandler: stubHttpErrorHandler
                 });
             var response = {"error": "invalid_grant", "error_description": "some desc"};
@@ -379,7 +382,7 @@ describe('SugarCRM Javascript API', function () {
                 {
                     'module':'Accounts',
                     'uid':['a','b','c']
-                }, 
+                },
                 'fakeEl',
                 'fakeCallbacks',
                 []);
@@ -1322,7 +1325,7 @@ describe('SugarCRM Javascript API', function () {
                 getResponseHeader: function() { return "application/json" }
             };
 
-            var error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
+            var error = new Api.HttpError({ xhr: xhr }, "text status", "error thrown");
             expect(error.status).toEqual(404);
             expect(error.responseText).toEqual("response text");
             expect(error.textStatus).toEqual("text status");
@@ -1338,7 +1341,7 @@ describe('SugarCRM Javascript API', function () {
                 getResponseHeader: function() { return "application/json"; }
             };
 
-            error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
+            error = new Api.HttpError({ xhr: xhr }, "text status", "error thrown");
             expect(error.status).toEqual(401);
             expect(error.code).toEqual("invalid_grant");
             expect(error.message).toEqual("some message");
@@ -1349,7 +1352,7 @@ describe('SugarCRM Javascript API', function () {
                 getResponseHeader: function() { return "text/html; charset=iso-8859-1"; }
             };
 
-            error = new SUGAR.Api.HttpError({ xhr: xhr }, "text status", "error thrown");
+            error = new Api.HttpError({ xhr: xhr }, "text status", "error thrown");
             expect(error.status).toEqual(500);
             expect(error.code).toBeUndefined();
             expect(error.description).toBeUndefined();
@@ -1361,7 +1364,7 @@ describe('SugarCRM Javascript API', function () {
 
         it("should be able to set oauth header before executing ajax request", function() {
             var request, spy = sinon.spy($, 'ajax');
-            request = new SUGAR.Api.HttpRequest({});
+            request = new Api.HttpRequest({});
 
             request.execute("xyz");
             expect(request.params.headers["OAuth-Token"]).toEqual("xyz");
@@ -1372,12 +1375,12 @@ describe('SugarCRM Javascript API', function () {
 
         it("should count the number of current requests", function() {
             var request, spy = sinon.spy($, 'ajax');
-            request = new SUGAR.Api.HttpRequest({});
-            expect(SUGAR.Api.getCallsInProgressCount()).toBe(0);
+            request = new Api.HttpRequest({});
+            expect(Api.getCallsInProgressCount()).toBe(0);
             request.execute("xyz");
-            expect(SUGAR.Api.getCallsInProgressCount()).toBe(1);
+            expect(Api.getCallsInProgressCount()).toBe(1);
             SugarTest.server.respond();
-            expect(SUGAR.Api.getCallsInProgressCount()).toBe(0);
+            expect(Api.getCallsInProgressCount()).toBe(0);
             spy.restore();
         });
 
