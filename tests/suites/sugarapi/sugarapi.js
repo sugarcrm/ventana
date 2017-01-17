@@ -1372,18 +1372,6 @@ describe('SugarCRM Javascript API', function () {
             expect(request.xhr).toBeDefined();
             spy.restore();
         });
-
-        it("should count the number of current requests", function() {
-            var request, spy = sinon.spy($, 'ajax');
-            request = new Api.HttpRequest({});
-            expect(Api.getCallsInProgressCount()).toBe(0);
-            request.execute("xyz");
-            expect(Api.getCallsInProgressCount()).toBe(1);
-            SugarTest.server.respond();
-            expect(Api.getCallsInProgressCount()).toBe(0);
-            spy.restore();
-        });
-
     });
 
     describe("Hash of requests", function() {
