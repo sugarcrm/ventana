@@ -9,20 +9,20 @@
  * Copyright (C) SugarCRM Inc. All rights reserved.
  */
 
-const Api = require('../../../lib/sugarapi/sugarapi');
+const Api = require('sugarapi/sugarapi');
 
 describe('SugarCRM Javascript API', function () {
 
     function restoreApiSingleton() {
-        // Essentially, this will go back to an API instance per user's config file
-        Api.createInstance({
+        let config = {
             reset: true,
-            serverUrl: SUGAR.App.config.serverUrl,
-            platform: SUGAR.App.config.platform,
-            timeout: SUGAR.App.config.serverTimeout,
-            keyValueStore: SUGAR.App[SUGAR.App.config.authStore || "cache"],
-            clientID: SUGAR.App.config.clientID
-        });
+            serverUrl: '/rest/v10',
+            platform: 'base',
+            timeout: 30,
+            keyValueStore: SugarTest.keyValueStore,
+            clientID: 'sugar',
+        };
+        Api.createInstance(config);
     }
 
     beforeEach(function () {
@@ -30,7 +30,6 @@ describe('SugarCRM Javascript API', function () {
         SugarTest.storage.AuthRefreshToken = "abc";
         SugarTest.storage.DownloadToken = "zxc";
 
-        // TODO add tests for crosstab support
         if (window.crosstab) {
             this.crosstabSupport = crosstab.supported;
             crosstab.supported = false;
@@ -65,11 +64,11 @@ describe('SugarCRM Javascript API', function () {
         if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
         if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
 
-        // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
         if (window.crosstab) {
             crosstab.supported = this.crosstabSupport;
         }
 
+        // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
         restoreApiSingleton();
     });
 
@@ -100,6 +99,14 @@ describe('SugarCRM Javascript API', function () {
             }).toThrow("Failed to initialize Sugar API: key/value store provider is invalid");
         });
 
+        it('should initialize asynchronously if keyValueStore has initAsync', function () {
+            let keyValueStore = _.clone(SugarTest.keyValueStore);
+            keyValueStore.initAsync = sinon.spy();
+            Api.createInstance({
+                keyValueStore: keyValueStore
+            });
+            expect(keyValueStore.initAsync).toHaveBeenCalled();
+        });
     });
 
     describe('Fallback Error Handler', function () {
@@ -319,58 +326,71 @@ describe('SugarCRM Javascript API', function () {
             expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?max_num=20');
         });
 
-        it('should build resource URLs to access the File API', function() {
-            var attributes = { module: 'Notes', id: 'note_id', field: 'fileField' },
-                url = this.api.buildFileURL(attributes),
-                options;
+        describe('buildFileURL', function() {
+            let attributes = {module: 'Notes', id: 'note_id', field: 'fileField'};
 
-            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
+            it('should build resource URLs', function () {
+                let url = this.api.buildFileURL(attributes);
+                let options;
 
-            options = { platform: "base" };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&platform=base');
+                expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
 
-            options = { htmlJsonFormat: false };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
+                options = {platform: "base"};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&platform=base');
 
-            attributes = { module: 'Notes', id: 'note_id' };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file');
+                options = {htmlJsonFormat: false};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
 
-            options = { platform: 'mobile' };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=mobile');
+                attributes = {module: 'Notes', id: 'note_id'};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
-            options = { htmlJsonFormat: false };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file');
+                options = {platform: 'mobile'};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=mobile');
 
-            options = { htmlJsonFormat: false, forceDownload: true };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=1');
+                options = {htmlJsonFormat: false};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
-            options = { htmlJsonFormat: false, forceDownload: false };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
+                options = {htmlJsonFormat: false, forceDownload: true};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=1');
 
-            options = { passOAuthToken: true };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+                options = {htmlJsonFormat: false, forceDownload: false};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
 
-            options = { passDownloadToken: true };
-            url = this.api.buildFileURL(attributes, options);
-            expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=zxc');
+                options = {passOAuthToken: true};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
 
-            //cleanCache url
-            options = { cleanCache: true };
-            url = this.api.buildFileURL(attributes, options);
-            var clock = sinon.useFakeTimers();
-            //waiting for next time request
-            clock.tick(100);
-            var nextUrl = this.api.buildFileURL(attributes, options);
-            expect(url).not.toBe(nextUrl);
-            clock.restore();
+                options = {passDownloadToken: true};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=zxc');
+
+                options = {keep: true};
+                url = this.api.buildFileURL(attributes, options);
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?keep=1');
+
+                //cleanCache url
+                options = {cleanCache: true};
+                url = this.api.buildFileURL(attributes, options);
+                var clock = sinon.useFakeTimers();
+                var nextUrl = this.api.buildFileURL(attributes, options);
+                expect(url).not.toBe(nextUrl);
+                clock.restore();
+            });
+
+            it('should fall back to _platform set on instantiation if no platform arg is passed', function () {
+                let api = Api.createInstance({
+                    platform: 'my-platform',
+                });
+                let url = api.buildFileURL(attributes, {});
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=my-platform')
+            });
         });
 
         it('should build resource URLs to access the Export API', function() {
@@ -447,6 +467,19 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respond();
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(recordOne);
+        });
+
+        it('should get the count', function () {
+            let spy = sinon.spy(this.callbacks, 'success');
+            let module = 'Contacts';
+
+            SugarTest.server.respondWith('GET', '/rest/v10/Contacts/count',
+                [200, { 'Content-Type': 'application/json' }, '']);
+
+            let request = this.api.count(module, {}, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalledWith(null, request);
         });
 
         it('should get a record', function () {
@@ -570,7 +603,6 @@ describe('SugarCRM Javascript API', function () {
 
             expect(spy).toHaveBeenCalledWith(null, request);
         });
-
     });
 
     describe('Relationship CRUD actions', function () {
@@ -777,6 +809,30 @@ describe('SugarCRM Javascript API', function () {
             expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
         });
 
+        it('should retrieve public metadata', function () {
+            let callstub = sinon.stub(this.api, 'call');
+
+            this.api.getMetadata({
+                public: true,
+            });
+
+            expect(callstub).toHaveBeenCalled();
+            expect(callstub.getCall(0).args[1]).toEqual('/rest/v10/metadata/public?module_dependencies=1');
+        });
+    });
+
+    describe('CSS API', function () {
+        it('should request the desired theme for the specified platform', function () {
+            let spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith('GET', '/rest/v10/css?platform=my-platform&themeName=my-theme',
+                [200, {'Content-Type': 'text/css'}, '']);
+
+            let request = this.api.css('my-platform', 'my-theme', this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalledWith(null, request);
+        });
     });
 
     describe('File actions', function() {
@@ -1314,9 +1370,111 @@ describe('SugarCRM Javascript API', function () {
             expect(SugarTest.storage["DownloadToken"]).toBeUndefined();
             expect(sspy).toHaveBeenCalledThrice();
         });
+
+        describe('External logins', function () {
+            it('should let you set the external login status', function () {
+                let originalExternalLogin = this.api.isExternalLogin();
+                let newExternalLogin = !originalExternalLogin;
+                this.api.setExternalLogin(newExternalLogin);
+                expect(this.api.isExternalLogin()).toEqual(newExternalLogin);
+                this.api.setExternalLogin(originalExternalLogin);
+            });
+
+            it('should call the externalLoginUICallback against the provided error url', function () {
+                let callback = sinon.spy();
+                let api = Api.createInstance({
+                    externalLoginUICallback: callback,
+                });
+                let error = {
+                    payload: {
+                        url: 'http://example.com'
+                    }
+                };
+                api.handleExternalLogin(new Api.HttpRequest({}), error, $.noop);
+                expect(callback).toHaveBeenCalledWith(error.payload.url);
+            });
+        });
+    });
+
+    describe('signup', function () {
+        it('should register a lead', function () {
+            let spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith('POST', '/rest/v10/Leads/register',
+                [200, {'Content-Type': 'application/json'}, '']);
+
+            let request = this.api.signup({ first_name: 'John', last_name: 'Doe' }, {}, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalledWith(null, request);
+        });
+    });
+
+    describe('Following', function () {
+        it('should subscribe or unsubscribe as appropriate', function () {
+            let module = 'Accounts';
+            let id = '1234';
+            let spy = sinon.spy(this.callbacks, 'success');
+
+            let data = [
+                {
+                    followed: true,
+                    method: 'POST',
+                    action: 'subscribe',
+                },
+                {
+                    followed: false,
+                    method: 'DELETE',
+                    action: 'unsubscribe',
+                }
+            ];
+            _.each(data, function (option) {
+                SugarTest.server.respondWith(option.method, ['/rest/v10', module, id, option.action].join('/'),
+                    [200, { 'Content-Type': 'application/json' }, '']);
+
+                let request = this.api.follow(module, id, option.followed, this.callbacks);
+                SugarTest.server.respond();
+
+                expect(spy).toHaveBeenCalledWith(null, request);
+            }.bind(this));
+        });
+    });
+
+    describe('Me API', function () {
+        it('should read my information', function () {
+            let spy = sinon.spy(this.callbacks, 'success');
+
+            SugarTest.server.respondWith('GET', '/rest/v10/me',
+                [200, { 'Content-Type': 'application/json' }, '']);
+
+            let request = this.api.me('read', {}, {}, this.callbacks);
+            SugarTest.server.respond();
+
+            expect(spy).toHaveBeenCalledWith(null, request);
+        });
     });
 
     describe("HttpError", function() {
+
+        describe('toString', function () {
+            it('should display details of the error', function () {
+                let error = new Api.HttpError({
+                    xhr: {
+                        status: 401,
+                        responseText: '{ "error": "forbidden", "error_message": "this is forbidden" }',
+                        getResponseHeader: () => { return 'application/json' },
+                    },
+                }, 'my text status', 'my error');
+                expect(error.toString()).toEqual([
+                    'HTTP error: 401',
+                    'type: my text status',
+                    'error: my error',
+                    'response: { "error": "forbidden", "error_message": "this is forbidden" }',
+                    'code: forbidden',
+                    'message: this is forbidden'
+                ].join('\n'));
+            });
+        });
 
         it("should be able properly instantiate itself", function() {
             var xhr = {
@@ -1361,16 +1519,32 @@ describe('SugarCRM Javascript API', function () {
     });
 
     describe("HttpRequest", function() {
+        let spy, request;
+
+        beforeEach(function () {
+            spy = sinon.spy($, 'ajax');
+            request = new Api.HttpRequest({});
+        });
+
+        afterEach(function () {
+            spy.restore();
+        });
 
         it("should be able to set oauth header before executing ajax request", function() {
-            var request, spy = sinon.spy($, 'ajax');
-            request = new Api.HttpRequest({});
-
             request.execute("xyz");
             expect(request.params.headers["OAuth-Token"]).toEqual("xyz");
             expect(spy).toHaveBeenCalled();
             expect(request.xhr).toBeDefined();
-            spy.restore();
+        });
+
+        it('should be able to set metadata hash', function () {
+            request.execute('something', 'my-metadata-hash');
+            expect(request.params.headers['X-Metadata-Hash']).toEqual('my-metadata-hash');
+        });
+
+        it('should be able to set userpref hash', function () {
+            request.execute('something', 'my-metadata-hash', 'my-userpref-hash');
+            expect(request.params.headers['X-Userpref-Hash']).toEqual('my-userpref-hash');
         });
     });
 
@@ -1419,12 +1593,55 @@ describe('SugarCRM Javascript API', function () {
             this.api.abortRequest(request.uid);
 
             SugarTest.server.respond();
-
         });
-
     });
 
-    describe("Bulk Requests", function() {
+    describe('File Downloads', function () {
+        it('should ping before using the iframe hack', function () {
+            let callStub = sinon.stub(this.api, 'call');
+            this.api.fileDownload('myfile');
+            expect(callStub).toHaveBeenCalledWith('read', '/rest/v10/ping');
+        });
+    });
+
+    describe('State properties', function () {
+       it('should store and clear state', function () {
+           this.api.resetState();
+           this.api.setStateProperty('my key', 'my value');
+           expect(this.api.getStateProperty('my key')).toEqual('my value');
+           this.api.clearStateProperty('my key');
+           expect(this.api.getStateProperty('my key')).toBeUndefined();
+       });
+    });
+
+    describe("Bulk Requests", function () {
+        it('should not request if bulk calls are disabled', function () {
+            let api = Api.createInstance({ disableBulkApi: true });
+            api.call('read', '/rest/v10/ping', null, null, { bulk: true });
+            let callStub = sinon.stub(api, 'call');
+            api.triggerBulkCall();
+            expect(callStub.called).toBeFalsy();
+        });
+
+        it('should not request if there is no queue', function () {
+            // FIXME: we also need to test that we should throw an error
+            this.api.clearBulkQueue();
+            let callStub = sinon.stub(this.api, 'call');
+            this.api.triggerBulkCall();
+            expect(callStub.called).toBeFalsy();
+        });
+
+        describe('bulk method', function() {
+            it('should make a bulk call with the provided arguments', function () {
+                let callStub = sinon.stub(this.api, 'call');
+                let data = { requests: ['test request'] };
+                let callbacks = { myCallback: $.noop };
+                let options = { async: true };
+                this.api.bulk(data, callbacks, options);
+                expect(callStub).toHaveBeenCalledWith('create', '/rest/v10/bulk', data, callbacks, options);
+            });
+        });
+
         it("should queue rather than call when bulk is set to an ID", function() {
             var ajaxStub = sinon.spy($, 'ajax');
             SugarTest.server.respondWith(function(xhr) {
