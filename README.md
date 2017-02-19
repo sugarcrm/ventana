@@ -1,4 +1,4 @@
-# Ventana
+# Ventana [![Build Status](https://travis-ci.org/sugarcrm/ventana.svg?branch=master)](https://travis-ci.org/sugarcrm/ventana)
 
 Ventana is a client to help connecting and making requests to a SugarCRM REST
 API on multiple versions.

@@ -1,0 +1,19 @@
+# https://docs.travis-ci.com/user/trusty-ci-environment/#Using-Trusty
+sudo: false
+dist: trusty
+
+language: node_js
+
+node_js:
+  - "6"
+
+addons:
+  apt:
+    packages:
+      - google-chrome-stable
+
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+script: "yarn test"

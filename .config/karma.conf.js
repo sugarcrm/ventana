@@ -7,7 +7,7 @@ const path = require('path');
 
 module.exports = function (config) {
 
-    config.set({
+    let conf = {
         basePath: '../',
 
         files: [
@@ -81,5 +81,18 @@ module.exports = function (config) {
         webpackMiddleware: {
             stats: 'errors-only',
         },
-    });
+
+        customLaunchers: {
+            Chrome_CI: {
+                base: 'Chrome',
+                flags: ['--no-sandbox'],
+            }
+        },
+    };
+
+    if (process.env.TRAVIS) {
+        conf.browsers = ['Chrome_CI'];
+    }
+
+    config.set(conf);
 };
