@@ -10,24 +10,12 @@ var SugarTest = {};
         set: function(key, value) {
             test.storage[key] = value;
         },
-        add: function(key, value) {
-            test.storage[key] += value;
-        },
         get: function(key) {
             return test.storage[key];
-        },
-        has: function(key) {
-            return test.storage[key] ? true : false;
         },
         cut: function(key) {
             delete test.storage[key];
         },
-        cutAll: function() {
-            test.storage = {};
-        },
-        getAll: function() {
-            return test.storage;
-        }
     };
 
     test.waitFlag = false;
