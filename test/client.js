@@ -6,18 +6,6 @@ const Api = require('../src/client');
 
 describe('SugarCRM Javascript API', function () {
 
-    function restoreApiSingleton() {
-        let config = {
-            reset: true,
-            serverUrl: '/rest/v10',
-            platform: 'base',
-            timeout: 30,
-            keyValueStore: SugarTest.keyValueStore,
-            clientID: 'sugar',
-        };
-        Api.createInstance(config);
-    }
-
     beforeEach(function () {
         SugarTest.storage.AuthAccessToken = "xyz";
         SugarTest.storage.AuthRefreshToken = "abc";
@@ -66,9 +54,6 @@ describe('SugarCRM Javascript API', function () {
         }
 
         this.server.restore();
-
-        // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
-        restoreApiSingleton();
     });
 
     describe('Sugar Api Creation', function () {
