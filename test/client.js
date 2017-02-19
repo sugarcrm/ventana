@@ -65,6 +65,8 @@ describe('SugarCRM Javascript API', function () {
             crosstab.supported = this.crosstabSupport;
         }
 
+        this.server.restore();
+
         // Since api is a singleton .. /rest/v10 becomes the new serverUrl for all other tests.
         restoreApiSingleton();
     });

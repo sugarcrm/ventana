@@ -22,9 +22,6 @@ var SugarTest = {};
     test.wait = function() { waitsFor(function() { return test.waitFlag; }); };
     test.resetWaitFlag = function() { this.waitFlag = false; };
     test.setWaitFlag = function() { this.waitFlag = true; };
-    test.dispose = function() {
-        if (this.server && this.server.restore) this.server.restore();
-    };
 
 }(SugarTest));
 
@@ -34,7 +31,6 @@ beforeEach(function(){
 });
 
 afterEach(function() {
-    SugarTest.dispose();
 });
 
 window.SugarTest = SugarTest;
