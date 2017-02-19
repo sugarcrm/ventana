@@ -30,10 +30,6 @@ var SugarTest = {};
         }
     };
 
-    test.seedFakeServer = function() {
-        SugarTest.server = sinon.fakeServer.create();
-    };
-
     test.waitFlag = false;
     test.wait = function() { waitsFor(function() { return test.waitFlag; }); };
     test.resetWaitFlag = function() { this.waitFlag = false; };
