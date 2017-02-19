@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/sugarcrm/ventana#readme",
   "devDependencies": {
+    "coveralls": "^2.11.16",
     "istanbul-instrumenter-loader": "^2.0.0",
     "jasmine-sinon": "^0.3.2",
     "jquery": "1.11.3",
