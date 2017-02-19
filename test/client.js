@@ -7,9 +7,6 @@ const Api = require('../src/client');
 describe('Api client', function () {
 
     beforeEach(function () {
-        SugarTest.storage.AuthAccessToken = "xyz";
-        SugarTest.storage.AuthRefreshToken = "abc";
-        SugarTest.storage.DownloadToken = "zxc";
 
         if (window.crosstab) {
             this.crosstabSupport = crosstab.supported;
@@ -75,6 +72,8 @@ describe('Api client', function () {
 
             expect(api.isAuthenticated()).toBeTruthy();
             expect(sspy).toHaveBeenCalled();
+
+            delete SugarTest.storage.AuthAccessToken;
         });
 
         it('should fail to create an instance if key/value store is invalid', function () {
@@ -141,7 +140,11 @@ describe('Api client', function () {
     });
 
     describe('Request Handler', function () {
+
         it('should make a request with the correct request url', function () {
+
+            SugarTest.storage.AuthAccessToken = "xyz";
+
             var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
@@ -154,6 +157,8 @@ describe('Api client', function () {
             expect(args.url).toEqual("/rest/v10/contact");
             expect(args.headers["If-Modified-Since"]).toBeUndefined();
             expect(args.headers["OAuth-Token"]).toBeDefined();
+
+            delete SugarTest.storage.AuthAccessToken;
         });
 
         it('should set the right method on request', function () {
@@ -347,14 +352,6 @@ describe('Api client', function () {
                 url = this.api.buildFileURL(attributes, options);
                 expect(url).toEqual('/rest/v10/Notes/note_id/file?force_download=0');
 
-                options = {passOAuthToken: true};
-                url = this.api.buildFileURL(attributes, options);
-                expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
-
-                options = {passDownloadToken: true};
-                url = this.api.buildFileURL(attributes, options);
-                expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=zxc');
-
                 options = {keep: true};
                 url = this.api.buildFileURL(attributes, options);
                 expect(url).toEqual('/rest/v10/Notes/note_id/file?keep=1');
@@ -366,6 +363,26 @@ describe('Api client', function () {
                 var nextUrl = this.api.buildFileURL(attributes, options);
                 expect(url).not.toBe(nextUrl);
                 clock.restore();
+            });
+
+            it('should allow passing OAuthToken on URL for 6.7 versions', function() {
+
+                SugarTest.storage.AuthAccessToken = 'xyz';
+                let url = this.api.buildFileURL(attributes, { passOAuthToken: true });
+
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+
+                delete SugarTest.storage.AuthAccessToken;
+            });
+
+            it('should allow passing download token on URL', function() {
+
+                SugarTest.storage.DownloadToken = 'zxc';
+                let url = this.api.buildFileURL(attributes, { passDownloadToken: true });
+
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=zxc');
+
+                delete SugarTest.storage.DownloadToken;
             });
 
             it('should fall back to _platform set on instantiation if no platform arg is passed', function () {
@@ -987,6 +1004,9 @@ describe('Api client', function () {
     describe("Authentication", function() {
 
         it("should be able to detect when to refresh auth token", function() {
+
+            SugarTest.storage.AuthRefreshToken = 'abc';
+
             this.api.setRefreshingToken(true);
             expect(this.api.needRefreshAuthToken()).toBeFalsy();
 
@@ -997,6 +1017,8 @@ describe('Api client', function () {
             expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/oauth2/logout", "invalid_grant")).toBeFalsy();
             expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/Contacts", "invalid_grant")).toBeTruthy();
             expect(this.api.needRefreshAuthToken("../sugarcrm/rest/v10/search", "invalid_grant")).toBeTruthy();
+
+            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it('should login users with correct credentials', function () {
@@ -1032,6 +1054,10 @@ describe('Api client', function () {
             expect(requestBody['client_info']).toBeDefined();
             expect(requestBody['client_info'].uuid).toEqual(extraInfo.uuid);
             expect(requestBody.username).toEqual('admin');
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
+            delete SugarTest.storage.DownloadToken;
         });
 
         it('should not login users with incorrect credentials', function () {
@@ -1059,6 +1085,8 @@ describe('Api client', function () {
             // this spy is created after the method gets called
             // so, this assertion means that 'executes' is not called the second time
             expect(rspy).not.toHaveBeenCalled();
+
+            delete SugarTest.storage.DownloadToken;
         });
 
         it("should attempt refresh in case of invalid_grant response", function() {
@@ -1103,6 +1131,10 @@ describe('Api client', function () {
             expect(cspy).toHaveBeenCalledOnce();
             expect(espy).not.toHaveBeenCalled();
             expect(sspy).toHaveBeenCalledOnce();
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
+            delete SugarTest.storage.DownloadToken;
         });
 
         it("should handle multiple requests and refresh token in case of invalid_grant response", function() {
@@ -1153,6 +1185,10 @@ describe('Api client', function () {
             expect(cspy.callCount).toEqual(3);
             expect(espy).not.toHaveBeenCalled();
             expect(sspy.callCount).toEqual(3);
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
+            delete SugarTest.storage.DownloadToken;
         });
 
         it("should pass error to original callback in case of invalid_grant response happens and the original request fails", function() {
@@ -1200,6 +1236,10 @@ describe('Api client', function () {
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(404);
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
+            delete SugarTest.storage.DownloadToken;
         });
 
         it("should stop refreshing in case of invalid_grant response happens more than once in a row", function() {
@@ -1233,6 +1273,9 @@ describe('Api client', function () {
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it("should handle multiple requests and stop refreshing in case of invalid_grant response happens more than once in a row", function() {
@@ -1271,6 +1314,9 @@ describe('Api client', function () {
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it("should not refresh token in case of invalid_grant response happens for auth request", function() {
@@ -1299,6 +1345,9 @@ describe('Api client', function () {
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(400);
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it("should not refresh token in case of invalid_grant while retrying queued requests", function() {
@@ -1335,6 +1384,9 @@ describe('Api client', function () {
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
+
+            delete SugarTest.storage.AuthAccessToken;
+            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it('should logout user', function () {

@@ -26,7 +26,6 @@ var SugarTest = {};
 }(SugarTest));
 
 beforeEach(function(){
-    SugarTest.storage = {};
     SugarTest.resetWaitFlag();
 });
 
