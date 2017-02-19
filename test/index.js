@@ -71,8 +71,5 @@ function using(name, values, func) {
 window.SugarTest = SugarTest;
 window.using = using;
 
-let fixtures = {};
-window.fixtures = fixtures;
-
 var testsContext = require.context('./', true, /client\.js/);
 testsContext.keys().forEach(testsContext);
