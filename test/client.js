@@ -4,6 +4,84 @@
 
 const Api = require('../src/client');
 
+describe('Instantiation', function () {
+
+    beforeEach(function () {
+        this.sandbox = sinon.sandbox.create();
+
+        this.storage = {
+            get() {},
+            set() {},
+            cut() {},
+        };
+    });
+
+    it('should default to `/rest/v10` and not be authenticated', function () {
+
+        let api = Api.createInstance();
+
+        expect(api.serverUrl).toEqual('/rest/v10');
+        expect(api.isAuthenticated()).toBeFalsy();
+    });
+
+    it('should assume to be authenticated if storage has `AuthAccessToken`', function () {
+
+        let getStub = this.sandbox.stub(this.storage, 'get')
+            .withArgs('AuthAccessToken').returns('xyz');
+
+        let api = Api.createInstance({
+            keyValueStore: this.storage,
+        });
+
+        expect(api.isAuthenticated()).toBeTruthy();
+        expect(getStub).toHaveBeenCalled();
+    });
+
+    it('should throw error when store is invalid', function () {
+
+        const err = 'Failed to initialize Sugar API: key/value store provider is invalid';
+
+        expect(function() {
+            Api.createInstance({ keyValueStore: {} });
+        }).toThrow(err);
+
+        expect(function() {
+            Api.createInstance({ keyValueStore: {
+                // no get
+                set() {},
+                cut() {},
+            } });
+        }).toThrow(err);
+
+        expect(function() {
+            Api.createInstance({ keyValueStore: {
+                get() {},
+                // no set
+                cut() {},
+            } });
+        }).toThrow(err);
+
+        expect(function() {
+            Api.createInstance({ keyValueStore: {
+                get() {},
+                set() {},
+                // no cut
+            } });
+        }).toThrow(err);
+
+    });
+
+    it('should initialize asynchronously if keyValueStore has initAsync', function () {
+
+        let storage = _.clone(this.storage);
+        storage.initAsync = sinon.spy();
+
+        Api.createInstance({ keyValueStore: storage });
+        expect(storage.initAsync).toHaveBeenCalled();
+    });
+
+});
+
 describe('Api client', function () {
 
     beforeEach(function () {
@@ -51,45 +129,6 @@ describe('Api client', function () {
         }
 
         this.server.restore();
-    });
-
-    describe('Sugar Api Creation', function () {
-        it('should create a default api instance', function () {
-            var api = Api.createInstance();
-            expect(api.serverUrl).toEqual('/rest/v10');
-            expect(api.isAuthenticated()).toBeFalsy();
-        });
-
-        it('should create an authenticated instance if storage has auth token set', function () {
-
-            SugarTest.storage.AuthAccessToken = "xyz";
-            var sspy = sinon.spy(SugarTest.keyValueStore, 'get'),
-                api = Api.createInstance({
-                    serverUrl:"/rest/v10",
-                    platform: "portal",
-                    keyValueStore: SugarTest.keyValueStore
-                });
-
-            expect(api.isAuthenticated()).toBeTruthy();
-            expect(sspy).toHaveBeenCalled();
-
-            delete SugarTest.storage.AuthAccessToken;
-        });
-
-        it('should fail to create an instance if key/value store is invalid', function () {
-            expect(function() {
-                Api.createInstance({ keyValueStore: {} });
-            }).toThrow("Failed to initialize Sugar API: key/value store provider is invalid");
-        });
-
-        it('should initialize asynchronously if keyValueStore has initAsync', function () {
-            let keyValueStore = _.clone(SugarTest.keyValueStore);
-            keyValueStore.initAsync = sinon.spy();
-            Api.createInstance({
-                keyValueStore: keyValueStore
-            });
-            expect(keyValueStore.initAsync).toHaveBeenCalled();
-        });
     });
 
     describe('Fallback Error Handler', function () {
