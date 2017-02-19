@@ -1,0 +1,46 @@
+{
+  "name": "@sugarcrm/ventana",
+  "version": "1.0.0",
+  "description": "SugarCRM REST API client",
+  "main": "src/client.js",
+  "scripts": {
+    "test": "karma start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sugarcrm/ventana.git"
+  },
+  "keywords": [
+    "sugarcrm",
+    "rest-client"
+  ],
+  "author": "SugarCRM Inc.",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sugarcrm/ventana/issues"
+  },
+  "homepage": "https://github.com/sugarcrm/ventana#readme",
+  "devDependencies": {
+    "istanbul-instrumenter-loader": "^2.0.0",
+    "jasmine-sinon": "^0.3.2",
+    "jquery": "1.11.3",
+    "jquery-migrate": "1.2.1",
+    "karma": "^1.4.1",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-coverage": "^1.1.1",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-jasmine": "~0.1.5",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-safari-launcher": "^1.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^2.0.2",
+    "sinon": "1.6.0",
+    "underscore": "^1.8.3",
+    "webpack": "^1.13.3"
+  },
+  "peerDependencies": {
+    "jquery": "1.11.3",
+    "jquery-migrate": "1.2.1",
+    "underscore": "^1.8.3"
+  }
+}
