@@ -33,7 +33,9 @@ describe('SugarCRM Javascript API', function () {
             keyValueStore: SugarTest.keyValueStore
         });
         this.fixtures = require('./fixtures/api.js');
-        this.fixtures.fields = fixtures.metadata.fields;
+        let metadata = require('./fixtures/metadata.js').metadata;
+        this.fixtures.metadata = metadata;
+        this.fixtures.fields = metadata.fields;
         SugarTest.seedFakeServer();
         var self = this;
         this.callbacks = {
@@ -761,7 +763,7 @@ describe('SugarCRM Javascript API', function () {
 
             SugarTest.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(fixtures.metadata.modules.Contacts)]);
+                    JSON.stringify(this.fixtures.metadata.modules.Contacts)]);
             this.api.getMetadata({modules: ['Contacts'], callbacks: this.callbacks});
             SugarTest.server.respond();
 
@@ -790,7 +792,7 @@ describe('SugarCRM Javascript API', function () {
             //this.api.debug=true;
             SugarTest.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
                 [200, {  "Content-Type":"application/json"},
-                    JSON.stringify(fixtures.metadata.modules.Contacts)]);
+                    JSON.stringify(this.fixtures.metadata.modules.Contacts)]);
 
             this.api.getMetadata({
                 modules: modules,
@@ -799,7 +801,7 @@ describe('SugarCRM Javascript API', function () {
             SugarTest.server.respond(); //tell server to respond to pending async call
 
             expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toEqual(fixtures.metadata.modules.Contacts);
+            expect(spy.getCall(0).args[0]).toEqual(this.fixtures.metadata.modules.Contacts);
         });
 
         it('should retrieve public metadata', function () {

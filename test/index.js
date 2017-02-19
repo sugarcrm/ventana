@@ -72,9 +72,6 @@ window.SugarTest = SugarTest;
 window.using = using;
 
 let fixtures = {};
-
-let metadata = require('./fixtures/metadata.js');
-fixtures.metadata = metadata.metadata;
 window.fixtures = fixtures;
 
 var testsContext = require.context('./', true, /client\.js/);
