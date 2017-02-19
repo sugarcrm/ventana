@@ -32,7 +32,7 @@ describe('SugarCRM Javascript API', function () {
             serverUrl:"/rest/v10",
             keyValueStore: SugarTest.keyValueStore
         });
-        this.fixtures = fixtures.api;
+        this.fixtures = require('./fixtures/api.js');
         this.fixtures.fields = fixtures.metadata.fields;
         SugarTest.seedFakeServer();
         var self = this;
@@ -223,7 +223,7 @@ describe('SugarCRM Javascript API', function () {
         it('should fire error callbacks and return requests objects on error', function () {
 
             SugarTest.server.respondWith("GET", "rest/v10/contacts/123",
-                [fixtures.api.responseErrors.fourhundred.code, { "Content-Type":"application/json" },
+                [this.fixtures.responseErrors.fourhundred.code, { "Content-Type":"application/json" },
                     this.fixtures.responseErrors.fourhundred.body]);
             var result = this.api.call('read', 'rest/v10/contacts/123', null, null, this.callbacks);
 

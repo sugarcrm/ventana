@@ -72,7 +72,6 @@ window.SugarTest = SugarTest;
 window.using = using;
 
 let fixtures = {};
-fixtures.api = require('./fixtures/api.js');
 
 let metadata = require('./fixtures/metadata.js');
 fixtures.metadata = metadata.metadata;
