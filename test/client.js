@@ -9,7 +9,7 @@
  * Copyright (C) SugarCRM Inc. All rights reserved.
  */
 
-const Api = require('sugarapi/sugarapi');
+const Api = require('../src/client');
 
 describe('SugarCRM Javascript API', function () {
 
