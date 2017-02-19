@@ -4,7 +4,7 @@
 
 const Api = require('../src/client');
 
-describe('SugarCRM Javascript API', function () {
+describe('Api client', function () {
 
     beforeEach(function () {
         SugarTest.storage.AuthAccessToken = "xyz";

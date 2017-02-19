@@ -30,9 +30,6 @@ beforeEach(function(){
     SugarTest.resetWaitFlag();
 });
 
-afterEach(function() {
-});
-
 window.SugarTest = SugarTest;
 
 var testsContext = require.context('./', true, /client\.js/);
