@@ -86,15 +86,24 @@ describe('Api client', function () {
 
     beforeEach(function () {
 
+        this.sandbox = sinon.sandbox.create();
+
         if (window.crosstab) {
             this.crosstabSupport = crosstab.supported;
             crosstab.supported = false;
         }
 
+        this.storage = {
+            get() {},
+            set() {},
+            cut() {},
+        };
+
         this.api = Api.createInstance({
-            serverUrl:"/rest/v10",
-            keyValueStore: SugarTest.keyValueStore
+            serverUrl: '/rest/v10',
+            keyValueStore: this.storage,
         });
+
         this.fixtures = require('./fixtures/api.js');
         let metadata = require('./fixtures/metadata.js').metadata;
         this.fixtures.metadata = metadata;
@@ -120,9 +129,6 @@ describe('Api client', function () {
         if (this.callbacks.complete.restore) this.callbacks.complete.restore();
         if (this.api.call.restore) this.api.call.restore();
         if ($.ajax.restore) $.ajax.restore();
-        if (SugarTest.keyValueStore.set.restore) SugarTest.keyValueStore.set.restore();
-        if (SugarTest.keyValueStore.get.restore) SugarTest.keyValueStore.get.restore();
-        if (SugarTest.keyValueStore.cut.restore) SugarTest.keyValueStore.cut.restore();
 
         if (window.crosstab) {
             crosstab.supported = this.crosstabSupport;
@@ -182,22 +188,15 @@ describe('Api client', function () {
 
         it('should make a request with the correct request url', function () {
 
-            SugarTest.storage.AuthAccessToken = "xyz";
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
 
-            var spy = sinon.spy($, 'ajax'), args;
+            this.api.call('read', '/rest/v10/contact', {
+                date_modified: '2012-02-08 19:18:25'
+            });
 
-            //@arguments: method, URL, options
-            this.api.call('read', '/rest/v10/contact', { date_modified: "2012-02-08 19:18:25" });
+            expect(xhr.requests[0].url).toEqual('/rest/v10/contact');
+            expect(xhr.requests[0].requestHeaders['If-Modified-Since']).toBeUndefined();
 
-            // Spy was called
-            expect(spy).toHaveBeenCalled();
-
-            args = spy.getCall(0).args[0];
-            expect(args.url).toEqual("/rest/v10/contact");
-            expect(args.headers["If-Modified-Since"]).toBeUndefined();
-            expect(args.headers["OAuth-Token"]).toBeDefined();
-
-            delete SugarTest.storage.AuthAccessToken;
         });
 
         it('should set the right method on request', function () {
@@ -406,22 +405,24 @@ describe('Api client', function () {
 
             it('should allow passing OAuthToken on URL for 6.7 versions', function() {
 
-                SugarTest.storage.AuthAccessToken = 'xyz';
+                this.sandbox.stub(this.storage, 'get')
+                    .withArgs('AuthAccessToken').returns('token-for-6.7');
+
                 let url = this.api.buildFileURL(attributes, { passOAuthToken: true });
 
-                expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=xyz');
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?oauth_token=token-for-6.7');
 
-                delete SugarTest.storage.AuthAccessToken;
             });
 
             it('should allow passing download token on URL', function() {
 
-                SugarTest.storage.DownloadToken = 'zxc';
+                this.sandbox.stub(this.storage, 'get')
+                    .withArgs('DownloadToken').returns('token-to-download');
+
                 let url = this.api.buildFileURL(attributes, { passDownloadToken: true });
 
-                expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=zxc');
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=token-to-download');
 
-                delete SugarTest.storage.DownloadToken;
             });
 
             it('should fall back to _platform set on instantiation if no platform arg is passed', function () {
@@ -1044,7 +1045,8 @@ describe('Api client', function () {
 
         it("should be able to detect when to refresh auth token", function() {
 
-            SugarTest.storage.AuthRefreshToken = 'abc';
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthRefreshToken').returns('refresh-me');
 
             this.api.setRefreshingToken(true);
             expect(this.api.needRefreshAuthToken()).toBeFalsy();
@@ -1057,21 +1059,21 @@ describe('Api client', function () {
             expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/Contacts", "invalid_grant")).toBeTruthy();
             expect(this.api.needRefreshAuthToken("../sugarcrm/rest/v10/search", "invalid_grant")).toBeTruthy();
 
-            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it('should login users with correct credentials', function () {
-            var spy = sinon.spy(this.callbacks, 'success'),
-                sspy = sinon.spy(SugarTest.keyValueStore, 'set'),
-                requestBody,
-                extraInfo = {
-                    "uuid":"xyz",
-                    "model":"iPhone3,1",
-                    "osVersion":"5.0.1",
-                    "carrier":"att",
-                    "appVersion":"SugarMobile 1.0",
-                    "ismobile":true
-                };
+
+            let spy = this.sandbox.spy(this.callbacks, 'success');
+            let setStub = this.sandbox.stub(this.storage, 'set');
+            let requestBody;
+            let extraInfo = {
+                'uuid': 'xyz',
+                'model': 'iPhone3,1',
+                'osVersion': '5.0.1',
+                'carrier': 'att',
+                'appVersion': 'SugarMobile 1.0',
+                'ismobile': true,
+            };
 
             this.server.respondWith("POST", "/rest/v10/oauth2/token?platform=",
                 [200, {  "Content-Type":"application/json"},
@@ -1084,26 +1086,22 @@ describe('Api client', function () {
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["/rest/v10/oauth2/token"].POST.response);
 
             expect(this.api.isAuthenticated()).toBeTruthy();
-            expect(SugarTest.storage["AuthAccessToken"]).toEqual("55000555");
-            expect(SugarTest.storage["AuthRefreshToken"]).toEqual("abc");
-            expect(SugarTest.storage["DownloadToken"]).toEqual("qwerty");
-            expect(sspy).toHaveBeenCalled();
+            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
+            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
+            expect(setStub).toHaveBeenCalledWith('DownloadToken', 'qwerty');
 
             requestBody = JSON.parse(this.server.requests[0].requestBody);
             expect(requestBody['client_info']).toBeDefined();
             expect(requestBody['client_info'].uuid).toEqual(extraInfo.uuid);
             expect(requestBody.username).toEqual('admin');
-
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
-            delete SugarTest.storage.DownloadToken;
         });
 
         it('should not login users with incorrect credentials', function () {
-            var spy = sinon.spy(this.callbacks, 'error'),
-                sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
 
-            var response = {"error": "need_login", "error_description": "some desc"};
+            let spy = sinon.spy(this.callbacks, 'error');
+            let cutSpy = sinon.spy(this.storage, 'cut');
+
+            let response = {"error": "need_login", "error_description": "some desc"};
             this.server.respondWith("POST", /.*\/oauth2\/token.*/,
                 [401, {  "Content-Type":"application/json"}, JSON.stringify(response) ]);
 
@@ -1117,107 +1115,76 @@ describe('Api client', function () {
             expect(spy.getCall(0).args[0].code).toEqual("need_login");
 
             expect(this.api.isAuthenticated()).toBeFalsy();
-            expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
-            expect(SugarTest.storage["AuthRefreshToken"]).toBeUndefined();
-            expect(SugarTest.storage["DownloadToken"]).toBeUndefined();
-            expect(sspy).toHaveBeenCalledThrice();
+
+            expect(cutSpy).toHaveBeenCalledWith('AuthAccessToken');
+            expect(cutSpy).toHaveBeenCalledWith('AuthRefreshToken');
+            expect(cutSpy).toHaveBeenCalledWith('DownloadToken');
+
             // this spy is created after the method gets called
             // so, this assertion means that 'executes' is not called the second time
             expect(rspy).not.toHaveBeenCalled();
-
-            delete SugarTest.storage.DownloadToken;
         });
 
-        it("should attempt refresh in case of invalid_grant response", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+        it('should handle multiple requests and refresh token in case of invalid_grant response', function() {
 
-            var sspy = sinon.spy(this.callbacks, "success");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var espy = sinon.spy(this.callbacks, "error");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('xyz')
+                .withArgs('AuthRefreshToken').returns('qwe');
 
-            var authed = false;
-            var self = this;
-            var num = 0;
-            this.server.respondWith(function(xhr) {
-                if (num > 2) throw new Error("Too many requests. Possible infinite loop");
-                var status, responseText;
-                if (xhr.url.indexOf("oauth2") > -1) {
-                    status = 200;
-                    responseText = JSON.stringify(self.fixtures["/rest/v10/oauth2/token"].POST.response);
-                    authed = true;
-                }
-                else if (authed) {
-                    status = 200;
-                    responseText = JSON.stringify({});
-                }
-                else {
-                    status = 401;
-                    responseText = JSON.stringify(response);
-                }
-                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
+            let setStub = this.sandbox.stub(this.storage, 'set');
+
+            let espy = sinon.spy(this.callbacks, 'error');
+            let cspy = sinon.spy(this.callbacks, 'complete');
+            let sspy = sinon.spy(this.callbacks, 'success');
+
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
+
+            let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
+            let rspy = sinon.spy(request, 'execute');
+            let request2 = this.api.records('read', 'Cases', null, null, this.callbacks);
+            let rspy2 = sinon.spy(request2, 'execute');
+            let request3 = this.api.records('read', 'Opportunities', null, null, this.callbacks);
+            let rspy3 = sinon.spy(request3, 'execute');
+
+            let headers = { 'Content-Type': 'application/json' };
+            let invalidBody = JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'some desc',
             });
 
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
-            var rspy = sinon.spy(request, "execute");
+            expect(xhr.requests[0].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[0].respond(401, headers, invalidBody);
 
-            this.server.respond();
+            expect(xhr.requests[1].url).toBe('/rest/v10/Cases');
+            expect(xhr.requests[1].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[1].respond(401, headers, invalidBody);
 
-            expect(SugarTest.storage.AuthAccessToken).toEqual("55000555");
-            expect(SugarTest.storage.AuthRefreshToken).toEqual("abc");
-            expect(rspy).toHaveBeenCalledOnce();
-            expect(cspy).toHaveBeenCalledOnce();
-            expect(espy).not.toHaveBeenCalled();
-            expect(sspy).toHaveBeenCalledOnce();
+            expect(xhr.requests[2].url).toBe('/rest/v10/Opportunities');
+            expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[2].respond(401, headers, invalidBody);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
-            delete SugarTest.storage.DownloadToken;
-        });
+            expect(xhr.requests[3].url).toBe('/rest/v10/oauth2/token?platform=');
+            xhr.requests[3].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(
+                this.fixtures['/rest/v10/oauth2/token'].POST.response
+            ));
 
-        it("should handle multiple requests and refresh token in case of invalid_grant response", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+            expect(xhr.requests[4].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[4].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[4].respond(200, headers);
 
-            var sspy = sinon.spy(this.callbacks, "success");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var espy = sinon.spy(this.callbacks, "error");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
+            expect(xhr.requests[5].url).toBe('/rest/v10/Cases');
+            expect(xhr.requests[5].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[5].respond(200, headers);
 
-            var authed = false;
-            var self = this;
-            var num = 0;
-            this.server.respondWith(function(xhr) {
-                if (++num > 7) throw new Error("Too many requests. Possible infinite loop");
-                var status, responseText;
-                if (xhr.url.indexOf("oauth2") > -1) {
-                    status = 200;
-                    responseText = JSON.stringify(self.fixtures["/rest/v10/oauth2/token"].POST.response);
-                    authed = true;
-                }
-                else if (authed) {
-                    status = 200;
-                    responseText = JSON.stringify({});
-                }
-                else {
-                    status = 401;
-                    responseText = JSON.stringify(response);
-                }
-                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
-            });
+            expect(xhr.requests[6].url).toBe('/rest/v10/Opportunities');
+            expect(xhr.requests[6].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[6].respond(200, headers);
 
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
-            var rspy = sinon.spy(request, "execute");
-            var request2 = this.api.records("read", "Cases", null, null, this.callbacks);
-            var rspy2 = sinon.spy(request2, "execute");
-            var request3 = this.api.records("read", "Opportunities", null, null, this.callbacks);
-            var rspy3 = sinon.spy(request3, "execute");
+            expect(xhr.requests.length).toBe(7);
 
-            this.server.respond();
-
-            expect(SugarTest.storage.AuthAccessToken).toEqual("55000555");
-            expect(SugarTest.storage.AuthRefreshToken).toEqual("abc");
+            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
+            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
             expect(rspy).toHaveBeenCalledOnce();
             expect(rspy2).toHaveBeenCalledOnce();
             expect(rspy3).toHaveBeenCalledOnce();
@@ -1225,50 +1192,49 @@ describe('Api client', function () {
             expect(espy).not.toHaveBeenCalled();
             expect(sspy.callCount).toEqual(3);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
-            delete SugarTest.storage.DownloadToken;
         });
 
-        it("should pass error to original callback in case of invalid_grant response happens and the original request fails", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+        it('should pass error to original callback in case of invalid_grant response happens and the original request fails', function() {
 
-            var espy = sinon.spy(this.callbacks, "error");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var sspy = sinon.spy(this.callbacks, "success");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('xyz')
+                .withArgs('AuthRefreshToken').returns('qwe');
 
-            var authed = false;
-            var self = this;
-            var num = 0;
-            this.server.respondWith(function(xhr) {
-                if (num > 2) throw new Error("Too many requests. Possible infinite loop");
-                var status, responseText;
-                if (xhr.url.indexOf("oauth2") > -1) {
-                    status = 200;
-                    responseText = JSON.stringify(self.fixtures["/rest/v10/oauth2/token"].POST.response);
-                    authed = true;
-                }
-                else if (authed) {
-                    status = 404;
-                    responseText = JSON.stringify({});
-                }
-                else {
-                    status = 401;
-                    responseText = JSON.stringify(response);
-                }
-                num++;
-                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
+            let setStub = this.sandbox.stub(this.storage, 'set');
+
+            let espy = sinon.spy(this.callbacks, 'error');
+            let cspy = sinon.spy(this.callbacks, 'complete');
+            let sspy = sinon.spy(this.callbacks, 'success');
+
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
+
+            let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
+            let rspy = sinon.spy(request, 'execute');
+
+            let headers = { 'Content-Type': 'application/json' };
+            let invalidBody = JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'some desc',
             });
 
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
-            var rspy = sinon.spy(request, "execute");
+            expect(xhr.requests[0].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[0].respond(401, headers, invalidBody);
 
-            this.server.respond();
+            expect(xhr.requests[1].url).toBe('/rest/v10/oauth2/token?platform=');
+            xhr.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(
+                this.fixtures['/rest/v10/oauth2/token'].POST.response
+            ));
 
-            expect(SugarTest.storage.AuthAccessToken).toEqual("55000555");
-            expect(SugarTest.storage.AuthRefreshToken).toEqual("abc");
+            expect(xhr.requests[2].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[2].respond(404, headers, invalidBody);
+
+            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
+            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
+
+            expect(xhr.requests.length).toBe(3);
+
             expect(rspy).toHaveBeenCalledOnce();
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
@@ -1276,75 +1242,50 @@ describe('Api client', function () {
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(404);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
-            delete SugarTest.storage.DownloadToken;
         });
 
-        it("should stop refreshing in case of invalid_grant response happens more than once in a row", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+        it('should handle multiple requests and stop refreshing in case of invalid_grant response happens more than once in a row', function() {
 
-            var espy = sinon.spy(this.callbacks, "error");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var sspy = sinon.spy(this.callbacks, "success");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('xyz')
+                .withArgs('AuthRefreshToken').returns('qwe');
 
-            var num = 0;
-            this.server.respondWith(function(xhr) {
-                if (num > 2) throw new Error("Too many requests. Possible infinite loop");
-                var status = 401;
-                var responseText = JSON.stringify(response);
-                num++;
-                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
+            let espy = sinon.spy(this.callbacks, 'error');
+            let cspy = sinon.spy(this.callbacks, 'complete');
+            let sspy = sinon.spy(this.callbacks, 'success');
+
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
+
+            let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
+            let rspy = sinon.spy(request, 'execute');
+            let request2 = this.api.records('read', 'Contacts', null, null, this.callbacks);
+            let rspy2 = sinon.spy(request2, 'execute');
+            let request3 = this.api.records('read', 'Meetings', null, null, this.callbacks);
+            let rspy3 = sinon.spy(request3, 'execute');
+
+            let headers = { 'Content-Type': 'application/json' };
+            let invalidBody = JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'some desc',
             });
 
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
-            var rspy = sinon.spy(request, "execute");
+            expect(xhr.requests[0].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[0].respond(401, headers, invalidBody);
 
-            this.server.respond();
+            expect(xhr.requests[1].url).toBe('/rest/v10/Contacts');
+            expect(xhr.requests[1].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[1].respond(401, headers, invalidBody);
 
-            expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
-            expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
-            expect(rspy).not.toHaveBeenCalled();
-            expect(espy).toHaveBeenCalledOnce();
-            expect(cspy).toHaveBeenCalledOnce();
-            expect(sspy).not.toHaveBeenCalled();
-            expect(this.httpError).not.toBeNull();
-            expect(this.httpError.status).toEqual(401);
+            expect(xhr.requests[2].url).toBe('/rest/v10/Meetings');
+            expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[2].respond(401, headers, invalidBody);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
-        });
+            expect(xhr.requests[3].url).toBe('/rest/v10/oauth2/token?platform=');
+            xhr.requests[3].respond(400, headers, invalidBody);
 
-        it("should handle multiple requests and stop refreshing in case of invalid_grant response happens more than once in a row", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+            expect(xhr.requests.length).toBe(4);
 
-            var espy = sinon.spy(this.callbacks, "error");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var sspy = sinon.spy(this.callbacks, "success");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
-
-            var num = 0;
-            this.server.respondWith(function(xhr) {
-                if (++num > 4) throw new Error("Too many requests. Possible infinite loop");
-                var status = 401;
-                var responseText = JSON.stringify(response);
-                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
-            });
-
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
-            var rspy = sinon.spy(request, "execute");
-            var request2 = this.api.records("read", "Contacts", null, null, this.callbacks);
-            var rspy2 = sinon.spy(request2, "execute");
-            var request3 = this.api.records("read", "Meetings", null, null, this.callbacks);
-            var rspy3 = sinon.spy(request3, "execute");
-
-            this.server.respond();
-
-            expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
-            expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
             expect(rspy).not.toHaveBeenCalled();
             expect(rspy2).not.toHaveBeenCalled();
             expect(rspy3).not.toHaveBeenCalled();
@@ -1354,83 +1295,96 @@ describe('Api client', function () {
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
         });
 
-        it("should not refresh token in case of invalid_grant response happens for auth request", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+        it('should not refresh token in case of invalid_grant response happens for auth request', function() {
 
-            var espy = sinon.spy(this.callbacks, "error");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var sspy = sinon.spy(this.callbacks, "success");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
+            let cutStub = this.sandbox.stub(this.storage, 'cut');
 
-            this.server.respondWith(function(xhr) {
-                xhr.respond(400, {"Content-Type": "application/json"}, JSON.stringify(response));
-            });
+            let espy = sinon.spy(this.callbacks, 'error');
+            let cspy = sinon.spy(this.callbacks, 'complete');
+            let sspy = sinon.spy(this.callbacks, 'success');
 
-            var request = this.api.login({ username: "a", password: "b"}, null, this.callbacks);
-            var rspy = sinon.spy(request, "execute");
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
 
-            this.server.respond();
+            this.api.login({ username: 'a', password: 'b'}, null, this.callbacks);
 
-            expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
-            expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
-            expect(rspy).not.toHaveBeenCalled();
+            expect(xhr.requests[0].url).toBe('/rest/v10/oauth2/token?platform=');
+            xhr.requests[0].respond(400, { 'Content-Type': 'application/json' }, JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'some desc',
+            }));
+
+            expect(xhr.requests.length).toBe(1);
+
+            expect(cutStub).toHaveBeenCalledWith('AuthAccessToken');
+            expect(cutStub).toHaveBeenCalledWith('AuthRefreshToken');
+
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(400);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
         });
 
-        it("should not refresh token in case of invalid_grant while retrying queued requests", function() {
-            SugarTest.storage.AuthAccessToken = "xyz"; //55000555
-            SugarTest.storage.AuthRefreshToken = "qwe";
+        it('should not refresh token in case of invalid_grant while retrying queued requests', function() {
 
-            var espy = sinon.spy(this.callbacks, "error");
-            var cspy = sinon.spy(this.callbacks, "complete");
-            var sspy = sinon.spy(this.callbacks, "success");
-            var response = {"error": "invalid_grant", "error_description": "some desc"};
-            var self = this;
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('xyz')
+                .withArgs('AuthRefreshToken').returns('qwe');
 
-            var num = 0;
-            this.server.respondWith(function(xhr) {
-                if (++num > 3) throw new Error("Too many requests. Possible infinite loop");
-                //fake a server that fails all non-token requests
-                var status = 401;
-                var responseText = JSON.stringify(response);
-                if (xhr.url.indexOf("oauth2") > -1) {
-                    status = 200;
-                    responseText = JSON.stringify(self.fixtures["/rest/v10/oauth2/token"].POST.response);
-                }
-                xhr.respond(status, {"Content-Type": "application/json"}, responseText);
-            });
+            let setStub = this.sandbox.stub(this.storage, 'set');
+            let cutStub = this.sandbox.stub(this.storage, 'cut');
 
-            this.api.records("read", "Accounts", null, null, this.callbacks);
+            let espy = sinon.spy(this.callbacks, 'error');
+            let cspy = sinon.spy(this.callbacks, 'complete');
+            let sspy = sinon.spy(this.callbacks, 'success');
 
-            this.server.respond();
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
 
-            expect(SugarTest.storage.AuthAccessToken).toBeUndefined();
-            expect(SugarTest.storage.AuthRefreshToken).toBeUndefined();
+            this.api.records('read', 'Accounts', null, null, this.callbacks);
+
+            expect(xhr.requests[0].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[0].respond(401, { 'Content-Type': 'application/json' }, JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'some desc',
+            }));
+
+            expect(xhr.requests[1].url).toBe('/rest/v10/oauth2/token?platform=');
+            xhr.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(
+                this.fixtures['/rest/v10/oauth2/token'].POST.response
+            ));
+
+            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
+            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
+
+            // simulate invalid_grant again
+            expect(xhr.requests[2].url).toBe('/rest/v10/Accounts');
+            expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
+            xhr.requests[2].respond(401, { 'Content-Type': 'application/json' }, JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'some desc',
+            }));
+
+            expect(cutStub).toHaveBeenCalledWith('AuthAccessToken');
+            expect(cutStub).toHaveBeenCalledWith('AuthRefreshToken');
+
+            expect(xhr.requests.length).toBe(3);
+
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
             expect(sspy).not.toHaveBeenCalled();
             expect(this.httpError).not.toBeNull();
             expect(this.httpError.status).toEqual(401);
 
-            delete SugarTest.storage.AuthAccessToken;
-            delete SugarTest.storage.AuthRefreshToken;
         });
 
         it('should logout user', function () {
-            var spy = sinon.spy(this.callbacks, 'success'),
-                sspy = sinon.spy(SugarTest.keyValueStore, 'cut');
+
+            let spy = sinon.spy(this.callbacks, 'success');
+            let cutSpy = sinon.spy(this.storage, 'cut');
 
             this.server.respondWith("POST", "/rest/v10/oauth2/logout", [200, {"Content-Type":"application/json"}, ""]);
 
@@ -1440,10 +1394,9 @@ describe('Api client', function () {
             expect(spy).toHaveBeenCalled();
 
             expect(this.api.isAuthenticated()).toBeFalsy();
-            expect(SugarTest.storage["AuthAccessToken"]).toBeUndefined();
-            expect(SugarTest.storage["AuthRefreshToken"]).toBeUndefined();
-            expect(SugarTest.storage["DownloadToken"]).toBeUndefined();
-            expect(sspy).toHaveBeenCalledThrice();
+            expect(cutSpy).toHaveBeenCalledWith('AuthAccessToken');
+            expect(cutSpy).toHaveBeenCalledWith('AuthRefreshToken');
+            expect(cutSpy).toHaveBeenCalledWith('DownloadToken');
         });
 
         describe('External logins', function () {
