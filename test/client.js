@@ -1593,26 +1593,31 @@ describe('Api client', function () {
             expect(this.api.getRequest(request.uid)).toBeNull();
         });
 
-        it("should abort request by id", function() {
+        it('should abort request by id', function() {
 
-            var cspy = sinon.stub(this.callbacks, "complete", function(xhr, status) {
 
-                expect(request.aborted).toBeTruthy();
-
-                SugarTest.setWaitFlag();
+            let sstub = sinon.stub(this.callbacks, 'success');
+            let estub = sinon.stub(this.callbacks, 'error', function(err) {
+                expect(err).toEqual(jasmine.any(Api.HttpError));
+                expect(err.request.aborted).toBeTruthy();
+            });
+            let cstub = sinon.stub(this.callbacks, 'complete', function(xhr) {
+                expect(xhr.aborted).toBeTruthy();
             });
 
-            this.server.respondWith(function(xhr) {
-                xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify({}));
-            });
-
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
+            let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
 
             expect(this.api.getRequest(request.uid)).toBeDefined();
 
+            expect(request.aborted).toBeUndefined();
+
             this.api.abortRequest(request.uid);
 
-            this.server.respond();
+            expect(request.aborted).toBeTruthy();
+
+            expect(sstub).not.toHaveBeenCalled();
+            expect(estub).toHaveBeenCalled();
+            expect(cstub).toHaveBeenCalledWith(request);
         });
     });
 
