@@ -1576,29 +1576,21 @@ describe('Api client', function () {
         });
     });
 
-    describe("Hash of requests", function() {
+    describe('Hash of requests', function() {
 
-        it("should clean hash of requests", function() {
-
-            var cspy = sinon.stub(this.callbacks, "complete", function() {
-                SugarTest.setWaitFlag();
-            });
+        it('should clean hash of requests on success', function() {
 
             this.server.respondWith(function(xhr) {
-                xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify({}));
+                xhr.respond(200, {'Content-Type': 'application/json'});
             });
 
-            var request = this.api.records("read", "Accounts", null, null, this.callbacks);
+            let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
 
             expect(this.api.getRequest(request.uid)).toBeDefined();
 
             this.server.respond();
 
-            SugarTest.wait();
-
-            runs(function(){
-                expect(this.api.getRequest(request.uid)).toBeNull();
-            })
+            expect(this.api.getRequest(request.uid)).toBeNull();
         });
 
         it("should abort request by id", function() {
