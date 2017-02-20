@@ -877,119 +877,135 @@ describe('Api client', function () {
 
     describe('File actions', function() {
 
-        it("should fetch list of files", function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+        it('should fetch list of files', function() {
 
-            var response = {
-              "filename": {
-                "content-type": "application\/pdf",
-                "content-length": 64869,
-                "name": "10.1.1.56.4713.pdf",
-                "uri": "http:\/\/localhost:8888\/sugarcrm\/rest\/v10\/Notes\/1234\/file\/filename"
-              }
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('file-oauth-token');
+
+            let stub = sinon.stub(this.callbacks, 'success');
+
+            let response = {
+                filename: {
+                    'content-type': 'application/pdf',
+                    'content-length': 64869,
+                    'name': '10.1.1.56.4713.pdf',
+                    'uri': 'http://localhost:8888/sugarcrm/rest/v10/Notes/1234/file/filename',
+                },
             };
 
-            var resp = JSON.stringify(response);
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
 
-            this.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file.*/,
-                [200, {  "Content-Type":"application/json"}, resp]);
-
-            this.api.file("read", {
-                module: "Notes",
-                id: "1234"
+            this.api.file('read', {
+                module: 'Notes',
+                id: '1234'
             }, null, this.callbacks);
-            this.server.respond();
 
-            expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toBeDefined();
-            expect(spy.getCall(0).args[0].filename).toBeDefined();
+            expect(xhr.requests[0].url).toMatch('/rest/v10/Notes/1234/file');
+            expect(xhr.requests[0].method).toBe('GET');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
+                'OAuth-Token': 'file-oauth-token'
+            }));
+            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(response));
+
+            expect(stub).toHaveBeenCalledOnce();
+            expect(stub).toHaveBeenCalledWith(response);
 
         });
 
-        it("should fetch a file", function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+        it('should fetch a file', function() {
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('file-oauth-token');
 
-            this.server.respondWith("GET", /\/rest\/v10\/Notes\/1234\/file\/filename.*/,
-                [200, {  "Content-Type":"application/json"}, "{}"]);
+            let stub = sinon.stub(this.callbacks, 'success');
 
-            this.api.file("read", {
-                module: "Notes",
-                id: "1234",
-                field: "filename"
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
+
+            this.api.file('read', {
+                module: 'Notes',
+                id: '1234',
+                field: 'filename'
             }, null, this.callbacks);
-            this.server.respond();
 
-            expect(spy).toHaveBeenCalled();
-            expect(spy.getCall(0).args[0]).toBeDefined();
+            expect(xhr.requests[0].url).toMatch('/rest/v10/Notes/1234/file');
+            expect(xhr.requests[0].method).toBe('GET');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
+                'OAuth-Token': 'file-oauth-token'
+            }));
+            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, '{}');
+
+            expect(stub).toHaveBeenCalledOnce();
+            expect(stub).toHaveBeenCalledWith({});
         });
 
-        it("should upload files", function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+        it('should upload files', function() {
 
-            var resp = this.fixtures["rest/v10/Contacts/1/file/picture"].POST.response;
-            this.server.respondWith("POST", /rest\/v10\/Contacts\/1\/file\/picture.*/,
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('file-oauth-token');
 
-            this.api.file("create", {
-                module: "Contacts",
-                id: "1",
-                field: "picture"
+            let stub = sinon.stub(this.callbacks, 'success');
+
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
+
+            this.api.file('create', {
+                module: 'Contacts',
+                id: '1',
+                field: 'picture'
             }, null, this.callbacks);
-            this.server.respond();
-            expect(spy).toHaveBeenCalled();
-            expect(spy).toHaveBeenCalledWith(resp);
+
+            expect(xhr.requests[0].url).toMatch('/rest/v10/Contacts/1/file/picture');
+            expect(xhr.requests[0].method).toBe('POST');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
+                'OAuth-Token': 'file-oauth-token'
+            }));
+            let resp = this.fixtures['rest/v10/Contacts/1/file/picture'].POST.response;
+            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(resp));
+
+            expect(stub).toHaveBeenCalledOnce();
+            expect(stub).toHaveBeenCalledWith(resp);
         });
 
-        it("should delete files", function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+        it('should delete files', function() {
 
-            var resp = this.fixtures["rest/v10/Contacts/1/file/picture"].DELETE.response;
-            this.server.respondWith("DELETE", /rest\/v10\/Contacts\/1\/file\/picture.*/,
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('file-oauth-token');
 
-            this.api.file("delete", {
-                module: "Contacts",
-                id: "1",
-                field: "picture"
+            let stub = sinon.stub(this.callbacks, 'success');
+
+            let xhr = this.sandbox.useFakeXMLHttpRequest();
+
+            this.api.file('delete', {
+                module: 'Contacts',
+                id: '1',
+                field: 'picture'
             }, null, this.callbacks);
-            this.server.respond();
-            expect(spy).toHaveBeenCalled();
-            expect(spy).toHaveBeenCalledWith(resp);
+
+            expect(xhr.requests[0].url).toMatch('/rest/v10/Contacts/1/file/picture');
+            expect(xhr.requests[0].method).toBe('DELETE');
+            expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
+                'OAuth-Token': 'file-oauth-token'
+            }));
+            let resp = this.fixtures['rest/v10/Contacts/1/file/picture'].DELETE.response;
+            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(resp));
+
+            expect(stub).toHaveBeenCalled();
+            expect(stub).toHaveBeenCalledWith(resp);
         });
 
-        it("should upload temporary files", function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+        it('should upload temporary files', function() {
+            let stub = sinon.stub(this.callbacks, 'success');
 
-            var resp = this.fixtures["rest/v10/Contacts/temp/file/picture"].POST.response;
-            this.server.respondWith("POST", /rest\/v10\/Contacts\/temp\/file\/picture.*/,
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
+            let resp = this.fixtures['rest/v10/Contacts/temp/file/picture'].POST.response;
+            this.server.respondWith('POST', /rest\/v10\/Contacts\/temp\/file\/picture.*/,
+                [200, {  'Content-Type':'application/json'}, JSON.stringify(resp)]);
 
-            this.api.file("create", {
-                module: "Contacts",
-                id: "temp",
-                field: "picture"
+            this.api.file('create', {
+                module: 'Contacts',
+                id: 'temp',
+                field: 'picture'
             }, null, this.callbacks);
             this.server.respond();
-            expect(spy).toHaveBeenCalled();
-            expect(spy).toHaveBeenCalledWith(resp);
-        });
-
-        it("should retrieve a temporary file", function() {
-            var spy = sinon.spy(this.callbacks, 'success');
-
-            var resp = this.fixtures["rest/v10/Contacts/temp/file/picture/1"].GET.response;
-            this.server.respondWith("GET", /rest\/v10\/Contacts\/temp\/file\/picture\/1.*/,
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(resp)]);
-
-            this.api.file("read", {
-                module: "Contacts",
-                id: "temp",
-                field: "picture",
-                fileId: "1"
-            }, null, this.callbacks);
-            this.server.respond();
-            expect(spy).toHaveBeenCalled();
-            expect(spy).toHaveBeenCalledWith(resp);
+            expect(stub).toHaveBeenCalled();
+            expect(stub).toHaveBeenCalledWith(resp);
         });
 
     });
