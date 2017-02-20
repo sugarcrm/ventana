@@ -111,13 +111,12 @@ describe('Api client', function () {
 
         this.server = sinon.fakeServer.create();
 
-        var self = this;
         this.callbacks = {
             success:function (data) {},
-            error:function (error) { self.httpError = error },
+            error:function (error) {},
             complete: function() {}
         };
-        this.httpError = null;
+
         //Override the normal app sync after refresh
         this.api.setRefreshTokenSuccessCallback(function(c){c();});
     });
@@ -1239,8 +1238,8 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
             expect(sspy).not.toHaveBeenCalled();
-            expect(this.httpError).not.toBeNull();
-            expect(this.httpError.status).toEqual(404);
+            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
+            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 404}));
 
         });
 
@@ -1292,8 +1291,8 @@ describe('Api client', function () {
             expect(espy.callCount).toEqual(3);
             expect(cspy.callCount).toEqual(3);
             expect(sspy).not.toHaveBeenCalled();
-            expect(this.httpError).not.toBeNull();
-            expect(this.httpError.status).toEqual(401);
+            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
+            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 401}));
 
         });
 
@@ -1323,8 +1322,8 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
             expect(sspy).not.toHaveBeenCalled();
-            expect(this.httpError).not.toBeNull();
-            expect(this.httpError.status).toEqual(400);
+            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
+            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 400}));
 
         });
 
@@ -1376,8 +1375,8 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledOnce();
             expect(cspy).toHaveBeenCalledOnce();
             expect(sspy).not.toHaveBeenCalled();
-            expect(this.httpError).not.toBeNull();
-            expect(this.httpError.status).toEqual(401);
+            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
+            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 401}));
 
         });
 
