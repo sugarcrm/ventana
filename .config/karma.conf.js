@@ -57,13 +57,23 @@ module.exports = function (config) {
         webpack: {
             devtool: 'inline-source-map',
             module: {
+                loaders: [
+                    {
+                        test: /\.js$/,
+                        exclude: /(node_modules)/,
+                        loader: 'babel-loader',
+                        query: {
+                            presets: ['es2015'],
+                        },
+                    },
+                ],
                 preLoaders: [
                     {
                         test: /\.js$/,
                         include: [
                             path.resolve('src'),
                         ],
-                        loader: 'istanbul-instrumenter',
+                        loader: 'istanbul-instrumenter-loader',
                     },
                 ],
             },
