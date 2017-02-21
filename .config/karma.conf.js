@@ -34,7 +34,7 @@ module.exports = function (config) {
         reporters: ['progress', 'coverage'],
 
         coverageReporter: {
-            type: 'lcov',
+            reporters: ['html', 'lcov'],
         },
 
         // web server port
@@ -48,7 +48,7 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
+        browsers: config.browsers.length ? config.browsers : ['Chrome'],
 
         browserDisconnectTimeout: 10000,
         browserDisconnectTolerance: 2,
@@ -101,7 +101,7 @@ module.exports = function (config) {
         },
 
         customLaunchers: {
-            Chrome_CI: {
+            travis_chrome: {
                 base: 'Chrome',
                 flags: ['--no-sandbox'],
             },
@@ -124,7 +124,7 @@ module.exports = function (config) {
             },
             sl_edge: {
                 base: 'SauceLabs',
-                browserName: 'MicrosoftEdge',
+                browserName: 'microsoftedge',
             },
         },
 
@@ -145,12 +145,22 @@ module.exports = function (config) {
         config.browserNoActivityTimeout = 120000;
 
         config.reporters = ['dots', 'coverage', 'saucelabs'];
+        config.coverageReporter.reporters = ['lcov'];
 
         // Allocating a browser can take pretty long (eg. if we are out of
         // capacity and need to wait for another build to finish) and so the
         // `captureTimeout` typically kills an in-queue-pending request, which
         // makes no sense.
         config.captureTimeout = 0;
+    }
+
+    if (config.browsers.includes('sl_edge')) {
+
+        // SauceLabs Edge doesn't work with istanbul, thus disable istanbul and coverage
+        delete config.webpack.module.preLoaders;
+
+        config.reporters = ['dots', 'saucelabs'];
+        delete config.coverageReporter;
     }
 
 };
