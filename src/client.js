@@ -2,43 +2,9 @@
  * Copyright (c) 2017 SugarCRM Inc. Licensed by SugarCRM under the Apache 2.0 license.
  */
 
-/*;
- * SugarCRM Javascript API
- */
-
 /**
- * SugarCRM Javascript API allows users to interact with SugarCRM instance via its REST interface.
- *
- * Use {@link SUGAR.Api#getInstance} method to create instances of Sugar API.
- * This method accepts arguments object with the following properties:
- * <pre>
- * {
- *   serverUrl: Sugar REST URL end-point
- *   platform: platform name ("portal", "mobile", etc.)
- *   keyValueStore: reference to key/value store provider used to read/save auth token from/to
- *   timeout: request timeout in seconds
- * }
- * </pre>
- *
- * The key/value store provider must implement three methods:
- * <pre><code>
- *   set: void function(String key, String value)
- *   get: String function(key)
- *   cut: void function(String key)
- * </code></pre>
- * The authentication tokens are kept in memory if the key/value store is not specified.
- *
- * Most of Sugar API methods accept `callbacks` object:
- * <pre>
- * {
- *   success: function(data) { },
- *   error: function(error) { },
- *   complete: function() { },
- * }
- * </pre>
- *
- * @class SUGAR.Api
- * @singleton
+ * Module that facilitates interaction with a SugarCRM REST API.
+ * @module @sugarcrm/ventana
  */
 
 var _instance;
@@ -60,22 +26,22 @@ var HttpError = function(request, textStatus, errorThrown) {
 
     /**
      * AJAX request that caused the error.
-     * @property {SUGAR.HttpRequest}
-     * @member SUGAR.HttpError
+     * @property {HttpRequest}
+     * @member HttpError
      */
     this.request = request;
 
     /**
      * XHR status code.
      * @property {string|number}
-     * @member SUGAR.HttpError
+     * @member HttpError
      */
     this.status = request.xhr.status;
 
     /**
      * XHR response text.
      * @property {String}
-     * @member SUGAR.HttpError
+     * @member HttpError
      */
     this.responseText = request.xhr.responseText;
 
@@ -84,7 +50,7 @@ var HttpError = function(request, textStatus, errorThrown) {
      *
      * Possible values (besides null) are `"timeout"`, `"error"`, `"abort"`, and `"parsererror"`.
      * @property {String}
-     * @member SUGAR.HttpError
+     * @member HttpError
      */
     this.textStatus = textStatus;
 
@@ -93,7 +59,7 @@ var HttpError = function(request, textStatus, errorThrown) {
      *
      * For example, `"Not Found"` or `"Internal Server Error"`.
      * @property {String}
-     * @member SUGAR.HttpError
+     * @member HttpError
      */
     this.errorThrown = errorThrown;
 
@@ -110,7 +76,7 @@ var HttpError = function(request, textStatus, errorThrown) {
                  * Additional failure information. See SugarCRM REST API
                  * documentation for a full list of error codes.
                  * @property {String}
-                 * @member SUGAR.HttpError
+                 * @member HttpError
                  */
                 this.code = this.payload.error;
 
@@ -119,7 +85,7 @@ var HttpError = function(request, textStatus, errorThrown) {
                  *
                  * Localized message appropriate for display to end user.
                  * @property {String}
-                 * @member SUGAR.HttpError
+                 * @member HttpError
                  */
                 this.message = this.payload.error_message;
             }
@@ -138,14 +104,14 @@ var HttpError = function(request, textStatus, errorThrown) {
  * - http://api.jquery.com/jQuery.ajax/
  * - http://zeptojs.com/#$.ajax
  *
- * @class SUGAR.HttpError
+ * @class HttpError
  */
 _.extend(HttpError.prototype, {
 
     /**
      * Returns string representation of HTTP error.
      * @return {String} HTTP error as a string.
-     * @member SUGAR.HttpError
+     * @member HttpError
      */
     toString: function() {
         return 'HTTP error: ' + this.status +
@@ -168,14 +134,14 @@ var HttpRequest = function(params, debug) {
      * - http://zeptojs.com/#$.ajax
      *
      * @property {Object}
-     * @member SUGAR.HttpRequest
+     * @member HttpRequest
      */
     this.params = params; // TODO: Consider cloning
 
     /**
      * Flag indicating that a request must output debug information.
      * @property {Boolean}
-     * @member SUGAR.HttpRequest
+     * @member HttpRequest
      */
     this.debug = debug;
 
@@ -184,7 +150,7 @@ var HttpRequest = function(params, debug) {
      * when processing this request but would not be passed to the server.
      *
      * @property {Object}
-     * @member SUGAR.HttpRequest
+     * @member HttpRequest
      */
     this.state = {};
 };
@@ -193,7 +159,7 @@ var HttpRequest = function(params, debug) {
  * Represents AJAX request.
  *
  * Encapsulates XHR object and AJAX parameters.
- * @class SUGAR.HttpRequest
+ * @class HttpRequest
  *
  */
 _.extend(HttpRequest.prototype, {
@@ -240,7 +206,7 @@ _.extend(HttpRequest.prototype, {
         /**
          * XmlHttpRequest object.
          * @property {Object}
-         * @member SUGAR.HttpRequest
+         * @member HttpRequest
          */
         this.xhr = $.ajax(this.params);
     }
@@ -253,7 +219,7 @@ _.extend(HttpRequest.prototype, {
  * @param {string|number} [result.status=200] The response status.
  * @param {Object} [result.status=200] The response headers.
  * @param {Object} [result.contents={}] The response contents.
- * @param {SUGAR.HttpRequest} parentReq bulk API request that this request is a part of.
+ * @param {HttpRequest} parentReq bulk API request that this request is a part of.
  */
 var bulkXHR = function(result, parentReq) {
     var contents = result.contents || {};
@@ -280,6 +246,40 @@ _.extend(bulkXHR.prototype, {
     }
 });
 
+/**
+ * SugarCRM Javascript API allows users to interact with SugarCRM instance via its REST interface.
+ *
+ * Use {@link Api#getInstance} method to create instances of Sugar API.
+ * This method accepts arguments object with the following properties:
+ * <pre>
+ * {
+ *   serverUrl: Sugar REST URL end-point
+ *   platform: platform name ("portal", "mobile", etc.)
+ *   keyValueStore: reference to key/value store provider used to read/save auth token from/to
+ *   timeout: request timeout in seconds
+ * }
+ * </pre>
+ *
+ * The key/value store provider must implement three methods:
+ * <pre><code>
+ *   set: void function(String key, String value)
+ *   get: String function(key)
+ *   cut: void function(String key)
+ * </code></pre>
+ * The authentication tokens are kept in memory if the key/value store is not specified.
+ *
+ * Most of Sugar API methods accept `callbacks` object:
+ * <pre>
+ * {
+ *   success: function(data) { },
+ *   error: function(error) { },
+ *   complete: function() { },
+ * }
+ * </pre>
+ *
+ * @class Api
+ * @singleton
+ */
 function SugarApi(args) {
     var _serverUrl,
         _platform,
@@ -485,14 +485,14 @@ function SugarApi(args) {
         /**
          * Client Id for oAuth
          * @property {String}
-         * @member SUGAR.Api
+         * @member Api
          */
         clientID: _clientID,
 
         /**
          * URL of Sugar REST end-point.
          * @property {String}
-         * @member SUGAR.Api
+         * @member Api
          */
         serverUrl: _serverUrl,
 
@@ -500,21 +500,21 @@ function SugarApi(args) {
          * Default fallback HTTP error handler. Used when api.call
          * is not supplied with an error: function in callbacks parameter.
          * @property {Function}
-         * @member SUGAR.Api
+         * @member Api
          */
         defaultErrorHandler: _defaultErrorHandler,
 
         /**
          * Request timeout (in milliseconds).
          * @property {Number}
-         * @member SUGAR.Api
+         * @member Api
          */
         timeout: _timeout,
 
         /**
          * Flag indicating if API should run in debug mode (console debugging of API calls).
          * @property {Boolean}
-         * @member SUGAR.Api
+         * @member Api
          */
         debug: false,
 
@@ -562,9 +562,9 @@ function SugarApi(args) {
          * @param {Object} [callbacks] callbacks object.
          * @param {Object} [options] options for request that map
          *   directly to the jquery/zepto Ajax options.
-         * @return {SUGAR.HttpRequest} AJAX request.
+         * @return {HttpRequest} AJAX request.
          * @private
-         * @member SUGAR.Api
+         * @member Api
          */
         call: function(method, url, data, callbacks, options) {
             var request,
@@ -595,7 +595,7 @@ function SugarApi(args) {
                     /**
                      * XHR status code.
                      * @property {string|number}
-                     * @member SUGAR.HttpRequest
+                     * @member HttpRequest
                      */
                     request.status = (data && data.status) ? data.status : status;
                     callbacks.success(data, request);
@@ -675,7 +675,7 @@ function SugarApi(args) {
          * Calling triggerBulkCall with the same ID will combine all the
          * previously queued requests into a single bulk call.
          * @param {number|string} bulkId
-         * @member SUGAR.Api
+         * @member Api
          */
         triggerBulkCall: function(bulkId) {
             if (!_allowBulk) {
@@ -763,7 +763,7 @@ function SugarApi(args) {
          * @param  {Object} [params] URL parameters.
          * @return {String} URL for specified resource.
          * @private
-         * @member SUGAR.Api
+         * @member Api
          */
         buildURL: function(module, action, attributes, params) {
             params = params || {};
@@ -867,7 +867,7 @@ function SugarApi(args) {
          *   file should be kept when issuing a `GET` request to the
          *   `FileTempApi` (it is cleaned up by default).
          * @return {string} URL for the file resource.
-         * @member SUGAR.Api
+         * @member Api
          */
         buildFileURL: function(attributes, options) {
             var params = {};
@@ -960,13 +960,13 @@ function SugarApi(args) {
          *   public metadata.
          * @param {Object} [options.params] Extra params to send to the
          *   request.
-         * @return {SUGAR.HttpRequest} The AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} The AJAX request.
+         * @member Api
          */
         getMetadata: function(options) {
 
             if (_.isString(options)) {
-                console.warn('`SUGAR.Api::getMetadata` has changed signature since 7.9 ' +
+                console.warn('`Api::getMetadata` has changed signature since 7.9 ' +
                     'and will drop support for old signature in 7.10. Please update your code.');
 
                 var oldOpt = arguments[4] || {};
@@ -1028,8 +1028,8 @@ function SugarApi(args) {
          * @param {Object} [params] URL parameters.
          * @param {Object} [callbacks] callback object.
          * @param {Object} [options] request options.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         records: function(method, module, data, params, callbacks, options) {
             var url = this.buildURL(module, method, data, params);
@@ -1055,8 +1055,8 @@ function SugarApi(args) {
          * @param {Object} [params] URL parameters.
          * @param {Object} [callbacks] callback object.
          * @param {Object} [options] request options.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         relationships: function(method, module, data, params, callbacks, options) {
             var url = this.buildURL(module, null, data, params);
@@ -1070,8 +1070,8 @@ function SugarApi(args) {
          * @param {boolean} favorite Flag indicating if the record must be marked as favorite.
          * @param {Object} [callbacks] Callback object.
          * @param {Object} [options] request options.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         favorite: function(module, id, favorite, callbacks, options) {
             var action = favorite ? 'favorite' : 'unfavorite';
@@ -1087,8 +1087,8 @@ function SugarApi(args) {
          *   the record changes.
          * @param {Object} [callbacks] Callback object.
          * @param {Object} [options] request options.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         follow: function(module, id, followed, callbacks, options) {
             callbacks = callbacks || {};
@@ -1105,8 +1105,8 @@ function SugarApi(args) {
          * @param {string} field Name of enum field.
          * @param {Object} [callbacks] Callback object
          * @param {Object} [options] Options object
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         enumOptions: function(module, field, callbacks, options) {
             var url = this.buildURL(module + '/enum/' + field);
@@ -1119,7 +1119,7 @@ function SugarApi(args) {
          * @param {Object} data Object with requests array.
          * @param {Object} callbacks.
          * @param {Object} [options] Options object.
-         * @return {SUGAR.HttpRequest}
+         * @return {HttpRequest}
          */
         bulk: function(data, callbacks, options) {
             var url = this.buildURL('bulk');
@@ -1182,10 +1182,10 @@ function SugarApi(args) {
          *
          * - htmlJsonFormat: Boolean flag indicating if `sugar-html-json` format must be used (`true` by default)
          * - iframe: Boolean flag indicating if iframe transport is used (`true` by default)
-         * See {@link SUGAR.Api#buildFileURL} function for other options.
+         * See {@link Api#buildFileURL} function for other options.
          *
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         file: function(method, data, $files, callbacks, options) {
             var ajaxParams = {
@@ -1277,8 +1277,8 @@ function SugarApi(args) {
          * @param {Object} [options.filter] If supplied, the count of
          *   filtered records will be returned, instead of the total number
          *   of records.
-         * @return {SUGAR.HttpRequest} Result of {@link SUGAR.Api#call}.
-         * @member SUGAR.Api
+         * @return {HttpRequest} Result of {@link Api#call}.
+         * @member Api
          */
         count: function(module, data, callbacks, options) {
             options = options || {};
@@ -1302,8 +1302,8 @@ function SugarApi(args) {
          *
          * - passOAuthToken: Boolean flag indicating if OAuth token must be passed in the URL (`true` by default)
          *
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         exportRecords: function(params, $el, callbacks, options) {
             var self = this;
@@ -1348,8 +1348,8 @@ function SugarApi(args) {
          * @param {Function} callbacks.error Function called on failure.
          *   Takes one argument.
          * @param {Object} [options] Request options.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         search: function(params, callbacks, options) {
             options = options || {};
@@ -1383,8 +1383,8 @@ function SugarApi(args) {
          * @param {Object} [data] extra data to be passed in login request
          *   such as client user agent, etc.
          * @param {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         login: function(credentials, data, callbacks) {
             var payload, success, error, method, url, self = this;
@@ -1454,8 +1454,8 @@ function SugarApi(args) {
          * @param {Object} [data] user profile object.
          * @param {Object} [params] URL parameters.
          * @param {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         me: function(method, data, params, callbacks) {
             var url = this.buildURL('me', method, data, params);
@@ -1468,7 +1468,7 @@ function SugarApi(args) {
          * @param {String} platform
          * @param {Object} themeName
          * @param {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
+         * @return {HttpRequest} AJAX request.
          */
         css: function(platform, themeName, callbacks) {
             var params = {
@@ -1483,8 +1483,8 @@ function SugarApi(args) {
          * Performs logout.
          *
          * @param {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         logout: function (callbacks, options) {
 
@@ -1522,8 +1522,8 @@ function SugarApi(args) {
          *   Currently, Sugar REST API supports "whattimeisit" only.
          * @param {Object} [callbacks] callback object.
          * @param {Object} [options] request options.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         ping: function(action, callbacks, options) {
             return this.call(
@@ -1548,8 +1548,8 @@ function SugarApi(args) {
          * @param  {Object} [data] extra data to be passed in login request
          *   such as client user agent, etc.
          * @param  {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         signup: function(contactData, data, callbacks) {
             var payload = contactData;
@@ -1566,8 +1566,8 @@ function SugarApi(args) {
          *
          * @param  {Object} password the password to verify
          * @param  {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         verifyPassword: function(password, callbacks) {
             var payload = {
@@ -1584,8 +1584,8 @@ function SugarApi(args) {
          * @param  {Object} password the new password
          * @param  {Object} password the new password
          * @param  {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         updatePassword: function(oldPassword, newPasword, callbacks) {
             var payload = {
@@ -1600,8 +1600,8 @@ function SugarApi(args) {
         /**
          * Fetches server information.
          * @param {Object} [callbacks] callback object.
-         * @return {SUGAR.HttpRequest} AJAX request.
-         * @member SUGAR.Api
+         * @return {HttpRequest} AJAX request.
+         * @member Api
          */
         info: function(callbacks) {
             var url = this.buildURL('ServerInfo');
@@ -1612,7 +1612,7 @@ function SugarApi(args) {
          * Checks if API instance is currently authenticated.
          *
          * @return {boolean} `true` if authenticated, `false` otherwise.
-         * @member SUGAR.Api
+         * @member Api
          */
         isAuthenticated: function() {
             return typeof(this.getOAuthToken()) === 'string' && this.getOAuthToken().length > 0;
@@ -1630,7 +1630,7 @@ function SugarApi(args) {
          * @param {string} url URL of the failed request.
          * @param {string} errorCode Failure code.
          * @return {boolean} `true` if the OAuth2 access token can be refreshed, `false` otherwise.
-         * @member SUGAR.Api
+         * @member Api
          * @private
          */
         needRefreshAuthToken: function(url, errorCode) {
@@ -1689,7 +1689,7 @@ function SugarApi(args) {
          *
          * @param {boolean} flag Flag indicating if token refresh is in
          * progress (`true`).
-         * @member SUGAR.Api
+         * @member Api
          * @private
          */
         setRefreshingToken: function(flag) {
@@ -1699,7 +1699,7 @@ function SugarApi(args) {
         /**
          * Handles login with an external provider.
          *
-         * @param {SUGAR.HttpRequest} request The request to trigger.
+         * @param {HttpRequest} request The request to trigger.
          * @param {Object} error The error object with at least the
          *   `payload` property.
          * @param {Function} onError The function to call in case of Error
@@ -1757,7 +1757,7 @@ function SugarApi(args) {
          * Sets a flag indicating that external login prodecure is used.
          * This means that 401 errors would contain external URL that we should use for authentication.
          * @param {Boolean} flag Flag indicating if external login is in effect
-         * @member SUGAR.Api
+         * @member Api
          */
         setExternalLogin: function(flag) {
             _externalLogin = flag;
@@ -1766,7 +1766,7 @@ function SugarApi(args) {
         /**
          * Sets a function as external login UI callback
          * @param {Function} callback
-         * @member SUGAR.Api
+         * @member Api
          */
         setExternalLoginUICallback: function(callback) {
             if (_.isFunction(callback)) {
@@ -1820,8 +1820,8 @@ module.exports = {
     /**
      * Gets an instance of Sugar API class.
      * @param args
-     * @return {SUGAR.Api} an instance of Sugar API class.
-     * @member SUGAR.Api
+     * @return {Api} an instance of Sugar API class.
+     * @member Api
      * @static
      */
     getInstance: function(args) {
@@ -1831,8 +1831,8 @@ module.exports = {
     /**
      * Creates a new instance of Sugar API class.
      * @param args
-     * @return {SUGAR.Api} a new instance of Sugar API class.
-     * @member SUGAR.Api
+     * @return {Api} a new instance of Sugar API class.
+     * @member Api
      * @static
      */
     createInstance: function(args) {

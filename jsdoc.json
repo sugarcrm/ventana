@@ -1,0 +1,18 @@
+{
+  "opts": {
+    "destination": "./docs",
+    "pedantic": true,
+    "readme": "README.md",
+    "recurse": true,
+    "template": "node_modules/@sugarcrm/jsdoc-baseline"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "source": {
+    "include": ["src"]
+  },
+  "templates": {
+    "baseline": "baseline-config.json"
+  }
+}
