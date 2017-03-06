@@ -1,0 +1,8 @@
+node_modules
+coverage/
+test/
+.config/
+.travis.yml
+CONTRIBUTING.md
+CONTRIBUTOR_TERMS.pdf
+yarn.lock
