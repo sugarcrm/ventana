@@ -1436,6 +1436,30 @@ describe('Api client', function () {
                 api.handleExternalLogin(new Api.HttpRequest({}), error, $.noop);
                 expect(callback).toHaveBeenCalledWith(error.payload.url);
             });
+
+            it('should call onError but stop before _refreshTokenSuccess if auth failed', function () {
+                let onErrorStub = sinon.stub();
+                let successStub = sinon.stub();
+                let done = false;
+                let complete = function() { done = true; };
+
+                $(window).on('message', complete);
+
+                this.api.setRefreshTokenSuccessCallback(successStub);
+                this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
+
+                window.postMessage(JSON.stringify({access_token: null}), '*');
+
+                waitsFor(function() {
+                    return done;
+                });
+
+                runs(function() {
+                    $(window).off('message', complete);
+                    expect(onErrorStub).toHaveBeenCalled();
+                    expect(successStub).not.toHaveBeenCalled();
+                });
+            });
         });
     });
 
