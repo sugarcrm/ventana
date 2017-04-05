@@ -1721,11 +1721,17 @@ function SugarApi(args) {
                 }
                 $(window).on('message', null);
                 var authData = $.parseJSON(event.originalEvent.data);
-                if (!authData || !authData.access_token) {
+                var loginFailed = !authData || !authData.access_token;
+
+                if (loginFailed) {
                     onError();
                 }
                 self.setRefreshingToken(false);
                 _resetAuth(authData);
+                if (loginFailed) {
+                    // No success actions needed on failure. Proceed causes an infinite loop.
+                    return;
+                }
                 _refreshTokenSuccess(
                     function() {
                         // Repeat original requests
