@@ -211,6 +211,7 @@ describe('Api client', function () {
             args = spy.getCall(0).args[0];
             expect(args.type).toEqual("PUT");
             expect(args.headers["If-Modified-Since"]).toBeUndefined();
+            spy.restore();
         });
 
         it('should not set oauth header for auth requests', function () {
@@ -222,6 +223,7 @@ describe('Api client', function () {
             expect(spy).toHaveBeenCalled();
             args = spy.getCall(0).args[0];
             expect(args.headers["OAuth-Token"]).toBeUndefined();
+            spy.restore();
         });
 
         it('should set the right options on request', function () {
@@ -237,6 +239,7 @@ describe('Api client', function () {
             args = spy.getCall(0).args[0];
             expect(args.async).toBeTruthy();
             expect(args.headers["If-Modified-Since"]).toBeUndefined();
+            spy.restore();
         });
 
         it('should handle successful responses', function () {
@@ -507,6 +510,7 @@ describe('Api client', function () {
             this.server.respond();
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(recordOne);
+            spy.restore();
         });
 
         it('should get the count', function () {
@@ -520,6 +524,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalledWith(null, request);
+            spy.restore();
         });
 
         it('should get a record', function () {
@@ -537,6 +542,7 @@ describe('Api client', function () {
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(recordOne);
             expect(this.server.requests[0].requestHeaders["If-Modified-Since"]).toBeUndefined();
+            spy.restore();
         });
 
         it('should create record', function () {
@@ -557,6 +563,7 @@ describe('Api client', function () {
             req = this.server.requests[0];
             expect(req.responseText).toMatch(/^\{.guid/);
             expect(req.requestBody).toEqual('{"first_name":"Ronald","last_name":"McDonald","phone_work":"0980987","description":"This dude is cool."}');
+            spy.restore();
         });
 
         it('should get records', function () {
@@ -578,6 +585,7 @@ describe('Api client', function () {
             expect(req.requestBody).toBeNull();
             data = JSON.parse(req.responseText);
             expect(data.length).toEqual(2);
+            spy.restore();
         });
 
         it('should update record', function () {
@@ -598,6 +606,8 @@ describe('Api client', function () {
             expect(cspy).toHaveBeenCalledWith(request);
             var req = this.server.requests[0];
             expect(req.requestBody).toEqual(JSON.stringify(attributes));
+            spy.restore();
+            cspy.restore();
         });
 
         it('should delete record', function () {
@@ -614,6 +624,7 @@ describe('Api client', function () {
 
             expect(spy).toHaveBeenCalledWith(null, request);
             expect(spy.getCall(0).args[0]).toEqual(null);
+            spy.restore();
         });
 
         it('should favorite record', function () {
@@ -628,6 +639,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalledWith(null, request);
+            spy.restore();
         });
 
         it('should unfavorite record', function () {
@@ -642,6 +654,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalledWith(null, request);
+            spy.restore();
         });
     });
 
@@ -667,6 +680,7 @@ describe('Api client', function () {
             data = JSON.parse(this.server.requests[0].responseText);
             expect(data.records.length).toEqual(3);
             expect(data.next_offset).toEqual(2);
+            spy.restore();
         });
 
 
@@ -699,6 +713,7 @@ describe('Api client', function () {
             expect(req.requestBody).toEqual(JSON.stringify(attributes.related));
             record = JSON.parse(req.responseText).record;
             expect(record.name).toEqual(fixture.record.name);
+            spy.restore();
         });
 
 
@@ -725,6 +740,7 @@ describe('Api client', function () {
             expect(spy.getCall(0).args[0]).toEqual(respFixture);
             requestBody = this.server.requests[0].requestBody;
             expect(requestBody).toEqual(JSON.stringify(attributes.related));
+            spy.restore();
         });
 
         it('should delete a relationship', function () {
@@ -745,8 +761,8 @@ describe('Api client', function () {
             this.server.respond();
             expect(this.server.requests[0].requestBody).toBeNull();
             expect(spy.getCall(0).args[0]).toEqual(fixture.DELETE.response);
+            spy.restore();
         });
-
     });
 
     describe('Password', function () {
@@ -847,6 +863,7 @@ describe('Api client', function () {
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures.metadata.modules.Contacts);
+            spy.restore();
         });
 
         it('should retrieve public metadata', function () {
@@ -858,6 +875,7 @@ describe('Api client', function () {
 
             expect(callstub).toHaveBeenCalled();
             expect(callstub.getCall(0).args[1]).toEqual('/rest/v10/metadata/public?module_dependencies=1');
+            callstub.restore();
         });
     });
 
@@ -872,6 +890,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalledWith(null, request);
+            spy.restore();
         });
     });
 
@@ -909,7 +928,7 @@ describe('Api client', function () {
 
             expect(stub).toHaveBeenCalledOnce();
             expect(stub).toHaveBeenCalledWith(response);
-
+            stub.restore();
         });
 
         it('should fetch a file', function() {
@@ -935,6 +954,7 @@ describe('Api client', function () {
 
             expect(stub).toHaveBeenCalledOnce();
             expect(stub).toHaveBeenCalledWith({});
+            stub.restore();
         });
 
         it('should upload files', function() {
@@ -962,6 +982,7 @@ describe('Api client', function () {
 
             expect(stub).toHaveBeenCalledOnce();
             expect(stub).toHaveBeenCalledWith(resp);
+            stub.restore();
         });
 
         it('should delete files', function() {
@@ -989,6 +1010,7 @@ describe('Api client', function () {
 
             expect(stub).toHaveBeenCalled();
             expect(stub).toHaveBeenCalledWith(resp);
+            stub.restore();
         });
 
         it('should upload temporary files', function() {
@@ -1006,6 +1028,7 @@ describe('Api client', function () {
             this.server.respond();
             expect(stub).toHaveBeenCalled();
             expect(stub).toHaveBeenCalledWith(resp);
+            stub.restore();
         });
 
     });
@@ -1028,6 +1051,7 @@ describe('Api client', function () {
 
             expect(spy).toHaveBeenCalled();
             expect(spy.getCall(0).args[0]).toBeDefined();
+            spy.restore();
         });
 
         it('should ping server', function() {
@@ -1040,6 +1064,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalled();
+            spy.restore();
         });
 
         it('should ping server with an action', function() {
@@ -1052,6 +1077,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalled();
+            spy.restore();
         });
 
     });
@@ -1138,6 +1164,10 @@ describe('Api client', function () {
             // this spy is created after the method gets called
             // so, this assertion means that 'executes' is not called the second time
             expect(rspy).not.toHaveBeenCalled();
+
+            spy.restore();
+            cutSpy.restore();
+            rspy.restore();
         });
 
         it('should handle multiple requests and refresh token in case of invalid_grant response', function() {
@@ -1207,6 +1237,9 @@ describe('Api client', function () {
             expect(espy).not.toHaveBeenCalled();
             expect(sspy.callCount).toEqual(3);
 
+            rspy.restore();
+            rspy2.restore();
+            rspy3.restore();
         });
 
         it('should pass error to original callback in case of invalid_grant response happens and the original request fails', function() {
@@ -1257,6 +1290,9 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
             expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 404}));
 
+            espy.restore();
+            cspy.restore();
+            sspy.restore();
         });
 
         it('should handle multiple requests and stop refreshing in case of invalid_grant response happens more than once in a row', function() {
@@ -1310,6 +1346,12 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
             expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 401}));
 
+            espy.restore();
+            cspy.restore();
+            sspy.restore();
+            rspy.restore();
+            rspy2.restore();
+            rspy3.restore();
         });
 
         it('should not refresh token in case of invalid_grant response happens for auth request', function() {
@@ -1341,6 +1383,9 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
             expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 400}));
 
+            espy.restore();
+            cspy.restore();
+            sspy.restore();
         });
 
         it('should not refresh token in case of invalid_grant while retrying queued requests', function() {
@@ -1394,6 +1439,9 @@ describe('Api client', function () {
             expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
             expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 401}));
 
+            espy.restore();
+            cspy.restore();
+            sspy.restore();
         });
 
         it('should logout user', function () {
@@ -1412,6 +1460,9 @@ describe('Api client', function () {
             expect(cutSpy).toHaveBeenCalledWith('AuthAccessToken');
             expect(cutSpy).toHaveBeenCalledWith('AuthRefreshToken');
             expect(cutSpy).toHaveBeenCalledWith('DownloadToken');
+
+            spy.restore();
+            cutSpy.restore();
         });
 
         describe('External logins', function () {
@@ -1474,6 +1525,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalledWith(null, request);
+            spy.restore();
         });
     });
 
@@ -1504,6 +1556,8 @@ describe('Api client', function () {
 
                 expect(spy).toHaveBeenCalledWith(null, request);
             }.bind(this));
+
+            spy.restore();
         });
     });
 
@@ -1518,6 +1572,7 @@ describe('Api client', function () {
             this.server.respond();
 
             expect(spy).toHaveBeenCalledWith(null, request);
+            spy.restore();
         });
     });
 
@@ -1657,6 +1712,10 @@ describe('Api client', function () {
             expect(sstub).not.toHaveBeenCalled();
             expect(estub).toHaveBeenCalled();
             expect(cstub).toHaveBeenCalledWith(request);
+
+            sstub.restore();
+            estub.restore();
+            cstub.restore();
         });
     });
 
@@ -1665,6 +1724,7 @@ describe('Api client', function () {
             let callStub = sinon.stub(this.api, 'call');
             this.api.fileDownload('myfile');
             expect(callStub).toHaveBeenCalledWith('read', '/rest/v10/ping');
+            callStub.restore();
         });
     });
 
@@ -1685,6 +1745,7 @@ describe('Api client', function () {
             let callStub = sinon.stub(api, 'call');
             api.triggerBulkCall();
             expect(callStub.called).toBeFalsy();
+            callStub.restore();
         });
 
         it('should not request if there is no queue', function () {
@@ -1693,6 +1754,7 @@ describe('Api client', function () {
             let callStub = sinon.stub(this.api, 'call');
             this.api.triggerBulkCall();
             expect(callStub.called).toBeFalsy();
+            callStub.restore();
         });
 
         describe('bulk method', function() {
@@ -1703,6 +1765,7 @@ describe('Api client', function () {
                 let options = { async: true };
                 this.api.bulk(data, callbacks, options);
                 expect(callStub).toHaveBeenCalledWith('create', '/rest/v10/bulk', data, callbacks, options);
+                callStub.restore();
             });
         });
 
