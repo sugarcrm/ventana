@@ -1,0 +1,14 @@
+{
+  "root": true,
+  "extends": "@sugarcrm/eslint-config-sugarcrm",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "jasmine": true
+  },
+  "globals": {
+    "sinon": false
+  }
+}
