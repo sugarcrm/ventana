@@ -790,14 +790,19 @@ function SugarApi(args) {
                 parts.push(action);
             }
 
-            if (attributes && attributes.relatedId) {
-                parts.push(attributes.relatedId);
-            }
+            if (attributes) {
+                if (attributes.relatedId) {
+                    parts.push(attributes.relatedId);
+                }
 
-            if (attributes && action == 'file' && attributes.field) {
-                parts.push(attributes.field);
-                if (attributes.fileId)
-                    parts.push(attributes.fileId);
+                if (action == 'file' && attributes.field) {
+                    parts.push(attributes.field);
+                    if (attributes.fileId) {
+                        parts.push(attributes.fileId);
+                    }
+                } else if (action === 'collection' && attributes.field) {
+                    parts.push(attributes.field);
+                }
             }
 
             url = parts.join('/');
@@ -1061,6 +1066,25 @@ function SugarApi(args) {
         relationships: function(method, module, data, params, callbacks, options) {
             var url = this.buildURL(module, null, data, params);
             return this.call(method, url, data.related, callbacks, options);
+        },
+
+        /**
+         * Fetches a collection field.
+         *
+         * @param {string} module Module name.
+         * @param {Object} data object containing information to build the url.
+         * @param {string} data.field The name of the collection field to fetch.
+         * @param {string} data.id The name of the bean id the collection field
+         *   belongs to.
+         * @param {Object} [params] URL parameters.
+         * @param {Object} [callbacks] callback object.
+         * @param {Object} [options] request options.
+         * @return {HttpRequest} AJAX request.
+         * @member Api
+         */
+        collection: function(module, data, params, callbacks, options) {
+            var url = this.buildURL(module, 'collection', data, params);
+            return this.call('read', url, null, callbacks, options);
         },
 
         /**
