@@ -464,6 +464,14 @@ describe('Api client', function () {
             expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
         });
 
+        it('should build resource URL for fetching a collection field', function() {
+            let params = {module_list: 'Contacts,Leads,Users', offset: {contacts: 1, users: 2, leads: 2}};
+            let attributes = {id: 'foobarbaz', field: 'invitees'};
+            let url = this.api.buildURL('Calls', 'collection', attributes, params);
+
+            expect(url).toEqual('/rest/v10/Calls/foobarbaz/collection/invitees?module_list=Contacts%2CLeads%2CUsers&offset%5Bcontacts%5D=1&offset%5Busers%5D=2&offset%5Bleads%5D=2');
+        });
+
         it('eliminates null and undefined params from the querystring', function() {
             var params = { bad: null, worse: undefined},
                 attributes = { id:'1234' };
@@ -491,6 +499,25 @@ describe('Api client', function () {
             expect(apispy.getCall(0).args[1]).toContain("Bugs/enum/fixed_in_release");
             spy.restore();
             apispy.restore();
+        });
+    });
+
+    describe('Collection API', function() {
+        it('should fetch collection field records', function() {
+            let spy = sinon.spy(this.callbacks, 'success');
+            let module = 'Contacts';
+            let records = this.fixtures["rest/v10/contact"].GET.response.records;
+            let data = {id: 'foobarbaz', field: 'collectionFieldName'};
+
+            this.server.respondWith('GET', '/rest/v10/Contacts/foobarbaz/collection/collectionFieldName',
+                [200, {'Content-Type': 'application/json'}, JSON.stringify(records)]);
+
+            var request = this.api.collection(module, data, null, this.callbacks);
+            this.server.respond();
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(records);
+            spy.restore();
         });
     });
 
