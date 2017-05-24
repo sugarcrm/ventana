@@ -1,10 +1,10 @@
 {
   "opts": {
     "destination": "./docs",
-    "pedantic": true,
-    "readme": "README.md",
+    "encoding": "utf8",
+    "readme": "./README.md",
     "recurse": true,
-    "template": "node_modules/@sugarcrm/jsdoc-baseline"
+    "template": "node_modules/ink-docstrap/template"
   },
   "plugins": [
     "plugins/markdown"
@@ -13,6 +13,6 @@
     "include": ["src"]
   },
   "templates": {
-    "baseline": "baseline-config.json"
+    "navType": "vertical"
   }
 }
