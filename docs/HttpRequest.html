@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Module: @sugarcrm/ventana</title>
+	<title>Documentation Class: HttpRequest</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,10 +79,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Module: @sugarcrm/ventana</h1>
+	<h1 class="page-title">Class: HttpRequest</h1>
 <section>
 
 <header>
+    
+        <h2>
+        HttpRequest
+        </h2>
+        
     
 </header>
 
@@ -91,10 +96,29 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Ventana module allows you to get an instance of the <a href="Api.html">Api</a> class.</p></div>
-        
+<hr>
+<dt>
+    <h4 class="name" id="HttpRequest"><span class="type-signature"></span>new HttpRequest()</h4>
+    
+    
+</dt>
+<dd>
 
-        
+    
+    <div class="description">
+        <p>Represents AJAX request.</p>
+<p>Encapsulates XHR object and AJAX parameters.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
 <dl class="details">
     
 
@@ -134,7 +158,21 @@
 </dl>
 
 
-        
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
     
     </div>
 
@@ -154,15 +192,15 @@
         <dl>
             
 <hr>
-<dt class="name" id=".HttpError">
-    <h4 id=".HttpError"><span class="type-signature">&lt;static> </span>HttpError<span class="type-signature"> :<a href="HttpError.html">HttpError</a></span></h4>
+<dt class="name" id="debug">
+    <h4 id="debug"><span class="type-signature"></span>debug<span class="type-signature"> :boolean</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        <p>The HttpError class.</p>
+        <p>Flag indicating that a request must output debug information.</p>
     </div>
     
 
@@ -171,7 +209,7 @@
         <ul>
             <li>
                 
-<span class="param-type"><a href="HttpError.html">HttpError</a></span>
+<span class="param-type">boolean</span>
 
 
 
@@ -225,15 +263,20 @@
         
             
 <hr>
-<dt class="name" id=".HttpRequest">
-    <h4 id=".HttpRequest"><span class="type-signature">&lt;static> </span>HttpRequest<span class="type-signature"> :<a href="HttpRequest.html">HttpRequest</a></span></h4>
+<dt class="name" id="params">
+    <h4 id="params"><span class="type-signature"></span>params<span class="type-signature"> :Object</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        <p>The HttpRequest class.</p>
+        <p>Request parameters.</p>
+<p>See Jquery/Zepto documentation for details.</p>
+<ul>
+<li>http://api.jquery.com/jQuery.ajax/</li>
+<li>http://zeptojs.com/#$.ajax</li>
+</ul>
     </div>
     
 
@@ -242,7 +285,151 @@
         <ul>
             <li>
                 
-<span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
+<span class="param-type">Object</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="state">
+    <h4 id="state"><span class="type-signature"></span>state<span class="type-signature"> :Object</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>The state object is used to store global enviroment conditions that may
+be relevant when processing this request but would not be passed to the
+server.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="xhr">
+    <h4 id="xhr"><span class="type-signature"></span>xhr<span class="type-signature"> :XMLHttpRequest</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>XmlHttpRequest object.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">XMLHttpRequest</span>
 
 
 
@@ -303,7 +490,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".createInstance"><span class="type-signature">&lt;static> </span>createInstance(args)</h4>
+    <h4 class="name" id="execute"><span class="type-signature"></span>execute(token, mdHash, upHash)</h4>
     
     
 </dt>
@@ -311,7 +498,7 @@
 
     
     <div class="description">
-        <p>Creates a new instance of a <a href="Api.html">Sugar API class</a>.</p>
+        <p>Executes AJAX request.</p>
     </div>
     
 
@@ -346,13 +533,13 @@
 
         <tr>
             
-                <td class="name"><code>args</code></td>
+                <td class="name"><code>token</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
 
 
 
@@ -363,7 +550,58 @@
 
             
 
-            <td class="description last"><p>The required arguments to instanciate the Sugar API class.</p></td>
+            <td class="description last"><p>OAuth token. Must not be supplied for login
+  type requests.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>mdHash</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>current private metadata hash, used to
+  validate the client metadata against the server.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>upHash</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Current User preferences hash, used to
+  validate the client user pref data against the server.</p></td>
         </tr>
 
     
@@ -423,182 +661,6 @@
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>A new instance of Sugar API class.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Api.html">Api</a></span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id=".getInstance"><span class="type-signature">&lt;static> </span>getInstance(args)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets an instance of a <a href="Api.html">Sugar API class</a>.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>args</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The required arguments to instanciate the Sugar API class.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>An instance of Sugar API class.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Api.html">Api</a></span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>

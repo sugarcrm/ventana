@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Module: @sugarcrm/ventana</title>
+	<title>Documentation Class: HttpError</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,10 +79,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Module: @sugarcrm/ventana</h1>
+	<h1 class="page-title">Class: HttpError</h1>
 <section>
 
 <header>
+    
+        <h2>
+        HttpError
+        </h2>
+        
     
 </header>
 
@@ -91,10 +96,139 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Ventana module allows you to get an instance of the <a href="Api.html">Api</a> class.</p></div>
-        
+<hr>
+<dt>
+    <h4 class="name" id="HttpError"><span class="type-signature"></span>new HttpError()</h4>
+    
+    
+</dt>
+<dd>
 
-        
+    
+    <div class="description">
+        <p>Represents AJAX error.</p>
+<p>See Jquery/Zepto documentation for details.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="http://api.jquery.com/jQuery.ajax/">http://api.jquery.com/jQuery.ajax/</a></li>
+			
+			<li><a href="http://zeptojs.com/#$.ajax">http://zeptojs.com/#$.ajax</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<hr>
+<dt class="name" id="code">
+    <h4 id="code"><span class="type-signature"></span>code<span class="type-signature"> :string</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Error code.</p>
+<p>Additional failure information. See SugarCRM REST API
+documentation for a full list of error codes.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
 <dl class="details">
     
 
@@ -134,35 +268,165 @@
 </dl>
 
 
+    
+</dd>
+
         
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        <dl>
             
 <hr>
-<dt class="name" id=".HttpError">
-    <h4 id=".HttpError"><span class="type-signature">&lt;static> </span>HttpError<span class="type-signature"> :<a href="HttpError.html">HttpError</a></span></h4>
+<dt class="name" id="errorThrown">
+    <h4 id="errorThrown"><span class="type-signature"></span>errorThrown<span class="type-signature"> :string</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        <p>The HttpError class.</p>
+        <p>Textual portion of the HTTP status when HTTP error occurs.</p>
+<p>For example, <code>&quot;Not Found&quot;</code> or <code>&quot;Internal Server Error&quot;</code>.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="message">
+    <h4 id="message"><span class="type-signature"></span>message<span class="type-signature"> :string</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Error message.</p>
+<p>Localized message appropriate for display to end user.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="request">
+    <h4 id="request"><span class="type-signature"></span>request<span class="type-signature"> :<a href="HttpError.html">HttpError</a></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>AJAX request that caused the error.</p>
     </div>
     
 
@@ -225,15 +489,15 @@
         
             
 <hr>
-<dt class="name" id=".HttpRequest">
-    <h4 id=".HttpRequest"><span class="type-signature">&lt;static> </span>HttpRequest<span class="type-signature"> :<a href="HttpRequest.html">HttpRequest</a></span></h4>
+<dt class="name" id="responseText">
+    <h4 id="responseText"><span class="type-signature"></span>responseText<span class="type-signature"> :string</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        <p>The HttpRequest class.</p>
+        <p>XHR response text.</p>
     </div>
     
 
@@ -242,7 +506,151 @@
         <ul>
             <li>
                 
-<span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
+<span class="param-type">string</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="status">
+    <h4 id="status"><span class="type-signature"></span>status<span class="type-signature"> :string</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>XHR status code.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="textStatus">
+    <h4 id="textStatus"><span class="type-signature"></span>textStatus<span class="type-signature"> :string</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>String describing the type of error that occurred.</p>
+<p>Possible values (besides null) are <code>&quot;timeout&quot;</code>, <code>&quot;error&quot;</code>, <code>&quot;abort&quot;</code>, and
+  <code>&quot;parsererror&quot;</code>.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
 
 
 
@@ -303,7 +711,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".createInstance"><span class="type-signature">&lt;static> </span>createInstance(args)</h4>
+    <h4 class="name" id="toString"><span class="type-signature"></span>toString()</h4>
     
     
 </dt>
@@ -311,7 +719,7 @@
 
     
     <div class="description">
-        <p>Creates a new instance of a <a href="Api.html">Sugar API class</a>.</p>
+        <p>Returns string representation of HTTP error.</p>
     </div>
     
 
@@ -320,56 +728,6 @@
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>args</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The required arguments to instanciate the Sugar API class.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -427,7 +785,7 @@
     
             
 <div class="param-desc">
-    <p>A new instance of Sugar API class.</p>
+    <p>HTTP error as a string.</p>
 </div>
 
 
@@ -438,159 +796,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Api.html">Api</a></span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id=".getInstance"><span class="type-signature">&lt;static> </span>getInstance(args)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets an instance of a <a href="Api.html">Sugar API class</a>.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>args</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The required arguments to instanciate the Sugar API class.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>An instance of Sugar API class.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Api.html">Api</a></span>
+<span class="param-type">string</span>
 
 
 
