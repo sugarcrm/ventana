@@ -1041,8 +1041,8 @@ function SugarApi(args) {
         getMetadata: function(options) {
 
             if (_.isString(options)) {
-                console.warn('`Api::getMetadata` has changed signature since 7.9 ' +
-                    'and will drop support for old signature in 7.10. Please update your code.');
+                console.warn('`Api::getMetadata` has changed signature ' +
+                    'and will drop support for the old signature in a future release. Please update your code.');
 
                 var oldOpt = arguments[4] || {};
                 options = {
