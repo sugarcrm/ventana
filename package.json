@@ -37,7 +37,7 @@
     "jquery-migrate": "1.2.1",
     "jsdoc": "^3.4.3",
     "karma": "^1.4.1",
-    "karma-chrome-launcher": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-jasmine": "~0.1.5",
