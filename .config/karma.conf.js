@@ -108,7 +108,7 @@ module.exports = function (config) {
             sl_chrome: {
                 base: 'SauceLabs',
                 browserName: 'chrome',
-                version: 55,
+                version: 59,
             },
             sl_firefox: {
                 base: 'SauceLabs',
