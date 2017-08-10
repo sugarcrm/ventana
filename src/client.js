@@ -1855,8 +1855,6 @@ function SugarApi(args) {
             if (!self.isLoginRequest(request.params.url)) {
                 _rqueue.push(request);
             }
-            // don't try to reauth again from here
-            self.setRefreshingToken(true);
 
             $(window).on('message', function(event) {
                 if (!event.originalEvent.origin || event.originalEvent.origin !== window.location.origin) {
