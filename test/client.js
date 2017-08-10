@@ -1538,6 +1538,30 @@ describe('Api client', function () {
                     expect(successStub).not.toHaveBeenCalled();
                 });
             });
+
+            it('should call complete callback if auth failed', function() {
+                const spyComplete = sinon.spy(this.callbacks, 'complete');
+
+                const responseBody = {
+                    error: 'need_login',
+                    error_message: 'some_error_message',
+                    url: 'some.url',
+                    platform: 'base',
+                };
+                this.server.respondWith('POST', 'rest/v10/oauth2/token?platform=base',
+                    [401, {'Content-Type': 'application/json'}, JSON.stringify(responseBody)]);
+                const api = Api.createInstance({
+                    serverUrl: '/rest/v10',
+                    keyValueStore: this.storage,
+                    platform: 'base',
+                });
+                api.setExternalLogin(true);
+
+                api.call('create', 'rest/v10/oauth2/token?platform=base', {}, this.callbacks);
+                this.server.respond();
+
+                sinon.assert.calledOnce(spyComplete);
+            });
         });
     });
 
