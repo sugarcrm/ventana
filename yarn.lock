@@ -2162,9 +2162,9 @@ jodid25519@^1.0.0:
   dependencies:
     jsbn "~0.1.0"
 
-jquery-migrate@1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-1.2.1.tgz#e1056ad970fb22d5009e2d4d77cf709b78f04768"
+jquery-migrate@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-1.4.1.tgz#85152f3ec99a95625f4f7d0bcf62e9b8638f5a76"
 
 jquery@1.12.4:
   version "1.12.4"

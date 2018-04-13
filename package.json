@@ -34,7 +34,7 @@
     "istanbul-instrumenter-loader": "^2.0.0",
     "jasmine-sinon": "^0.3.2",
     "jquery": "1.12.4",
-    "jquery-migrate": "1.2.1",
+    "jquery-migrate": "1.4.1",
     "jsdoc": "^3.4.3",
     "karma": "^1.4.1",
     "karma-chrome-launcher": "^2.2.0",
@@ -51,7 +51,7 @@
   },
   "peerDependencies": {
     "jquery": "1.12.4",
-    "jquery-migrate": "1.2.1",
+    "jquery-migrate": "1.4.1",
     "underscore": "^1.8.3"
   }
 }
