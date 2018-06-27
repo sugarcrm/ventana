@@ -42,7 +42,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "~0.1.5",
     "karma-safari-launcher": "^1.0.0",
-    "karma-sauce-launcher": "^1.1.0",
+    "karma-sauce-launcher": "^1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.2",
     "sinon": "^1.17.7",
