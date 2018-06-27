@@ -1,37 +1,42 @@
-# https://docs.travis-ci.com/user/trusty-ci-environment/#Using-Trusty
 sudo: false
-dist: trusty
-
 language: node_js
 
 # https://blog.travis-ci.com/2016-11-21-travis-ci-now-supports-yarn
 cache: yarn
 
-addons:
-  apt:
-    packages:
-      - google-chrome-stable
-  firefox: latest
-
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start
 
 matrix:
   include:
     - node_js: 6
       env: BROWSERS=travis_chrome,Firefox
+      os: linux
+      dist: trusty
+      addons:
+        apt:
+          packages:
+            - google-chrome-stable
+        firefox: latest
     - node_js: 6
-      env: BROWSERS=sl_safari,sl_ie
+      env: BROWSERS=sl_ie
       addons:
         sauce_connect: true
+      os: linux
+      dist: trusty
     - node_js: 6
       env: BROWSERS=sl_edge
       addons:
         sauce_connect: true
+      os: linux
+      dist: trusty
+    - node_js: 6
+      os: osx
+      env: BROWSERS=Safari
 
 script:
-  - yarn test -- --browsers $BROWSERS
+  - yarn test --browsers $BROWSERS
 
 after_success:
   - if [[ -d coverage/ ]]; then cat coverage/*/lcov.info | ./node_modules/coveralls/bin/coveralls.js ; fi
