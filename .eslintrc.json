@@ -6,9 +6,11 @@
   },
   "env": {
     "browser": true,
-    "jasmine": true
+    "jasmine": true,
+    "jquery" : true
   },
   "globals": {
+    "_": false,
     "sinon": false
   }
 }
