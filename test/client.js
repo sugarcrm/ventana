@@ -544,13 +544,16 @@ describe('Api client', function () {
             let spy = sinon.spy(this.callbacks, 'success');
             let module = 'Contacts';
 
-            this.server.respondWith('GET', '/rest/v10/Contacts/count',
-                [200, { 'Content-Type': 'application/json' }, '']);
+            this.server.respondWith(
+                'GET',
+                '/rest/v10/Contacts/count',
+                [200, { 'Content-Type': 'application/json' }, '{"record_count": "5"}']
+            );
 
             let request = this.api.count(module, {}, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith({record_count: '5'}, request);
             spy.restore();
         });
 
@@ -616,71 +619,94 @@ describe('Api client', function () {
         });
 
         it('should update record', function () {
-            var module = "Contacts",
-                params = "",
-                attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"1234123", description:"This dude is cool."},
-                spy = sinon.spy(this.callbacks, 'success'),
-                cspy = sinon.spy(this.callbacks, 'complete');
+            let module = 'Contacts';
+            let params = '';
+            let attributes = {
+                id: 1,
+                first_name: 'Ronald',
+                last_name: 'McDonald',
+                phone_work: '1234123',
+                description: 'This dude is cool.'
+            };
+            let stringifiedAttributes = JSON.stringify(attributes);
+            let spy = sinon.spy(this.callbacks, 'success');
+            let cspy = sinon.spy(this.callbacks, 'complete');
 
-            this.server.respondWith("PUT", "/rest/v10/Contacts",
-                [200, {  "Content-Type":"application/json"},
-                    ""]);
+            this.server.respondWith(
+                'PUT',
+                '/rest/v10/Contacts/1',
+                [200, { 'Content-Type': 'application/json' }, stringifiedAttributes]
+            );
 
-            var request = this.api.records("update", module, attributes, params, this.callbacks);
+            let request = this.api.records('update', module, attributes, params, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith(attributes, request);
             expect(cspy).toHaveBeenCalledWith(request);
-            var req = this.server.requests[0];
-            expect(req.requestBody).toEqual(JSON.stringify(attributes));
+            let req = this.server.requests[0];
+            expect(req.requestBody).toEqual(stringifiedAttributes);
+
             spy.restore();
             cspy.restore();
         });
 
         it('should delete record', function () {
-            var spy = sinon.spy(this.callbacks, 'success'),
-                module = "Contacts",
-                params = "",
-                attributes = {id:"1234"};
+            let spy = sinon.spy(this.callbacks, 'success');
+            let module = 'Contacts';
+            let params = "";
+            let attributes = {id: '1234'};
 
-            this.server.respondWith("DELETE", "/rest/v10/Contacts/1234",
-                [200, {  "Content-Type":"application/json"}, ""]);
+            this.server.respondWith(
+                'DELETE',
+                '/rest/v10/Contacts/1234',
+                [200, {'Content-Type': 'application/json'}, JSON.stringify(attributes)]
+            );
 
-            var request = this.api.records("delete", module, attributes, params, this.callbacks);
+            let request = this.api.records('delete', module, attributes, params, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
-            expect(spy.getCall(0).args[0]).toEqual(null);
+            expect(spy).toHaveBeenCalledWith(attributes, request);
+            expect(spy.getCall(0).args[0]).toEqual(attributes);
+
             spy.restore();
         });
 
         it('should favorite record', function () {
-            var spy = sinon.spy(this.callbacks, 'success'),
-                module = "Contacts",
-                id ="1234";
+            let spy = sinon.spy(this.callbacks, 'success');
+            let module = 'Contacts';
+            let id = '1234';
 
-            this.server.respondWith("PUT", "/rest/v10/Contacts/1234/favorite",
-                [200, {  "Content-Type":"application/json"}, ""]);
+            let expectedAttributes = {id: id, my_favorite: true};
+            this.server.respondWith(
+                'PUT',
+                '/rest/v10/Contacts/1234/favorite',
+                [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
+            );
 
-            var request = this.api.favorite(module, id, true, this.callbacks);
+            let request = this.api.favorite(module, id, true, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
+
             spy.restore();
         });
 
         it('should unfavorite record', function () {
-            var spy = sinon.spy(this.callbacks, 'success'),
-                module = "Contacts",
-                id ="1234";
+            let spy = sinon.spy(this.callbacks, 'success');
+            let module = 'Contacts';
+            let id = '1234';
 
-            this.server.respondWith("PUT", "/rest/v10/Contacts/1234/unfavorite",
-                [200, {  "Content-Type":"application/json"}, ""]);
+            let expectedAttributes = {id: id, my_favorite: false};
+            this.server.respondWith(
+                'PUT',
+                '/rest/v10/Contacts/1234/unfavorite',
+                [200, { 'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
+            );
 
-            var request = this.api.favorite(module, id, false, this.callbacks);
+            let request = this.api.favorite(module, id, false, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
             spy.restore();
         });
     });
@@ -909,14 +935,21 @@ describe('Api client', function () {
     describe('CSS API', function () {
         it('should request the desired theme for the specified platform', function () {
             let spy = sinon.spy(this.callbacks, 'success');
+            let url = 'cache/themes/clients/my-platform/my-theme/styling.css';
+            let expectedAttributes = {
+                url: [url]
+            };
 
-            this.server.respondWith('GET', '/rest/v10/css?platform=my-platform&themeName=my-theme',
-                [200, {'Content-Type': 'text/css'}, '']);
+            this.server.respondWith(
+                'GET',
+                '/rest/v10/css?platform=my-platform&themeName=my-theme',
+                [200, {'Content-Type': 'text/css'}, JSON.stringify(expectedAttributes)]
+            );
 
             let request = this.api.css('my-platform', 'my-theme', this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
             spy.restore();
         });
     });
@@ -1087,10 +1120,13 @@ describe('Api client', function () {
         });
 
         it('should ping server', function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+            let spy = sinon.spy(this.callbacks, 'success');
 
-            this.server.respondWith('GET', /.*\/rest\/v10\/ping/,
-                [200, { 'Content-Type': 'application/json'}, '']);
+            this.server.respondWith(
+                'GET',
+                /.*\/rest\/v10\/ping/,
+                [200, { 'Content-Type': 'application/json'}, '"pong"']
+            );
 
             this.api.ping(null, this.callbacks);
             this.server.respond();
@@ -1100,10 +1136,13 @@ describe('Api client', function () {
         });
 
         it('should ping server with an action', function() {
-            var spy = sinon.spy(this.callbacks, 'success');
+            let spy = sinon.spy(this.callbacks, 'success');
 
-            this.server.respondWith('GET', /.*\/rest\/v10\/ping\/some_action/,
-                [200, { 'Content-Type': 'application/json'}, '']);
+            this.server.respondWith(
+                'GET',
+                /.*\/rest\/v10\/ping\/some_action/,
+                [200, {'Content-Type': 'application/json'}, '"some data"']
+            );
 
             this.api.ping('some_action', this.callbacks);
             this.server.respond();
@@ -1203,7 +1242,6 @@ describe('Api client', function () {
         });
 
         it('should handle multiple requests and refresh token in case of invalid_grant response', function() {
-
             this.sandbox.stub(this.storage, 'get')
                 .withArgs('AuthAccessToken').returns('xyz')
                 .withArgs('AuthRefreshToken').returns('qwe');
@@ -1218,9 +1256,9 @@ describe('Api client', function () {
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
-            let request2 = this.api.records('read', 'Cases', null, null, this.callbacks);
+            let request2 = this.api.records('read', 'Bugs', null, null, this.callbacks);
             let rspy2 = sinon.spy(request2, 'execute');
-            let request3 = this.api.records('read', 'Opportunities', null, null, this.callbacks);
+            let request3 = this.api.records('read', 'Calls', null, null, this.callbacks);
             let rspy3 = sinon.spy(request3, 'execute');
 
             let headers = { 'Content-Type': 'application/json' };
@@ -1233,30 +1271,32 @@ describe('Api client', function () {
             expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
             xhr.requests[0].respond(401, headers, invalidBody);
 
-            expect(xhr.requests[1].url).toBe('/rest/v10/Cases');
+            expect(xhr.requests[1].url).toBe('/rest/v10/Bugs');
             expect(xhr.requests[1].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
             xhr.requests[1].respond(401, headers, invalidBody);
 
-            expect(xhr.requests[2].url).toBe('/rest/v10/Opportunities');
+            expect(xhr.requests[2].url).toBe('/rest/v10/Calls');
             expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
             xhr.requests[2].respond(401, headers, invalidBody);
 
             expect(xhr.requests[3].url).toBe('/rest/v10/oauth2/token?platform=');
-            xhr.requests[3].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(
-                this.fixtures['/rest/v10/oauth2/token'].POST.response
-            ));
+            xhr.requests[3].respond(
+                200,
+                {'Content-Type': 'application/json'},
+                JSON.stringify(this.fixtures['/rest/v10/oauth2/token'].POST.response)
+            );
 
             expect(xhr.requests[4].url).toBe('/rest/v10/Accounts');
             expect(xhr.requests[4].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
-            xhr.requests[4].respond(200, headers);
+            xhr.requests[4].respond(200, headers, JSON.stringify(this.fixtures['/rest/v10/Accounts'].GET.response));
 
-            expect(xhr.requests[5].url).toBe('/rest/v10/Cases');
+            expect(xhr.requests[5].url).toBe('/rest/v10/Bugs');
             expect(xhr.requests[5].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
-            xhr.requests[5].respond(200, headers);
+            xhr.requests[5].respond(200, headers, JSON.stringify(this.fixtures['/rest/v10/Bugs'].GET.response));
 
-            expect(xhr.requests[6].url).toBe('/rest/v10/Opportunities');
+            expect(xhr.requests[6].url).toBe('/rest/v10/Calls');
             expect(xhr.requests[6].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
-            xhr.requests[6].respond(200, headers);
+            xhr.requests[6].respond(200, headers, JSON.stringify(this.fixtures['/rest/v10/Calls'].GET.response));
 
             expect(xhr.requests.length).toBe(7);
 
@@ -1269,6 +1309,9 @@ describe('Api client', function () {
             expect(espy).not.toHaveBeenCalled();
             expect(sspy.callCount).toEqual(3);
 
+            espy.restore();
+            cspy.restore();
+            sspy.restore();
             rspy.restore();
             rspy2.restore();
             rspy3.restore();
@@ -1476,12 +1519,15 @@ describe('Api client', function () {
             sspy.restore();
         });
 
-        it('should logout user', function () {
-
+        it('should log user out', function () {
             let spy = sinon.spy(this.callbacks, 'success');
             let cutSpy = sinon.spy(this.storage, 'cut');
 
-            this.server.respondWith("POST", "/rest/v10/oauth2/logout", [200, {"Content-Type":"application/json"}, ""]);
+            this.server.respondWith(
+                'POST',
+                '/rest/v10/oauth2/logout',
+                [200, {'Content-Type': 'application/json'}, '{"success": true}']
+            );
 
             this.api.logout(this.callbacks);
             this.server.respond();
@@ -1549,14 +1595,24 @@ describe('Api client', function () {
     describe('signup', function () {
         it('should register a lead', function () {
             let spy = sinon.spy(this.callbacks, 'success');
+            let firstName = 'John';
+            let lastName = 'Doe';
+            let expectedAttributes = {
+                first_name: firstName,
+                last_name: lastName,
+                id: '22'
+            };
 
-            this.server.respondWith('POST', '/rest/v10/Leads/register',
-                [200, {'Content-Type': 'application/json'}, '']);
+            this.server.respondWith(
+                'POST',
+                '/rest/v10/Leads/register',
+                [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
+            );
 
-            let request = this.api.signup({ first_name: 'John', last_name: 'Doe' }, {}, this.callbacks);
+            let request = this.api.signup({ first_name: firstName, last_name: lastName }, {}, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
             spy.restore();
         });
     });
@@ -1580,13 +1636,16 @@ describe('Api client', function () {
                 }
             ];
             _.each(data, function (option) {
-                this.server.respondWith(option.method, ['/rest/v10', module, id, option.action].join('/'),
-                    [200, { 'Content-Type': 'application/json' }, '']);
+                this.server.respondWith(
+                    option.method,
+                    ['/rest/v10', module, id, option.action].join('/'),
+                    [200, { 'Content-Type': 'application/json' }, 'true']
+                );
 
                 let request = this.api.follow(module, id, option.followed, this.callbacks);
                 this.server.respond();
 
-                expect(spy).toHaveBeenCalledWith(null, request);
+                expect(spy).toHaveBeenCalledWith(true, request);
             }.bind(this));
 
             spy.restore();
@@ -1596,14 +1655,20 @@ describe('Api client', function () {
     describe('Me API', function () {
         it('should read my information', function () {
             let spy = sinon.spy(this.callbacks, 'success');
+            let myInfo = this.fixtures['/rest/v10/me'].GET.response;
 
-            this.server.respondWith('GET', '/rest/v10/me',
-                [200, { 'Content-Type': 'application/json' }, '']);
+            this.server.respondWith(
+                'GET',
+                '/rest/v10/me',
+                [200, {'Content-Type': 'application/json'}, JSON.stringify(myInfo)]
+            );
+
 
             let request = this.api.me('read', {}, {}, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(null, request);
+            expect(spy).toHaveBeenCalledWith(myInfo, request);
+
             spy.restore();
         });
     });

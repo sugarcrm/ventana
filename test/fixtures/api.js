@@ -396,6 +396,39 @@ module.exports = {
             "response":"image"
         }
     },
+    '/rest/v10/Accounts': {
+        GET: {
+            status: 200,
+            response: {
+                next_offset: -1,
+                records: [
+                    {id: '5', name: 'ACME Corporation'}
+                ]
+            }
+        }
+    },
+    '/rest/v10/Bugs': {
+        GET: {
+            status: 200,
+            response: {
+                next_offset: -1,
+                records: [
+                    {id: '7', name: "It's a trap!"}
+                ]
+            }
+        }
+    },
+    '/rest/v10/Calls': {
+        GET: {
+            status: 200,
+            response: {
+                next_offset: -1,
+                records: [
+                    {id: '7', name: 'Talk about awesome product'}
+                ]
+            }
+        }
+    },
     responseErrors: {
         threehundred:{code: 300,body: "The value used for an external ID exists in more than one record. The response body contains the list of matching records."},
         fourhundred:{code: 400,body: 'The request could not be understood, usually because the JSON or XML body has an error.  This error code will also return all SQL errors from the server as well.'},
