@@ -46,12 +46,12 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.2",
     "sinon": "^1.17.7",
-    "underscore": "^1.8.3",
+    "underscore": "^1.9.1",
     "webpack": "^1.13.3"
   },
   "peerDependencies": {
     "jquery": "1.12.4",
     "jquery-migrate": "1.4.1",
-    "underscore": "^1.8.3"
+    "underscore": "^1.9.1"
   }
 }
