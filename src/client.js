@@ -661,7 +661,11 @@ function SugarApi(args) {
             } else {
                 // set data for create, update, and delete
                 if (data && (method == 'create' || method == 'update' || method == 'delete')) {
-                    params.data = JSON.stringify(data);
+                    if (data instanceof FormData) {
+                        params.data = data;
+                    } else {
+                        params.data = JSON.stringify(data);
+                    }
                 }
             }
 
@@ -1284,7 +1288,7 @@ function SugarApi(args) {
          * }
          * </pre>
          * The `field` property is optional. If not specified, the API fetches the file list.
-         * @param {Object} [$files] jQuery/Zepto DOM elements that carry the files to upload.
+         * @param {Object} [$files] jQuery/Zepto DOM elements that carry the $files to upload.
          * @param {Object} [callbacks] callback object.
          * @param {Object} [options] Request options hash.
          *
@@ -1298,25 +1302,20 @@ function SugarApi(args) {
          */
         file: function(method, data, $files, callbacks, options) {
             var ajaxParams = {
-                files: $files,
-                processData: false
+                processData: false,
+                contentType: false
             };
 
-            //delete method doesn't need to go through the iframe transport
-            if (method === 'delete') {
-                ajaxParams.iframe = false;
-            } else if (!options || options.iframe !== false) {
-                ajaxParams.iframe = true;
+            var fd = new FormData();
 
-                // pass OAuth token as GET-parameter during file upload.
-                // otherwise, in case if file is too large, the whole request body may be
-                // ignored by interpreter together with the token
-                options = options || {};
-                options.passOAuthToken = true;
+            if (data.field && $files && typeof $files[0] != 'undefined' && $files[0].files.length > 0) {
+                fd.append(data.field, $files[0].files[0]);
             }
 
-            if (!options || options.deleteIfFails !== false) {
-                options = options || {};
+            options = options || {};
+            options.htmlJsonFormat = false;
+
+            if (options.deleteIfFails !== false) {
                 options.deleteIfFails = true;
             }
 
@@ -1328,8 +1327,7 @@ function SugarApi(args) {
                 }
             });
 
-            return this.call(method, this.buildFileURL(data, options),
-                null, callbacks, ajaxParams);
+            return this.call(method, this.buildFileURL(data, options), fd, callbacks, ajaxParams);
         },
 
         /**
