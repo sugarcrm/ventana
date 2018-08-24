@@ -265,12 +265,6 @@ _.extend(bulkXHR.prototype, {
 });
 
 /**
-
- *
- *
- */
-
-/**
  * The SugarCRM JavaScript API allows users to interact with SugarCRM instance
  * via its REST interface.
  *
@@ -595,13 +589,13 @@ function SugarApi(args) {
         },
 
         /**
-         * Makes AJAX call via jquery/zepto AJAX API.
+         * Makes AJAX call via jQuery/Zepto AJAX API.
          *
          * @param {string} method CRUD action to make (read, create, update,
          *   delete) are mapped to corresponding HTTP verb: GET, POST, PUT, DELETE.
          * @param {string} url resource URL.
-         * @param {Object} [data] data will be stringified into JSON and
-         *   set to request body.
+         * @param {FormData|Object} [data] Request body contents. If not given as FormData,
+         *   will be stringified into JSON.
          * @param {Object} [callbacks] callbacks object.
          * @param {Object} [options] options for request that map
          *   directly to the jquery/zepto Ajax options.
@@ -661,7 +655,11 @@ function SugarApi(args) {
             } else {
                 // set data for create, update, and delete
                 if (data && (method == 'create' || method == 'update' || method == 'delete')) {
-                    params.data = JSON.stringify(data);
+                    if (data instanceof FormData) {
+                        params.data = data;
+                    } else {
+                        params.data = JSON.stringify(data);
+                    }
                 }
             }
 
@@ -933,11 +931,6 @@ function SugarApi(args) {
 
             if (options.deleteIfFails === true) {
                 params.delete_if_fails = true;
-            }
-
-            // This is for BWC only. Don't document it and remove as soon as 6.7 is decommissioned.
-            if (options.passOAuthToken) {
-                params.oauth_token = this.getOAuthToken();
             }
 
             if (options.passDownloadToken) {
@@ -1287,36 +1280,32 @@ function SugarApi(args) {
          * @param {Object} [$files] jQuery/Zepto DOM elements that carry the files to upload.
          * @param {Object} [callbacks] callback object.
          * @param {Object} [options] Request options hash.
-         *
-         * - htmlJsonFormat: Boolean flag indicating if `sugar-html-json` format must be used (`true` by default)
-         * - iframe: Boolean flag indicating if iframe transport is used (`true` by default)
          * See {@link Api#buildFileURL} function for other options.
-         *
          * @return {HttpRequest} The AJAX request.
          * @memberOf Api
          * @instance
          */
         file: function(method, data, $files, callbacks, options) {
-            var ajaxParams = {
-                files: $files,
-                processData: false
+            let ajaxParams = {
+                processData: false,
+                contentType: false,
             };
 
-            //delete method doesn't need to go through the iframe transport
-            if (method === 'delete') {
-                ajaxParams.iframe = false;
-            } else if (!options || options.iframe !== false) {
-                ajaxParams.iframe = true;
+            let fd = new FormData();
 
-                // pass OAuth token as GET-parameter during file upload.
-                // otherwise, in case if file is too large, the whole request body may be
-                // ignored by interpreter together with the token
-                options = options || {};
-                options.passOAuthToken = true;
+            // first we check if there was anything sent at all
+            if (data.field && $files) {
+                let attachedFile = $files[0];
+                // then we check if we really have files to work with
+                if (!_.isUndefined(attachedFile) && attachedFile.files && attachedFile.files.length) {
+                    fd.append(data.field, attachedFile.files[0]);
+                }
             }
 
-            if (!options || options.deleteIfFails !== false) {
-                options = options || {};
+            options = options || {};
+            options.htmlJsonFormat = false;
+
+            if (options.deleteIfFails !== false) {
                 options.deleteIfFails = true;
             }
 
@@ -1328,8 +1317,7 @@ function SugarApi(args) {
                 }
             });
 
-            return this.call(method, this.buildFileURL(data, options),
-                null, callbacks, ajaxParams);
+            return this.call(method, this.buildFileURL(data, options), fd, callbacks, ajaxParams);
         },
 
         /**
@@ -1409,9 +1397,6 @@ function SugarApi(args) {
          * @param {Function} [callbacks.error] Called on failure.
          * @param {Function} [callbacks.complete] Called when finished.
          * @param {Object} [options] Request options hash.
-         *
-         * - passOAuthToken: Boolean flag indicating if OAuth token must be passed in the URL (`true` by default)
-         *
          * @return {HttpRequest} The AJAX request.
          * @memberOf Api
          * @instance
