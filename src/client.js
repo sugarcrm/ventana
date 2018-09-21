@@ -1848,6 +1848,10 @@ function SugarApi(args) {
                     // this is not our message, ignore it
                     return;
                 }
+                // ignore messages from yiu3/timer.js
+                if (event.originalEvent.data.indexOf('setImmediate') >= 0) {
+                    return;
+                }
                 $(window).on('message', null);
                 var authData = $.parseJSON(event.originalEvent.data);
                 var loginFailed = !authData || !authData.access_token;
