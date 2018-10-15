@@ -345,7 +345,7 @@ describe('Api client', function () {
                 },
                 attributes = { id:'1234'},
                 url = this.api.buildURL("contacts", "update", attributes, params);
-            expect(url).toEqual('/rest/v10/contacts/1234?fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello+world%2F%25');
+            expect(url).toEqual('/rest/v10/contacts/1234?fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello%20world%2F%25');
         });
 
         it('should build resource URLs for fetching a link', function() {
