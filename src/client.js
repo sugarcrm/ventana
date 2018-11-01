@@ -1265,6 +1265,90 @@ function SugarApi(args) {
         },
 
         /**
+         * This function uses native XMLHttpRequest to download File/Blob data from an endpoint.
+         * jQuery ajax struggles with Blob data, so this adds a Sugar-friendly way to do it.
+         *
+         * @param {String} url The URL to use for the XMLHttpRequest
+         * @param {Function} [callback] An optional callback function to call at the end of onload
+         */
+        xhrDownloadFile: function(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'arraybuffer';
+
+            xhr.onload = function() {
+                var fileName = '';
+                var disposition;
+                var fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                var matches;
+                var contentType;
+                var blob;
+                var URL;
+                var downloadUrl;
+                var aEl;
+
+                if (this.status === 200) {
+                    disposition = xhr.getResponseHeader('Content-Disposition');
+                    contentType = xhr.getResponseHeader('Content-Type');
+
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        matches = fileNameRegex.exec(disposition);
+
+                        if (matches != null && matches[1]) {
+                            fileName = matches[1].replace(/['"]/g, '');
+                        }
+                    }
+
+                    if (typeof File === 'function') {
+                        blob = new File([this.response], fileName, {
+                            type: contentType
+                        });
+                    } else {
+                        blob = new Blob([this.response], {
+                            type: contentType
+                        });
+                    }
+
+                    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                        // this lets us work around IE's HTML7007 blob issue
+                        window.navigator.msSaveBlob(blob, fileName);
+                    } else {
+                        URL = window.URL || window.webkitURL;
+                        downloadUrl = URL.createObjectURL(blob);
+
+                        if (fileName) {
+                            // set up an anchor Element to take advantage of the download attribute
+                            aEl = document.createElement('a');
+                            aEl.download = fileName;
+                            aEl.target = '_blank';
+                            aEl.href = downloadUrl;
+                            // appends the anchor element to the dom
+                            document.body.appendChild(aEl);
+                            // clicks the actual anchor link to begin download process
+                            aEl.click();
+                        } else {
+                            window.location = downloadUrl;
+                        }
+
+                        // perform cleanup of removing the anchor element from the DOM
+                        // as well as revoking the ObjectURL to prevent minor memory leak
+                        setTimeout(function () {
+                            URL.revokeObjectURL(downloadUrl);
+                        }, 100);
+                    }
+
+                    if (_.isFunction(callback)) {
+                        callback(fileName);
+                    }
+                }
+            };
+
+            xhr.setRequestHeader('OAuth-Token', this.getOAuthToken());
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.send();
+        },
+
+        /**
          * Executes CRUD on a file resource.
          *
          * @param {string} method operation type: create, read, update, or delete.
