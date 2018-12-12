@@ -1283,9 +1283,13 @@ function SugarApi(args) {
                 var matches;
                 var contentType;
                 var blob;
-                var URL;
-                var downloadUrl;
                 var aEl;
+                var binary;
+                var arrBuf;
+                var i;
+                var len;
+                var base64;
+                var uri;
 
                 if (this.status === 200) {
                     disposition = xhr.getResponseHeader('Content-Disposition');
@@ -1312,33 +1316,26 @@ function SugarApi(args) {
                     if (typeof window.navigator.msSaveBlob !== 'undefined') {
                         // this lets us work around IE's HTML7007 blob issue
                         window.navigator.msSaveBlob(blob, fileName);
-                    } else {
-                        URL = window.URL || window.webkitURL;
-                        downloadUrl = URL.createObjectURL(blob);
-
-                        if (fileName) {
-                            // set up an anchor Element to take advantage of the download attribute
-                            aEl = document.createElement('a');
-                            aEl.download = fileName;
-                            aEl.target = '_blank';
-                            aEl.href = downloadUrl;
-                            // appends the anchor element to the dom
-                            document.body.appendChild(aEl);
-                            // clicks the actual anchor link to begin download process
-                            aEl.click();
-                        } else {
-                            window.location = downloadUrl;
+                        if (_.isFunction(callback)) {
+                            callback(fileName);
                         }
+                    } else {
+                        var reader = new FileReader();
 
-                        // perform cleanup of removing the anchor element from the DOM
-                        // as well as revoking the ObjectURL to prevent minor memory leak
-                        setTimeout(function () {
-                            URL.revokeObjectURL(downloadUrl);
-                        }, 100);
-                    }
-
-                    if (_.isFunction(callback)) {
-                        callback(fileName);
+                        reader.readAsDataURL(blob);
+                        reader.onloadend = function() {
+                            base64 = reader.result;
+                            uri = encodeURI(base64);
+                            aEl = document.createElement('a');
+                            document.body.appendChild(aEl);
+                            aEl.href = uri;
+                            aEl.download = fileName;
+                            aEl.click();
+                            document.body.removeChild(aEl);
+                            if (_.isFunction(callback)) {
+                                callback(fileName);
+                            }
+                        }
                     }
                 }
             };
