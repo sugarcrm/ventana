@@ -1807,7 +1807,7 @@ describe('Api client', function () {
             expect(request.aborted).toBeTruthy();
 
             expect(sstub).not.toHaveBeenCalled();
-            expect(estub).toHaveBeenCalled();
+            expect(estub).not.toHaveBeenCalled();
             expect(cstub).toHaveBeenCalledWith(request);
 
             sstub.restore();
