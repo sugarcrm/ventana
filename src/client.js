@@ -389,6 +389,10 @@ function SugarApi(args) {
 
     var _handleErrorAndRefreshToken = function(self, request, callbacks) {
         return function(xhr, textStatus, errorThrown) {
+            // Don't handle aborted request as error
+            if (xhr.aborted || request.aborted) {
+                return;
+            }
             var error = new HttpError(request, textStatus, errorThrown);
             var onError = function() {
                 // Either regular request failed or token refresh failed
