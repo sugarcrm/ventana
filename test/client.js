@@ -1577,7 +1577,7 @@ describe('Api client', function () {
                 this.api.setRefreshTokenSuccessCallback(successStub);
                 this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
 
-                window.postMessage(JSON.stringify({access_token: null}), '*');
+                window.postMessage(JSON.stringify({access_token: null, external_login: true}), '*');
 
                 waitsFor(function() {
                     return done;
@@ -1587,6 +1587,27 @@ describe('Api client', function () {
                     $(window).off('message', complete);
                     expect(onErrorStub).toHaveBeenCalled();
                     expect(successStub).not.toHaveBeenCalled();
+                });
+            });
+
+            it('should not call onError and return if not external login', function () {
+                let onErrorStub = sinon.stub();
+                let done = false;
+                let complete = function() { done = true; };
+
+                $(window).on('message', complete);
+
+                this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
+
+                window.postMessage(JSON.stringify({some_token: null}), '*');
+
+                waitsFor(function() {
+                    return done;
+                });
+
+                runs(function() {
+                    $(window).off('message', complete);
+                    expect(onErrorStub).not.toHaveBeenCalled();
                 });
             });
         });
