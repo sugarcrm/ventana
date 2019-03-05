@@ -1936,8 +1936,14 @@ function SugarApi(args) {
                     // this is not our message, ignore it
                     return;
                 }
-                $(window).on('message', null);
+
                 var authData = $.parseJSON(event.originalEvent.data);
+                if (!authData.external_login) {
+                    // this is not our message, ignore it
+                    return;
+                }
+
+                $(window).on('message', null);
                 var loginFailed = !authData || !authData.access_token;
 
                 if (loginFailed) {
