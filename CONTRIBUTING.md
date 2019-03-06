@@ -26,3 +26,6 @@ comments where appropriate.
 
 [contributor-pdf]: https://github.com/sugarcrm/ventana/blob/master/CONTRIBUTOR_TERMS.pdf
 [tracker]: https://github.com/sugarcrm/ventana/issues
+
+## Note for SugarCRM Employees
+Please push directly to a branch on sugarcrm/ventana and make your PR from there, rather than from your personal fork, if possible. Due to [issue #21](https://github.com/sugarcrm/ventana/issues/21), our continuous integration will not run from PR's made via forks.
