@@ -397,7 +397,7 @@ function SugarApi(args) {
             var onError = function() {
                 // Either regular request failed or token refresh failed
                 // Call original error callback
-                if (!_rqueue.length || self.refreshingToken(request.params.url)) {
+                if (!_rqueue.length || self.refreshingToken(request.params.url) || !self.isRequestInQueue(request)) {
                     if (callbacks.error) {
                         callbacks.error(error);
                     }
@@ -1754,6 +1754,15 @@ function SugarApi(args) {
             return this.call(method, url, payload, callbacks);
         },
 
+        /**
+         * Is request in request queue.
+         *
+         * @param {HttpRequest} request
+         * @returns {boolean}
+         */
+        isRequestInQueue: function(request) {
+            return _rqueue.indexOf(request) > -1;
+        },
 
         /**
          * Verifies password.

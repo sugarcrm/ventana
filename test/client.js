@@ -181,6 +181,28 @@ describe('Api client', function () {
             expect(callbackError).toHaveBeenCalled();
             expect(stubHttpErrorHandler).not.toHaveBeenCalled();
         });
+
+
+        it('request in Queue', function() {
+
+            let requestInQueue = new Api.HttpRequest({});
+            this.api.handleExternalLogin(requestInQueue, {}, $.noop);
+
+            let isIn = this.api.isRequestInQueue(requestInQueue);
+
+            expect(isIn).toBeTruthy();
+        });
+
+        it('request not in Queue', function() {
+
+            let requestNotInQueue = new Api.HttpRequest({});
+            requestNotInQueue.execute();
+
+            let isIn = this.api.isRequestInQueue(requestNotInQueue);
+
+            expect(isIn).toBeFalsy();
+        });
+
     });
 
     describe('Request Handler', function () {
