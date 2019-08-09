@@ -1648,7 +1648,7 @@ describe('Api client', function () {
 
             this.server.respondWith(
                 'POST',
-                '/rest/v10/Contacts/register?platform=portal',
+                '/rest/v10/Contacts/register?platform=',
                 [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
             );
 
