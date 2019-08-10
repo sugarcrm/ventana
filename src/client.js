@@ -1750,7 +1750,9 @@ function SugarApi(args) {
             payload.client_info = data;
 
             var method = 'create';
-            var url = this.buildURL('Leads', 'register', payload);
+            var url = this.buildURL('Contacts', 'register', payload, {
+                platform: _platform
+            });
             return this.call(method, url, payload, callbacks);
         },
 

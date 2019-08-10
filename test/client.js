@@ -1636,7 +1636,7 @@ describe('Api client', function () {
     });
 
     describe('signup', function () {
-        it('should register a lead', function () {
+        it('should register a contact', function () {
             let spy = sinon.spy(this.callbacks, 'success');
             let firstName = 'John';
             let lastName = 'Doe';
@@ -1648,7 +1648,7 @@ describe('Api client', function () {
 
             this.server.respondWith(
                 'POST',
-                '/rest/v10/Leads/register',
+                '/rest/v10/Contacts/register?platform=',
                 [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
             );
 
