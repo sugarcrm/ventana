@@ -6,3 +6,4 @@ test/
 CONTRIBUTING.md
 CONTRIBUTOR_TERMS.pdf
 yarn.lock
+.idea/
