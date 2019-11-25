@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2017 SugarCRM Inc. Licensed by SugarCRM under the Apache 2.0 license.
  */
+var _ = require("underscore")
 
 var _instance;
 var _methodsToRequest = {
