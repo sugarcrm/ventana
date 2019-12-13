@@ -1138,6 +1138,33 @@ function SugarApi(args) {
         },
 
         /**
+         * Fetch the lean count of related records.
+         *
+         * The data paramerer represents relationship information:
+         * <pre>
+         * {
+         *    id: record ID
+         *    link: relationship link name
+         *    relatedId: ID of the related record
+         *    related: object that contains request payload (related record or relationship fields)
+         * }
+         * </pre>
+         *
+         * @param {string} module module name.
+         * @param {Object} data object with relationship information.
+         * @param {Object} [params] URL parameters.
+         * @param {Object} [callbacks] callback object.
+         * @param {Object} [options] request options.
+         * @return {HttpRequest} The AJAX request.
+         * @memberOf Api
+         * @instance
+         */
+        relatedLeanCount: function(module, data, params, callbacks, options) {
+            var url = this.buildURL(module, 'leancount', data, params);
+            return this.call('read', url, data.related, callbacks, options);
+        },
+
+        /**
          * Fetches a collection field.
          *
          * @param {string} module Module name.

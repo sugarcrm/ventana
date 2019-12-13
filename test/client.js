@@ -840,6 +840,32 @@ describe('Api client', function () {
         });
     });
 
+    describe('relatedLeanCount GET action', function () {
+
+        it('should fetch relatedLeanCount', function () {
+            var spy = sinon.spy(this.callbacks, 'success'),
+                module = "opportunities", data = null,
+                attributes = {
+                    id: "1",
+                    link: "contacts"
+                },
+                respFixture = this.fixtures["rest/v10/opportunities/1/link/contacts/leancount"].GET.response;
+
+            this.server.respondWith("GET", "/rest/v10/opportunities/1/link/contacts/leancount",
+                [200, {  "Content-Type":"application/json"},
+                    JSON.stringify(respFixture)]);
+
+            this.api.relatedLeanCount(module, attributes, null, this.callbacks);
+            this.server.respond();
+
+            expect(spy.getCall(0).args[0]).toEqual(respFixture);
+            data = JSON.parse(this.server.requests[0].responseText);
+            expect(data.record_count).toEqual(5);
+            expect(data.has_more).toEqual(true);
+            spy.restore();
+        });
+    });
+
     describe('Password', function () {
 
         it('should verify password', function () {
