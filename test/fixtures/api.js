@@ -284,6 +284,15 @@ module.exports = {
         "DELETE": { "status" : 200 },
         "POST" : { "status" : 405 }
     },
+    "rest/v10/opportunities/1/link/contacts/leancount" : {
+        "GET": {
+            "status": 200,
+            "response": {
+                "has_more": true,
+                "record_count": 5
+            }
+        }
+    },
 
     "rest/v10/opportunities/1/link/contacts" : {
         "GET": {
