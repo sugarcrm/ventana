@@ -612,7 +612,8 @@ function SugarApi(args) {
                 args,
                 type = _methodsToRequest[method],
                 self = this,
-                token = this.getOAuthToken();
+                token = this.getOAuthToken(),
+                triggerBulkRequest = false;
 
             options = options || {};
             callbacks = callbacks || {};
@@ -672,6 +673,12 @@ function SugarApi(args) {
                 params.processData = false;
             }
 
+            // Switching to bulk in case of GET URI size limit (2KB) reached, this allows to avoid server errors
+            if (params.type === 'GET' && !options.bulk && _allowBulk && params.url.length > 2048) {
+                options.bulk = _.uniqueId();
+                triggerBulkRequest = true;
+            }
+
             // Clients may override any of AJAX options.
             request = new HttpRequest(_.extend(params, options), this.debug);
             params.error = _handleErrorAndRefreshToken(self, request, callbacks);
@@ -702,6 +709,12 @@ function SugarApi(args) {
                     request: request,
                     args: args
                 });
+
+                if (triggerBulkRequest) {
+                    this.triggerBulkCall(params.bulk);
+
+                    return request;
+                }
             } else {
                 request.execute.apply(request, args);
             }
