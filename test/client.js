@@ -2068,4 +2068,37 @@ describe('Api client', function () {
             expect(complete).toBeTruthy();
         });
     });
+
+    describe("'call' method for 'read' (GET) requests", function () {
+        beforeEach(function () {
+            this.api.clearBulkQueue();
+            this.server.respondWith(function(xhr) {
+                if (xhr.url === "/rest/v10/bulk") {
+                    xhr.respond(200, {"Content-Type": "application/json"}, "BULK");
+                } else {
+                    xhr.respond(200, {"Content-Type": "application/json"}, "NON-BULK");
+                }
+            });
+        });
+
+        it("should not use Bulk API if URI size less than a limit", function() {
+            this.api.call("read", "/rest/v10/ping", null, {
+                complete: function(req) {
+                    expect(req.xhr.responseText).toEqual("NON-BULK");
+                }
+            });
+            this.server.respond();
+        });
+
+        it("should use Bulk API if URI size limit (2KB) reached", function() {
+            // 2 KB is hardcoded URI size limit
+            var veryLongQueryString = (new Array(2048 + 1)).join("1");
+            this.api.call("read", "/rest/v10/ping?" + veryLongQueryString, null, {
+                complete: function(req) {
+                    expect(req.xhr.responseText).toEqual("BULK");
+                }
+            });
+            this.server.respond();
+        });
+    });
 });
