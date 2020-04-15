@@ -6,31 +6,33 @@ cache: yarn
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 
 matrix:
   include:
     - node_js: 8
       env: BROWSERS=travis_chrome,Firefox
       os: linux
-      dist: trusty
+      dist: bionic
+      services:
+        - xvfb
       addons:
-        apt:
-          packages:
-            - google-chrome-stable
         firefox: latest
     - node_js: 8
       env: BROWSERS=sl_ie
+      services:
+        - xvfb
       addons:
         sauce_connect: true
       os: linux
-      dist: trusty
+      dist: bionic
     - node_js: 8
       env: BROWSERS=sl_edge
+      services:
+        - xvfb
       addons:
         sauce_connect: true
       os: linux
-      dist: trusty
+      dist: bionic
     - node_js: 8
       os: osx
       env: BROWSERS=Safari
