@@ -20,6 +20,7 @@ the current code coverage.
 - Make sure your pull request is fully documented.
 - Reference related Github issues within commit messages and pull request
 comments where appropriate.
+- Ensure unit tests pass by running `yarn test` in the ventana directory
 
 ## Bugs
 - File bugs or feature requests using our [Github Issue Tracker][tracker].
