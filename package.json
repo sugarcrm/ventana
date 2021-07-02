@@ -1,6 +1,6 @@
 {
   "name": "@sugarcrm/ventana",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "description": "SugarCRM REST API client",
   "main": "src/client.js",
   "scripts": {
@@ -46,12 +46,12 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.2",
     "sinon": "^1.17.7",
-    "underscore": "^1.9.1",
+    "underscore": "^1.13.1",
     "webpack": "^1.13.3"
   },
   "peerDependencies": {
     "jquery": "3.6.0",
     "jquery-migrate": "3.3.2",
-    "underscore": "^1.9.1"
+    "underscore": "^1.13.1"
   }
 }
