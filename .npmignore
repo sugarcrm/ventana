@@ -1,9 +1,9 @@
 node_modules
 coverage/
+docs/
 test/
 .config/
 .travis.yml
 CONTRIBUTING.md
 CONTRIBUTOR_TERMS.pdf
 yarn.lock
-docs/
