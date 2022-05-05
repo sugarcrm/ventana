@@ -29,30 +29,30 @@
 	</div>
 	<div class="navbar-collapse collapse" id="topNavigation">
 		<ul class="nav navbar-nav">
-			
+
 			<li class="dropdown">
 				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
 					<li><a href="module-@sugarcrm_ventana.html">@sugarcrm/ventana</a></li>
 				</ul>
 			</li>
-			
+
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
 					<li><a href="Api.html">Api</a></li><li><a href="HttpError.html">HttpError</a></li><li><a href="HttpRequest.html">HttpRequest</a></li>
 				</ul>
 			</li>
-			
+
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
 					<li><a href="global.html#bulkXHR">bulkXHR</a></li>
 				</ul>
 			</li>
-			
+
 		</ul>
-        
+
             <div class="col-sm-3 col-md-3">
                 <form class="navbar-form" role="search">
                     <div class="input-group">
@@ -63,7 +63,7 @@
                     </div>
                 </form>
             </div>
-        
+
 	</div>
 
 </div>
@@ -73,38 +73,38 @@
 <div class="container" id="toc-content">
 <div class="row">
 
-	
+
 	<div class="col-md-8">
-	
+
 		<div id="main">
-			
+
 
 	<h1 class="page-title">Class: Api</h1>
 <section>
 
 <header>
-    
+
         <h2>
         Api
         </h2>
-        
-    
+
+
 </header>
 
 
 <article>
     <div class="container-overview">
-    
-        
+
+
 <hr>
 <dt>
     <h4 class="name" id="Api"><span class="type-signature"></span>new Api(args)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>The SugarCRM JavaScript API allows users to interact with SugarCRM instance
 via its REST interface.</p>
@@ -115,196 +115,196 @@ via its REST interface.</p>
     complete: function() {},
 }</code></pre>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>args</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The configuration parameters for the instance.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
         <th>Default</th>
-        
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>serverUrl</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                     '/rest/v10'
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Sugar REST URL end-point.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>platform</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                     ''
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Platform name (&quot;portal&quot;, &quot;mobile&quot;, etc.).</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>keyValueStore</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Reference to key/value store provider used
   to read/save auth token from/to. It must implement three methods:</p>
@@ -314,785 +314,785 @@ via its REST interface.</p>
   specified.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>timeout</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">number</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Request timeout in seconds.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>defaultErrorHandler</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>The default error handler.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>clientID</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                     'sugar'
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>The clientID for oAuth.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>disableBulkApi</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>externalLoginUICallback</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>The callback to be called if
  external login is activated.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-    
+
     </div>
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
         <h3 class="subsection-title">Members</h3>
 
         <dl>
-            
+
 <hr>
 <dt class="name" id="clientID">
     <h4 id="clientID"><span class="type-signature"></span>clientID<span class="type-signature"> :string</span></h4>
 
-    
+
 </dt>
 <dd>
-    
+
     <div class="description">
         <p>Client Id for oAuth.</p>
     </div>
-    
 
-    
+
+
         <h5>Type:</h5>
         <ul>
             <li>
-                
+
 <span class="param-type">string</span>
 
 
 
             </li>
         </ul>
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt class="name" id="debug">
     <h4 id="debug"><span class="type-signature"></span>debug<span class="type-signature"> :boolean</span></h4>
 
-    
+
 </dt>
 <dd>
-    
+
     <div class="description">
         <p>Flag indicating if API should run in debug mode (console debugging
 of API calls).</p>
     </div>
-    
 
-    
+
+
         <h5>Type:</h5>
         <ul>
             <li>
-                
+
 <span class="param-type">boolean</span>
 
 
 
             </li>
         </ul>
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt class="name" id="defaultErrorHandler">
     <h4 id="defaultErrorHandler"><span class="type-signature"></span>defaultErrorHandler<span class="type-signature"> :function</span></h4>
 
-    
+
 </dt>
 <dd>
-    
+
     <div class="description">
         <p>Default fallback HTTP error handler. Used when api.call
 is not supplied with an error: function in callbacks parameter.</p>
     </div>
-    
 
-    
+
+
         <h5>Type:</h5>
         <ul>
             <li>
-                
+
 <span class="param-type">function</span>
 
 
 
             </li>
         </ul>
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt class="name" id="serverUrl">
     <h4 id="serverUrl"><span class="type-signature"></span>serverUrl<span class="type-signature"> :string</span></h4>
 
-    
+
 </dt>
 <dd>
-    
+
     <div class="description">
         <p>URL of Sugar REST end-point.</p>
     </div>
-    
 
-    
+
+
         <h5>Type:</h5>
         <ul>
             <li>
-                
+
 <span class="param-type">string</span>
 
 
 
             </li>
         </ul>
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt class="name" id="timeout">
     <h4 id="timeout"><span class="type-signature"></span>timeout<span class="type-signature"> :number</span></h4>
 
-    
+
 </dt>
 <dd>
-    
+
     <div class="description">
         <p>Request timeout (in milliseconds).</p>
     </div>
-    
 
-    
+
+
         <h5>Type:</h5>
         <ul>
             <li>
-                
+
 <span class="param-type">number</span>
 
 
 
             </li>
         </ul>
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
+
 </dd>
 
         </dl>
-    
 
-    
+
+
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
+
 <hr>
 <dt>
     <h4 class="name" id="abortRequest"><span class="type-signature"></span>abortRequest(id)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Aborts a request by ID.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>id</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Request ID</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="buildFileURL"><span class="type-signature"></span>buildFileURL(attributes [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Builds a file resource URL.</p>
 <p>The <code>attributes</code> hash must contain the following properties:</p>
@@ -1119,334 +1119,334 @@ URL for a list of file resources.</p>
 // Returns:
 'http://localhost:8888/sugarcrm/rest/v10/Contacts/123/file?platform=base'</code></pre>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>attributes</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Hash with file information.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL options hash.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>htmlJsonFormat</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicating if
   <code>sugar-html-json</code> format must be used (<code>true</code> by default if
   <code>field</code> property is specified).</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>passDownloadToken</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicating if
   download token must be passed in the URL (<code>false</code> by default).</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>deleteIfFails</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicating if
   related record should be marked deleted:1 if file operation
   unsuccessful.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>keep</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicating if the temporary
   file should be kept when issuing a <code>GET</code> request to the
   <code>FileTempApi</code> (it is cleaned up by default).</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>URL for the file resource.</p>
 </div>
@@ -1458,7 +1458,7 @@ URL for a list of file resources.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -1467,22 +1467,22 @@ URL for a list of file resources.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="buildURL"><span class="type-signature"></span>buildURL(module, action [, attributes] [, params])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Builds URL based on module name action and attributes of the format
 rooturl/module/id/action.</p>
@@ -1490,230 +1490,230 @@ rooturl/module/id/action.</p>
 actioned upon for record CRUD and <code>relatedId</code> if the URL is build for
 relationship CRUD.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>action</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>CRUD method.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>attributes</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>object of resource being
   actioned upon, e.g. <code>{name: &quot;bob&quot;, id:&quot;123&quot;}</code>.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL parameters.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>URL for specified resource.</p>
 </div>
@@ -1725,7 +1725,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -1734,214 +1734,214 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="bulk"><span class="type-signature"></span>bulk(data, callbacks [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Calls API requests in bulk.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Object with requests array.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Options object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -1953,7 +1953,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -1962,131 +1962,131 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="call"><span class="type-signature"></span>call(method, url [, data] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Makes AJAX call via jQuery/Zepto AJAX API.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>method</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>CRUD action to make (read, create, update,
   delete) are mapped to corresponding HTTP verb: GET, POST, PUT, DELETE.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>url</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>resource URL.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">FormData</span>
 |
 
@@ -2094,156 +2094,156 @@ relationship CRUD.</p>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Request body contents. If not given as FormData,
   will be stringified into JSON.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callbacks object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>options for request that map
   directly to the jquery/zepto Ajax options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>AJAX request.</p>
 </div>
@@ -2255,7 +2255,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -2264,563 +2264,563 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="clearBulkQueue"><span class="type-signature"></span>clearBulkQueue()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Clears the bulk call queue.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="clearStateProperty"><span class="type-signature"></span>clearStateProperty(key)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Removes the given key from the current state.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>key</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="collection"><span class="type-signature"></span>collection(module, data [, params] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Fetches a collection field.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>object containing information to build the url.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>field</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The name of the collection field to fetch.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>id</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The name of the bean id the collection field
   belongs to.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL parameters.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -2832,7 +2832,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -2841,22 +2841,22 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="count"><span class="type-signature"></span>count(module [, data] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Fetches the total amount of records for a given module.</p>
 <p>Example 1:</p>
@@ -2893,392 +2893,392 @@ relationship CRUD.</p>
     }
 );</code></pre>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Module to fetch the count for.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Data object containing relationship
   information.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>link</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>The link module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>id</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>The id of the model.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback functions.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL options hash.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>filter</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>If supplied, the count of
   filtered records will be returned, instead of the total number
   of records.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>Result of <a href="Api.html#call">Api#call</a>.</p>
 </div>
@@ -3290,7 +3290,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -3299,214 +3299,214 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="css"><span class="type-signature"></span>css(Platform, ThemeName [, callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Makes a call to the CSS Api.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>Platform</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>ThemeName</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -3518,7 +3518,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -3527,248 +3527,248 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="enumOptions"><span class="type-signature"></span>enumOptions(module, field [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Loads an enum field's options using the enum API.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>field</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Name of enum field.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Options object</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -3780,7 +3780,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -3789,452 +3789,452 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="exportRecords"><span class="type-signature"></span>exportRecords(params, $el [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Triggers a file download of the exported records.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Download parameters.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>uid</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Array</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Array of record ids to request export.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>$el</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">jQuery</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>JQuery selector to element.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Various callbacks.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>success</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Called on success.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>error</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Called on failure.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>complete</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Called when finished.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Request options hash.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -4246,7 +4246,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -4255,280 +4255,280 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="favorite"><span class="type-signature"></span>favorite(module, id, favorite [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Marks/unmarks a record as favorite.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>id</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Record ID.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>favorite</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicating if the record must be marked as favorite.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -4540,7 +4540,7 @@ relationship CRUD.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -4549,116 +4549,116 @@ relationship CRUD.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="file"><span class="type-signature"></span>file(method, data [, $files] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Executes CRUD on a file resource.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>method</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>operation type: create, read, update, or delete.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>object with file information.</p>
 <p><pre>
@@ -4671,169 +4671,169 @@ relationship CRUD.</p>
 The <code>field</code> property is optional. If not specified, the API fetches the file list.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>$files</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>jQuery/Zepto DOM elements that carry the files to upload.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Request options hash.
 See <a href="Api.html#buildFileURL">Api#buildFileURL</a> function for other options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -4845,7 +4845,7 @@ See <a href="Api.html#buildFileURL">Api#buildFileURL</a> function for other opti
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -4854,152 +4854,152 @@ See <a href="Api.html#buildFileURL">Api#buildFileURL</a> function for other opti
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="fileDownload"><span class="type-signature"></span>fileDownload(url [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Given a url, attempts to download a file.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>url</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>url to call</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Options object</p>
 <ul>
@@ -5008,337 +5008,337 @@ if not specified we must fall back to window.location.href</li>
 </ul></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="follow"><span class="type-signature"></span>follow(module, id, followed [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Subscribe/unsubscribe a record changes.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>id</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Record ID.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>followed</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">boolean</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicates if wants to subscribe
   the record changes.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -5350,7 +5350,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -5359,88 +5359,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getDownloadToken"><span class="type-signature"></span>getDownloadToken()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Returns the current download token.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The current download token.</p>
 </div>
@@ -5452,7 +5452,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -5461,377 +5461,377 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getMetadata"><span class="type-signature"></span>getMetadata( [options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Fetches metadata.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Objec</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Options to decide what to get from
   the server.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
         <th>Default</th>
-        
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>types</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Array</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Metadata types to fetch.
   E.g.: <code>['vardefs','detailviewdefs']</code></p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>modules</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Array</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Module names to fetch.
   E.g.: <code>['accounts','contacts']</code></p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>public</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                     false
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Pass <code>true</code> to get the
   public metadata.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
                 <td class="default">
-                
+
                 </td>
-            
+
 
             <td class="description last"><p>Extra params to send to the
   request.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -5843,7 +5843,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -5852,88 +5852,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getMetadataHash"><span class="type-signature"></span>getMetadataHash()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Returns the current metadata hash.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The current metadata hash</p>
 </div>
@@ -5945,7 +5945,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -5954,88 +5954,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getOAuthToken"><span class="type-signature"></span>getOAuthToken()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Returns the current access token.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The current access token.</p>
 </div>
@@ -6047,7 +6047,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -6056,88 +6056,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getRefreshToken"><span class="type-signature"></span>getRefreshToken()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Returns the current refresh token.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The current refresh token.</p>
 </div>
@@ -6149,7 +6149,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -6158,266 +6158,266 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getRequest"><span class="type-signature"></span>getRequest(id)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Gets request by ID.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>id</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Request ID</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getStateProperty"><span class="type-signature"></span>getStateProperty(key)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Retrieve a property from the current state.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>key</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 
 
 <dl>
@@ -6425,7 +6425,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">Mixed</span>
 
 
@@ -6434,88 +6434,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="getUserprefHash"><span class="type-signature"></span>getUserprefHash()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Gets the user preference hash for use in checking state of change.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The user preference hash set from a /me response.</p>
 </div>
@@ -6527,7 +6527,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 
 
@@ -6536,328 +6536,328 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="handleExternalLogin"><span class="type-signature"></span>handleExternalLogin(request, error, onError)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Handles login with an external provider.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>request</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The request to trigger.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>error</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The error object with at least the
   <code>payload</code> property.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>onError</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The function to call in case of Error
   during the login request.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="info"><span class="type-signature"></span>info( [callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Fetches server information.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -6869,7 +6869,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -6878,88 +6878,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="isAuthenticated"><span class="type-signature"></span>isAuthenticated()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Checks if API instance is currently authenticated.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p><code>true</code> if authenticated, <code>false</code> otherwise.</p>
 </div>
@@ -6971,7 +6971,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">boolean</span>
 
 
@@ -6980,139 +6980,139 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="isAuthRequest"><span class="type-signature"></span>isAuthRequest(url)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Checks if the request is authentication request.</p>
 <p>It could be either login (including token refresh) our logout request.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>url</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p><code>true</code> if this is an authentication request,
   <code>false</code> otherwise.</p>
@@ -7125,7 +7125,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">boolean</span>
 
 
@@ -7134,88 +7134,88 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="isExternalLogin"><span class="type-signature"></span>isExternalLogin()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Returns <code>true</code> when using an external login provider.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p><code>true</code> when we are using an external
   login provider, <code>false</code> otherwise.</p>
@@ -7228,7 +7228,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">boolean</span>
 
 
@@ -7237,138 +7237,138 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="isLoginRequest"><span class="type-signature"></span>isLoginRequest(url)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Checks if request is a login request.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>url</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p><code>true</code> if this is a login request, <code>false</code>
   otherwise.</p>
@@ -7381,7 +7381,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">boolean</span>
 
 
@@ -7390,22 +7390,22 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="login"><span class="type-signature"></span>login(credentials [, data] [, callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Performs login.</p>
 <p>Credentials:</p>
@@ -7414,198 +7414,198 @@ if not specified we must fall back to window.location.href</li>
     password: user's password in clear text
 </pre>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>credentials</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>user credentials.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>extra data to be passed in login request
   such as client user agent, etc.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -7617,7 +7617,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -7626,150 +7626,150 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="logout"><span class="type-signature"></span>logout( [callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Performs logout.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -7781,7 +7781,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -7790,251 +7790,251 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="me"><span class="type-signature"></span>me(method [, data] [, params] [, callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Executes CRUD on user profile.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>method</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Operation type: read or update (reserved for
   future use).</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>user Profile object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL parameters.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -8046,7 +8046,7 @@ if not specified we must fall back to window.location.href</li>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -8055,221 +8055,221 @@ if not specified we must fall back to window.location.href</li>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="ping"><span class="type-signature"></span>ping( [action] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Pings the server.</p>
 <p>The request doesn't send metadata hash by default.
 Pass <code>false</code> for &quot;skipMetadataHash&quot; option to override this behavior.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>action</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Optional ping operation.
   Currently, Sugar REST API supports &quot;whattimeisit&quot; only.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -8281,7 +8281,7 @@ Pass <code>false</code> for &quot;skipMetadataHash&quot; option to override this
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -8290,316 +8290,316 @@ Pass <code>false</code> for &quot;skipMetadataHash&quot; option to override this
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="records"><span class="type-signature"></span>records(method, module, data [, params] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Executes CRUD on records.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>method</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>operation type: create, read, update, or delete.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request object. If it contains id, action,
   link, etc., URI will be adjusted accordingly.
 If methods parameter is 'create' or 'update', the data object will be put in the request body payload.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL parameters.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -8611,7 +8611,7 @@ If methods parameter is 'create' or 'update', the data object will be put in the
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -8620,22 +8620,22 @@ If methods parameter is 'create' or 'update', the data object will be put in the
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="relationships"><span class="type-signature"></span>relationships(method, module, data [, params] [, callbacks] [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Executes CRUD on relationships.</p>
 <p>The data paramerer represents relationship information:</p>
@@ -8648,295 +8648,295 @@ If methods parameter is 'create' or 'update', the data object will be put in the
 }
 </pre>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>method</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>operation type: create, read, update, or delete.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>module name.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>object with relationship information.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>URL parameters.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -8948,7 +8948,7 @@ If methods parameter is 'create' or 'update', the data object will be put in the
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -8957,642 +8957,642 @@ If methods parameter is 'create' or 'update', the data object will be put in the
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="resetAuth"><span class="type-signature"></span>resetAuth()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Clears authentication tokens.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="resetState"><span class="type-signature"></span>resetState()</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Clears the current API request state object.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
 
-    
+
+
+
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="search"><span class="type-signature"></span>search(params, callbacks [, options])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Searches for specified query.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>params</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Properties.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>q</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Query.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>module_list</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Comma-separated module list.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>fields</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Comma-separated list of fields.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>max_num</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">number</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Max number of records to return.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>offset</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">number</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Initial offset into the results.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Hash with success and error callbacks.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>success</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Function called on success.
   Takes one argument.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>error</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Function called on failure.
   Takes one argument.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
             </td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>options</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Request options.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -9604,7 +9604,7 @@ If methods parameter is 'create' or 'update', the data object will be put in the
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -9613,401 +9613,401 @@ If methods parameter is 'create' or 'update', the data object will be put in the
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="setExternalLogin"><span class="type-signature"></span>setExternalLogin(flag)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Sets a flag indicating that external login prodecure is used.</p>
 <p>This means that 401 errors would contain external URL that we should use for authentication.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>flag</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Boolean</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>Flag indicating if external login is in effect</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="setExternalLoginUICallback"><span class="type-signature"></span>setExternalLoginUICallback(callback)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Sets a function as external login UI callback.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callback</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">function</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="setRefreshTokenSuccessCallback"><span class="type-signature"></span>setRefreshTokenSuccessCallback(callback)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Sets the callback to be triggered after a token refresh occurs.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callback</code></td>
-            
+
 
             <td class="type">
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>function to be called</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="setStateProperty"><span class="type-signature"></span>setStateProperty(key, value)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Set a property of the current state. The current state will be attached to all
 api request objects when they are sent. Modifications to the state after the request is sent
@@ -10015,351 +10015,351 @@ but before the request completes will not affect that requests state.</p>
 <p>States should be used to track conditions or parameters that should be applied to all requests made
 regardless of their source.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>key</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>value</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">*</span>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="signup"><span class="type-signature"></span>signup(contactData [, data] [, callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Performs signup.</p>
 <p>TODO: The signup action needs another endpoint to allow a guest to signup</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>contactData</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>user profile.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>data</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>extra data to be passed in login request
   such as client user agent, etc.</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -10371,7 +10371,7 @@ regardless of their source.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -10380,67 +10380,67 @@ regardless of their source.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="triggerBulkCall"><span class="type-signature"></span>triggerBulkCall(bulkId)</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Begins a BulkAPI request. Previous uses of call() should have
 options.bulk set to an ID.</p>
 <p>Calling triggerBulkCall with the same ID will combine all the
 previously queued requests into a single bulk call.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>bulkId</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">number</span>
 |
 
@@ -10448,280 +10448,280 @@ previously queued requests into a single bulk call.</p>
 
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>The id of the bulk request.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="updatePassword"><span class="type-signature"></span>updatePassword(password, password [, callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Updates password.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>password</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>The new password</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>password</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>The new password</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -10733,7 +10733,7 @@ previously queued requests into a single bulk call.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -10742,182 +10742,182 @@ previously queued requests into a single bulk call.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
-        
-            
+
+
 <hr>
 <dt>
     <h4 class="name" id="verifyPassword"><span class="type-signature"></span>verifyPassword(password [, callbacks])</h4>
-    
-    
+
+
 </dt>
 <dd>
 
-    
+
     <div class="description">
         <p>Verifies password.</p>
     </div>
-    
 
-    
 
-    
 
-    
-    
+
+
+
+
+
         <h5>Parameters:</h5>
-        
+
 
 <table class="params table table-striped">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Argument</th>
-        
 
-        
+        <th>Argument</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>password</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>The password to verify</p></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>callbacks</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>Callback object.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
-    
 
-    
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
 
-	
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
     <h5>Returns:</h5>
-    
-            
+
+
 <div class="param-desc">
     <p>The AJAX request.</p>
 </div>
@@ -10929,7 +10929,7 @@ previously queued requests into a single bulk call.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="HttpRequest.html">HttpRequest</a></span>
 
 
@@ -10938,17 +10938,17 @@ previously queued requests into a single bulk call.</p>
 </dl>
 
 
-        
 
-    
+
+
 </dd>
 
         </dl>
-    
 
-    
 
-    
+
+
+
 </article>
 
 </section>
@@ -10961,11 +10961,11 @@ previously queued requests into a single bulk call.</p>
 
 	<div class="clearfix"></div>
 
-	
+
 		<div class="col-md-3">
 			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
 		</div>
-	
+
 
 </div>
 </div>
@@ -10992,9 +10992,9 @@ previously queued requests into a single bulk call.</p>
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
-	
+
 		on 2018-08-16T15:13:18-07:00
-	
+
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
 </footer>
@@ -11021,7 +11021,7 @@ $( function () {
 		var lang = /{@lang (.*?)}/.exec( exampleText );
 		if ( lang && lang[1] ) {
 			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
+			example.text( exampleText );
 			lang = lang[1];
 		} else {
 			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
