@@ -1363,9 +1363,9 @@ function SugarApi(args) {
                         if (fileName) {
                             // set up an anchor Element to take advantage of the download attribute
                             aEl = document.createElement('a');
-                            aEl.download = fileName;
+                            aEl.setAttribute('download', fileName);
                             aEl.target = '_blank';
-                            aEl.href = downloadUrl;
+                            aEl.setAttribute('href', downloadUrl);
                             // appends the anchor element to the dom
                             document.body.appendChild(aEl);
                             // clicks the actual anchor link to begin download process
