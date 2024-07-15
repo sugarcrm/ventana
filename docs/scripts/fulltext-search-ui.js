@@ -40,7 +40,7 @@ window.SearcherDisplay = (function($) {
                 quickSearch[0].contentWindow.postMessage({
                   "searchTerms": searchTerms,
                   "msgid": "docstrap.quicksearch.start"
-                }, "*");
+                }, document.location.origin);
               }
             }
 
