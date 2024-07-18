@@ -24,7 +24,10 @@
 
             var results = Searcher.search(msgData.searchTerms);
 
-            window.parent.postMessage({"results": results, "msgid": "docstrap.quicksearch.done"}, "*");
+            window.parent.postMessage({
+                "results": results,
+                "msgid": "docstrap.quicksearch.done"
+            }, document.location.origin);
         });
     </script>
 </body>
