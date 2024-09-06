@@ -7,7 +7,7 @@ const Api = require('../src/client');
 describe('Instantiation', function () {
 
     beforeEach(function () {
-        this.sandbox = sinon.sandbox.create();
+        this.sandbox = sinon.createSandbox();
 
         this.storage = {
             get() {},
@@ -43,7 +43,7 @@ describe('Instantiation', function () {
 
         expect(function() {
             Api.createInstance({ keyValueStore: {} });
-        }).toThrow(err);
+        }).toThrowError(Error, err);
 
         expect(function() {
             Api.createInstance({ keyValueStore: {
@@ -51,7 +51,7 @@ describe('Instantiation', function () {
                 set() {},
                 cut() {},
             } });
-        }).toThrow(err);
+        }).toThrowError(Error, err);
 
         expect(function() {
             Api.createInstance({ keyValueStore: {
@@ -59,7 +59,7 @@ describe('Instantiation', function () {
                 // no set
                 cut() {},
             } });
-        }).toThrow(err);
+        }).toThrowError(Error, err);
 
         expect(function() {
             Api.createInstance({ keyValueStore: {
@@ -67,7 +67,7 @@ describe('Instantiation', function () {
                 set() {},
                 // no cut
             } });
-        }).toThrow(err);
+        }).toThrowError(Error, err);
 
     });
 
@@ -86,7 +86,7 @@ describe('Api client', function () {
 
     beforeEach(function () {
 
-        this.sandbox = sinon.sandbox.create();
+        this.sandbox = sinon.createSandbox();
 
         if (window.crosstab) {
             this.crosstabSupport = crosstab.supported;
@@ -122,7 +122,7 @@ describe('Api client', function () {
     });
 
     afterEach(function () {
-        sinon.collection.restore();
+        sinon.restore();
         if (this.callbacks.success.restore) this.callbacks.success.restore();
         if (this.callbacks.error.restore) this.callbacks.error.restore();
         if (this.callbacks.complete.restore) this.callbacks.complete.restore();
@@ -209,7 +209,7 @@ describe('Api client', function () {
 
         it('should make a request with the correct request url', function () {
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             this.api.call('read', '/rest/v10/contact', {
                 date_modified: '2012-02-08 19:18:25'
@@ -908,8 +908,8 @@ describe('Api client', function () {
     describe('Metadata actions', function () {
 
         it('should log a deprecation warning if old signature is used', function() {
-            sinon.collection.stub(this.api, 'call');
-            var warnStub = sinon.collection.stub(console, 'warn');
+            sinon.stub(this.api, 'call');
+            var warnStub = sinon.stub(console, 'warn');
 
             this.api.getMetadata('hash', '', '', '', '');
             expect(warnStub).toHaveBeenCalled();
@@ -1020,7 +1020,7 @@ describe('Api client', function () {
                 },
             };
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             this.api.file('read', {
                 module: 'Notes',
@@ -1045,7 +1045,7 @@ describe('Api client', function () {
 
             let stub = sinon.stub(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             this.api.file('read', {
                 module: 'Notes',
@@ -1071,7 +1071,7 @@ describe('Api client', function () {
 
             let stub = sinon.stub(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             const fileObject = new Blob(['I am a file']); // IE 11 and Edge don't support the File() constructor
             this.api.file(
@@ -1105,7 +1105,7 @@ describe('Api client', function () {
 
             let stub = sinon.stub(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             this.api.file('delete', {
                 module: 'Contacts',
@@ -1300,7 +1300,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
@@ -1377,7 +1377,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
@@ -1428,7 +1428,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
@@ -1485,7 +1485,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             this.api.login({ username: 'a', password: 'b'}, null, this.callbacks);
 
@@ -1524,7 +1524,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeXMLHttpRequest();
+            let xhr = this.sandbox.useFakeServer();
 
             this.api.records('read', 'Accounts', null, null, this.callbacks);
 
@@ -1617,22 +1617,20 @@ describe('Api client', function () {
             it('should call onError but stop before _refreshTokenSuccess if auth failed', function () {
                 let onErrorStub = sinon.stub();
                 let successStub = sinon.stub();
-                let done = false;
-                let complete = function() { done = true; };
 
-                $(window).on('message', complete);
+                return new Promise((resolve) => {
+                    let complete = function() {
+                        $(window).off('message', complete);
+                        resolve();
+                    };
 
-                this.api.setRefreshTokenSuccessCallback(successStub);
-                this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
+                    $(window).on('message', complete);
 
-                window.postMessage(JSON.stringify({access_token: null, external_login: true}), '*');
+                    this.api.setRefreshTokenSuccessCallback(successStub);
+                    this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
 
-                waitsFor(function() {
-                    return done;
-                });
-
-                runs(function() {
-                    $(window).off('message', complete);
+                    window.postMessage(JSON.stringify({ access_token: null, external_login: true }), '*');
+                }).then(() => {
                     expect(onErrorStub).toHaveBeenCalled();
                     expect(successStub).not.toHaveBeenCalled();
                 });
@@ -1640,22 +1638,20 @@ describe('Api client', function () {
 
             it('should not call onError and return if not external login', function () {
                 let onErrorStub = sinon.stub();
-                let done = false;
-                let complete = function() { done = true; };
 
-                $(window).on('message', complete);
+                return new Promise((resolve) => {
+                    let complete = function() {
+                        $(window).off('message', complete);
+                        resolve();
+                    };
 
-                this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
+                    $(window).on('message', complete);
 
-                window.postMessage(JSON.stringify({some_token: null}), '*');
+                    this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
 
-                waitsFor(function() {
-                    return done;
-                });
-
-                runs(function() {
-                    $(window).off('message', complete);
-                    expect(onErrorStub).not.toHaveBeenCalled();
+                    window.postMessage(JSON.stringify({ some_token: null }), '*');
+                }).then(() => {
+                    expect(onErrorStub).toHaveBeenCalledTimes(0);
                 });
             });
         });
@@ -1857,11 +1853,11 @@ describe('Api client', function () {
 
 
             let sstub = sinon.stub(this.callbacks, 'success');
-            let estub = sinon.stub(this.callbacks, 'error', function(err) {
+            let estub = sinon.stub(this.callbacks, 'error').callsFake(function(err) {
                 expect(err).toEqual(jasmine.any(Api.HttpError));
                 expect(err.request.aborted).toBeTruthy();
             });
-            let cstub = sinon.stub(this.callbacks, 'complete', function(xhr) {
+            let cstub = sinon.stub(this.callbacks, 'complete').callsFake(function(xhr) {
                 expect(xhr.aborted).toBeTruthy();
             });
 
