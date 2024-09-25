@@ -461,10 +461,25 @@ function SugarApi(args) {
                 };
 
                 if (!('crosstab' in window) || !crosstab.supported) {
+
+                    // prevents concurrent events from multiple tabs asking for a
+                    // refresh token
+                    if (_refreshingToken) {
+                        return;
+                    }
+                    _refreshingToken = true;
                     self.login(null, {refresh: true}, {
-                        complete: refreshCallbacks.complete,
-                        success: refreshCallbacks.success,
-                        error: refreshCallbacks.error
+                        complete: function() {
+                            refreshCallbacks.complete;
+                        },
+                        success: function() {
+                            _refreshingToken = false;
+                            refreshCallbacks.success;
+                        },
+                        error: function() {
+                            _refreshingToken = false;
+                            refreshCallbacks.error;
+                        }
                     });
                     return;
                 }
