@@ -29,6 +29,7 @@ module.exports = function (config) {
 
         frameworks: [
             'jasmine',
+            'webpack',
         ],
 
         reporters: ['progress', 'coverage'],
@@ -57,17 +58,12 @@ module.exports = function (config) {
         webpack: {
             devtool: 'inline-source-map',
             module: {
-                loaders: [
+                rules: [
                     {
                         test: /\.js$/,
                         exclude: /(node_modules)/,
                         loader: 'babel-loader',
-                        query: {
-                            presets: ['es2015'],
-                        },
                     },
-                ],
-                preLoaders: [
                     {
                         test: /\.js$/,
                         include: [
@@ -83,16 +79,11 @@ module.exports = function (config) {
                 }),
             ],
             resolve: {
-                root: [
+                modules: [
+                    'node_modules',
                     path.resolve(__dirname, '../src'),
                     path.resolve(__dirname, '../lib'),
                     path.resolve(__dirname, '../node_modules'),
-                ],
-                modulesDirectories: [
-                    'node_modules',
-                ],
-                extensions: [
-                    '', '.js', '.json',
                 ],
             },
         },
@@ -162,5 +153,4 @@ module.exports = function (config) {
         config.reporters = ['dots', 'saucelabs'];
         delete config.coverageReporter;
     }
-
 };
