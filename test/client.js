@@ -378,23 +378,23 @@ describe('Api client', function () {
         });
 
         describe('buildFileURL', function() {
-            let attributes = {module: 'Notes', id: 'note_id', field: 'fileField'};
+            let fileFieldAttributes = {module: 'Notes', id: 'note_id', field: 'fileField'};
+            let attributes = {module: 'Notes', id: 'note_id'};
 
             it('should build resource URLs', function () {
-                let url = this.api.buildFileURL(attributes);
+                let url = this.api.buildFileURL(fileFieldAttributes);
                 let options;
 
                 expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json');
 
                 options = {platform: "base"};
-                url = this.api.buildFileURL(attributes, options);
+                url = this.api.buildFileURL(fileFieldAttributes, options);
                 expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField?format=sugar-html-json&platform=base');
 
                 options = {htmlJsonFormat: false};
-                url = this.api.buildFileURL(attributes, options);
+                url = this.api.buildFileURL(fileFieldAttributes, options);
                 expect(url).toEqual('/rest/v10/Notes/note_id/file/fileField');
 
-                attributes = {module: 'Notes', id: 'note_id'};
                 url = this.api.buildFileURL(attributes, options);
                 expect(url).toEqual('/rest/v10/Notes/note_id/file');
 
@@ -517,7 +517,7 @@ describe('Api client', function () {
             var request = this.api.enumOptions(module, field, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(options, request);
+            expect(spy.calledWith(options, request)).toBe(true);
             expect(apispy.getCall(0).args[1]).toContain("Bugs/enum/fixed_in_release");
             spy.restore();
             apispy.restore();
@@ -537,8 +537,8 @@ describe('Api client', function () {
             var request = this.api.collection(module, data, null, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledOnce();
-            expect(spy).toHaveBeenCalledWith(records);
+            sinon.assert.calledOnce(spy);
+            sinon.assert.calledWith(spy, records);
             spy.restore();
         });
     });
@@ -557,8 +557,8 @@ describe('Api client', function () {
 
             this.api.search({q:query, module_list: modules, fields: fields, max_num:20}, this.callbacks, {useNewApi: true});
             this.server.respond();
-            expect(spy).toHaveBeenCalledOnce();
-            expect(spy).toHaveBeenCalledWith(recordOne);
+            sinon.assert.calledOnce(spy);
+            sinon.assert.calledWith(spy, recordOne);
             spy.restore();
         });
 
@@ -575,7 +575,7 @@ describe('Api client', function () {
             let request = this.api.count(module, {}, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith({record_count: '5'}, request);
+            sinon.assert.calledWith(spy, {record_count: '5'}, request);
             spy.restore();
         });
 
@@ -663,8 +663,8 @@ describe('Api client', function () {
             let request = this.api.records('update', module, attributes, params, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(attributes, request);
-            expect(cspy).toHaveBeenCalledWith(request);
+            sinon.assert.calledWith(spy, attributes, request);
+            sinon.assert.calledWith(cspy, request);
             let req = this.server.requests[0];
             expect(req.requestBody).toEqual(stringifiedAttributes);
 
@@ -687,7 +687,7 @@ describe('Api client', function () {
             let request = this.api.records('delete', module, attributes, params, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(attributes, request);
+            sinon.assert.calledWith(spy, attributes, request);
             expect(spy.getCall(0).args[0]).toEqual(attributes);
 
             spy.restore();
@@ -708,8 +708,7 @@ describe('Api client', function () {
             let request = this.api.favorite(module, id, true, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
-
+            sinon.assert.calledWith(spy, expectedAttributes, request);
             spy.restore();
         });
 
@@ -728,7 +727,7 @@ describe('Api client', function () {
             let request = this.api.favorite(module, id, false, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
+            sinon.assert.calledWith(spy, expectedAttributes, request);
             spy.restore();
         });
     });
@@ -997,7 +996,7 @@ describe('Api client', function () {
             let request = this.api.css('my-platform', 'my-theme', this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
+            sinon.assert.calledWith(spy, expectedAttributes, request);
             spy.restore();
         });
     });
@@ -1035,7 +1034,7 @@ describe('Api client', function () {
             xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(response));
 
             expect(stub).toHaveBeenCalledOnce();
-            expect(stub).toHaveBeenCalledWith(response);
+            sinon.assert.calledWith(stub, response);
             stub.restore();
         });
 
@@ -1061,7 +1060,7 @@ describe('Api client', function () {
             xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, '{}');
 
             expect(stub).toHaveBeenCalledOnce();
-            expect(stub).toHaveBeenCalledWith({});
+            sinon.assert.calledWith(stub, {});
             stub.restore();
         });
 
@@ -1094,7 +1093,7 @@ describe('Api client', function () {
             xhr.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify(resp));
 
             expect(stub).toHaveBeenCalledOnce();
-            expect(stub).toHaveBeenCalledWith(resp);
+            sinon.assert.calledWith(stub, resp);
             stub.restore();
         });
 
@@ -1122,7 +1121,7 @@ describe('Api client', function () {
             xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(resp));
 
             expect(stub).toHaveBeenCalled();
-            expect(stub).toHaveBeenCalledWith(resp);
+            sinon.assert.calledWith(stub, resp);
             stub.restore();
         });
 
@@ -1140,7 +1139,7 @@ describe('Api client', function () {
             }, null, this.callbacks);
             this.server.respond();
             expect(stub).toHaveBeenCalled();
-            expect(stub).toHaveBeenCalledWith(resp);
+            sinon.assert.calledWith(stub, resp);
             stub.restore();
         });
 
@@ -1246,9 +1245,9 @@ describe('Api client', function () {
             expect(spy.getCall(0).args[0]).toEqual(this.fixtures["/rest/v10/oauth2/token"].POST.response);
 
             expect(this.api.isAuthenticated()).toBeTruthy();
-            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
-            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
-            expect(setStub).toHaveBeenCalledWith('DownloadToken', 'qwerty');
+            sinon.assert.calledWith(setStub, 'AuthAccessToken', '55000555');
+            sinon.assert.calledWith(setStub, 'AuthRefreshToken', 'abc');
+            sinon.assert.calledWith(setStub, 'DownloadToken', 'qwerty');
 
             requestBody = JSON.parse(this.server.requests[0].requestBody);
             expect(requestBody['client_info']).toBeDefined();
@@ -1276,9 +1275,9 @@ describe('Api client', function () {
 
             expect(this.api.isAuthenticated()).toBeFalsy();
 
-            expect(cutSpy).toHaveBeenCalledWith('AuthAccessToken');
-            expect(cutSpy).toHaveBeenCalledWith('AuthRefreshToken');
-            expect(cutSpy).toHaveBeenCalledWith('DownloadToken');
+            sinon.assert.calledWith(cutSpy, 'AuthAccessToken');
+            sinon.assert.calledWith(cutSpy, 'AuthRefreshToken');
+            sinon.assert.calledWith(cutSpy, 'DownloadToken');
 
             // this spy is created after the method gets called
             // so, this assertion means that 'executes' is not called the second time
@@ -1348,13 +1347,13 @@ describe('Api client', function () {
 
             expect(xhr.requests.length).toBe(7);
 
-            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
-            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
-            expect(rspy).toHaveBeenCalledOnce();
-            expect(rspy2).toHaveBeenCalledOnce();
-            expect(rspy3).toHaveBeenCalledOnce();
+            sinon.assert.calledWith(setStub, 'AuthAccessToken', '55000555');
+            sinon.assert.calledWith(setStub, 'AuthRefreshToken', 'abc');
+            sinon.assert.calledOnce(rspy);
+            sinon.assert.calledOnce(rspy2);
+            sinon.assert.calledOnce(rspy3);
             expect(cspy.callCount).toEqual(3);
-            expect(espy).not.toHaveBeenCalled();
+            sinon.assert.notCalled(espy);
             expect(sspy.callCount).toEqual(3);
 
             espy.restore();
@@ -1401,17 +1400,17 @@ describe('Api client', function () {
             expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
             xhr.requests[2].respond(404, headers, invalidBody);
 
-            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
-            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
+            sinon.assert.calledWith(setStub, 'AuthAccessToken', '55000555');
+            sinon.assert.calledWith(setStub, 'AuthRefreshToken', 'abc');
 
             expect(xhr.requests.length).toBe(3);
 
-            expect(rspy).toHaveBeenCalledOnce();
-            expect(espy).toHaveBeenCalledOnce();
-            expect(cspy).toHaveBeenCalledOnce();
-            expect(sspy).not.toHaveBeenCalled();
-            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
-            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 404}));
+            sinon.assert.calledOnce(rspy);
+            sinon.assert.calledOnce(espy);
+            sinon.assert.calledOnce(cspy);
+            sinon.assert.notCalled(sspy);
+            sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
+            sinon.assert.calledWith(espy, sinon.match({ status: 404 }));
 
             espy.restore();
             cspy.restore();
@@ -1460,14 +1459,14 @@ describe('Api client', function () {
 
             expect(xhr.requests.length).toBe(4);
 
-            expect(rspy).not.toHaveBeenCalled();
-            expect(rspy2).not.toHaveBeenCalled();
-            expect(rspy3).not.toHaveBeenCalled();
-            expect(espy.callCount).toEqual(3);
-            expect(cspy.callCount).toEqual(3);
-            expect(sspy).not.toHaveBeenCalled();
-            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
-            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 401}));
+            sinon.assert.notCalled(rspy);
+            sinon.assert.notCalled(rspy2);
+            sinon.assert.notCalled(rspy3);
+            sinon.assert.callCount(espy, 3);
+            sinon.assert.callCount(cspy, 3);
+            sinon.assert.notCalled(sspy);
+            sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
+            sinon.assert.calledWith(espy, sinon.match({ status: 401 }));
 
             espy.restore();
             cspy.restore();
@@ -1497,14 +1496,14 @@ describe('Api client', function () {
 
             expect(xhr.requests.length).toBe(1);
 
-            expect(cutStub).toHaveBeenCalledWith('AuthAccessToken');
-            expect(cutStub).toHaveBeenCalledWith('AuthRefreshToken');
+            sinon.assert.calledWith(cutStub, 'AuthAccessToken');
+            sinon.assert.calledWith(cutStub, 'AuthRefreshToken');
 
-            expect(espy).toHaveBeenCalledOnce();
-            expect(cspy).toHaveBeenCalledOnce();
-            expect(sspy).not.toHaveBeenCalled();
-            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
-            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 400}));
+            sinon.assert.calledOnce(espy);
+            sinon.assert.calledOnce(cspy);
+            sinon.assert.notCalled(sspy);
+            sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
+            sinon.assert.calledWith(espy, sinon.match({ status: 400 }));
 
             espy.restore();
             cspy.restore();
@@ -1540,8 +1539,8 @@ describe('Api client', function () {
                 this.fixtures['/rest/v10/oauth2/token'].POST.response
             ));
 
-            expect(setStub).toHaveBeenCalledWith('AuthAccessToken', '55000555');
-            expect(setStub).toHaveBeenCalledWith('AuthRefreshToken', 'abc');
+            sinon.assert.calledWith(setStub, 'AuthAccessToken', '55000555');
+            sinon.assert.calledWith(setStub, 'AuthRefreshToken', 'abc');
 
             // simulate invalid_grant again
             expect(xhr.requests[2].url).toBe('/rest/v10/Accounts');
@@ -1551,16 +1550,16 @@ describe('Api client', function () {
                 error_description: 'some desc',
             }));
 
-            expect(cutStub).toHaveBeenCalledWith('AuthAccessToken');
-            expect(cutStub).toHaveBeenCalledWith('AuthRefreshToken');
+            sinon.assert.calledWith(cutStub, 'AuthAccessToken');
+            sinon.assert.calledWith(cutStub, 'AuthRefreshToken');
 
             expect(xhr.requests.length).toBe(3);
 
-            expect(espy).toHaveBeenCalledOnce();
-            expect(cspy).toHaveBeenCalledOnce();
-            expect(sspy).not.toHaveBeenCalled();
-            expect(espy).toHaveBeenCalledWith(jasmine.any(Api.HttpError));
-            expect(espy).toHaveBeenCalledWith(jasmine.objectContaining({status: 401}));
+            sinon.assert.calledOnce(espy);
+            sinon.assert.calledOnce(cspy);
+            sinon.assert.notCalled(sspy);
+            sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
+            sinon.assert.calledWith(espy, sinon.match({ status: 401 }));
 
             espy.restore();
             cspy.restore();
@@ -1583,9 +1582,9 @@ describe('Api client', function () {
             expect(spy).toHaveBeenCalled();
 
             expect(this.api.isAuthenticated()).toBeFalsy();
-            expect(cutSpy).toHaveBeenCalledWith('AuthAccessToken');
-            expect(cutSpy).toHaveBeenCalledWith('AuthRefreshToken');
-            expect(cutSpy).toHaveBeenCalledWith('DownloadToken');
+            sinon.assert.calledWith(cutSpy, 'AuthAccessToken');
+            sinon.assert.calledWith(cutSpy, 'AuthRefreshToken');
+            sinon.assert.calledWith(cutSpy, 'DownloadToken');
 
             spy.restore();
             cutSpy.restore();
@@ -1611,7 +1610,7 @@ describe('Api client', function () {
                     }
                 };
                 api.handleExternalLogin(new Api.HttpRequest({}), error, $.noop);
-                expect(callback).toHaveBeenCalledWith(error.payload.url);
+                sinon.assert.calledWith(callback, error.payload.url);
             });
 
             it('should call onError but stop before _refreshTokenSuccess if auth failed', function () {
@@ -1651,7 +1650,7 @@ describe('Api client', function () {
 
                     window.postMessage(JSON.stringify({ some_token: null }), '*');
                 }).then(() => {
-                    expect(onErrorStub).toHaveBeenCalledTimes(0);
+                    sinon.assert.callCount(onErrorStub, 0);
                 });
             });
         });
@@ -1677,7 +1676,7 @@ describe('Api client', function () {
             let request = this.api.signup({ first_name: firstName, last_name: lastName }, {}, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(expectedAttributes, request);
+            sinon.assert.calledWith(spy, expectedAttributes, request);
             spy.restore();
         });
     });
@@ -1710,7 +1709,7 @@ describe('Api client', function () {
                 let request = this.api.follow(module, id, option.followed, this.callbacks);
                 this.server.respond();
 
-                expect(spy).toHaveBeenCalledWith(true, request);
+                sinon.assert.calledWith(spy, true, request);
             }.bind(this));
 
             spy.restore();
@@ -1732,7 +1731,7 @@ describe('Api client', function () {
             let request = this.api.me('read', {}, {}, this.callbacks);
             this.server.respond();
 
-            expect(spy).toHaveBeenCalledWith(myInfo, request);
+            sinon.assert.calledWith(spy, myInfo, request);
 
             spy.restore();
         });
@@ -1871,9 +1870,9 @@ describe('Api client', function () {
 
             expect(request.aborted).toBeTruthy();
 
-            expect(sstub).not.toHaveBeenCalled();
-            expect(estub).not.toHaveBeenCalled();
-            expect(cstub).toHaveBeenCalledWith(request);
+            sinon.assert.notCalled(sstub);
+            sinon.assert.notCalled(estub);
+            sinon.assert.calledWith(cstub, request);
 
             sstub.restore();
             estub.restore();
@@ -1885,7 +1884,7 @@ describe('Api client', function () {
         it('should ping before using the iframe hack', function () {
             let callStub = sinon.stub(this.api, 'call');
             this.api.fileDownload('myfile');
-            expect(callStub).toHaveBeenCalledWith('read', '/rest/v10/ping');
+            sinon.assert.calledWith(callStub, 'read', '/rest/v10/ping');
             callStub.restore();
         });
     });
@@ -1926,7 +1925,7 @@ describe('Api client', function () {
                 let callbacks = { myCallback: $.noop };
                 let options = { async: true };
                 this.api.bulk(data, callbacks, options);
-                expect(callStub).toHaveBeenCalledWith('create', '/rest/v10/bulk', data, callbacks, options);
+                sinon.assert.calledWith(callStub, 'create', '/rest/v10/bulk', data, callbacks, options);
                 callStub.restore();
             });
         });
