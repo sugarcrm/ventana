@@ -182,6 +182,15 @@ describe('Api client', function () {
             expect(stubHttpErrorHandler).not.toHaveBeenCalled();
         });
 
+        it("should throw an error if url contains a Path Traversal attack", function() {
+            const stubHttpErrorHandler = sinon.stub(),
+            api = Api.createInstance({
+                defaultErrorHandler: stubHttpErrorHandler
+            });
+            const url = '/rest/v10/oauth2/token/../../Administration/config';
+            expect(() => api.call('create', url, null)).toThrow(new Error("Invalid URL: " + url));
+        });
+
 
         it('request in Queue', function() {
 

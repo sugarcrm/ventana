@@ -618,6 +618,13 @@ function SugarApi(args) {
             options = options || {};
             callbacks = callbacks || {};
 
+            const hasPathTraversal = /(\.\.\/|\.\.%2f|\.\.%5c)/i.test(url);
+            const hasNullByte = /%00/i.test(url);
+            if (hasPathTraversal || hasNullByte) {
+                window.stop();
+                throw new Error('Invalid URL: ' + url);
+            }
+
             // by default use json headers
             var params = {
                 type: type,
