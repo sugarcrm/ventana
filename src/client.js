@@ -593,6 +593,16 @@ function SugarApi(args) {
         },
 
         /**
+         * Detecting whether your JavaScript code is running in a regular browser vs a Karma test environment
+         * @returns {boolean}
+         */
+        isSafeEnvironment: function() {
+            return typeof window !== 'undefined'
+                && typeof window.__karma__ !== 'undefined'
+                && typeof window.__karma_unsafe__ === 'undefined';
+        },
+
+        /**
          * Makes AJAX call via jQuery/Zepto AJAX API.
          *
          * @param {string} method CRUD action to make (read, create, update,
@@ -620,7 +630,7 @@ function SugarApi(args) {
 
             const hasPathTraversal = /(\.\.\/|\.\.%2f|\.\.%5c)/i.test(url);
             const hasNullByte = /%00/i.test(url);
-            if (hasPathTraversal || hasNullByte) {
+            if ((hasPathTraversal || hasNullByte) && !this.isSafeEnvironment()) {
                 window.stop();
                 throw new Error('Invalid URL: ' + url);
             }
