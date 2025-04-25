@@ -136,6 +136,25 @@ describe('Api client', function () {
         this.server.restore();
     });
 
+    describe('Security checks', function () {
+        beforeEach(() => {
+            window.__karma_unsafe__ = true;
+        });
+
+        afterEach(() => {
+            delete window.__karma_unsafe__;
+        });
+
+        it("should throw an error if url contains a Path Traversal attack", function () {
+            const stubHttpErrorHandler = sinon.stub(),
+                api = Api.createInstance({
+                    defaultErrorHandler: stubHttpErrorHandler
+                });
+            const url = '/rest/v10/oauth2/token/../../Administration/config';
+            expect(() => api.call('create', url, null)).toThrow(new Error("Invalid URL: " + url));
+        });
+    });
+
     describe('Fallback Error Handler', function () {
 
         it('should create instance taking an "on error" fallback http handler', function () {
@@ -181,16 +200,6 @@ describe('Api client', function () {
             expect(callbackError).toHaveBeenCalled();
             expect(stubHttpErrorHandler).not.toHaveBeenCalled();
         });
-
-        it("should throw an error if url contains a Path Traversal attack", function() {
-            const stubHttpErrorHandler = sinon.stub(),
-            api = Api.createInstance({
-                defaultErrorHandler: stubHttpErrorHandler
-            });
-            const url = '/rest/v10/oauth2/token/../../Administration/config';
-            expect(() => api.call('create', url, null)).toThrow(new Error("Invalid URL: " + url));
-        });
-
 
         it('request in Queue', function() {
 
