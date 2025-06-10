@@ -3,6 +3,7 @@
  */
 
 const Api = require('../src/client');
+const nise = require('nise');
 
 describe('Instantiation', function () {
 
@@ -109,7 +110,7 @@ describe('Api client', function () {
         this.fixtures.metadata = metadata;
         this.fixtures.fields = metadata.fields;
 
-        this.server = sinon.fakeServer.create();
+        this.server = nise.fakeServer.create();
 
         this.callbacks = {
             success:function (data) {},
@@ -227,7 +228,7 @@ describe('Api client', function () {
 
         it('should make a request with the correct request url', function () {
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             this.api.call('read', '/rest/v10/contact', {
                 date_modified: '2012-02-08 19:18:25'
@@ -479,7 +480,7 @@ describe('Api client', function () {
         it('should build resource URLs to access the Export API', function() {
             this.server.respondWith("POST", "/rest/v10/Accounts/record_list",
                 [200, { "Content-Type":"application/json" },
-                 '{"id":"12345-67890-11-12","records":["a","b","c"],"module_name":"Accounts"}']);
+                '{"id":"12345-67890-11-12","records":["a","b","c"],"module_name":"Accounts"}']);
             var fileDownloadStub = sinon.stub(this.api, 'fileDownload');
             var result = this.api.exportRecords(
                 {
@@ -940,7 +941,7 @@ describe('Api client', function () {
         it('should delegate to the call method', function () {
             var callspy = sinon.spy(this.api, 'call');
 
-            this.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
+            this.server.respondWith("GET", "/rest/v10/metadata\\?module_filter=Contacts&module_dependencies=1",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures.metadata.modules.Contacts)]);
             this.api.getMetadata({modules: ['Contacts'], callbacks: this.callbacks});
@@ -969,7 +970,7 @@ describe('Api client', function () {
             var modules = ["Contacts"],
                 spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
-            this.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
+            this.server.respondWith("GET", "/rest/v10/metadata\\?module_filter=Contacts&module_dependencies=1",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures.metadata.modules.Contacts)]);
 
@@ -1007,7 +1008,7 @@ describe('Api client', function () {
 
             this.server.respondWith(
                 'GET',
-                '/rest/v10/css?platform=my-platform&themeName=my-theme',
+                '/rest/v10/css\\?platform=my-platform&themeName=my-theme',
                 [200, {'Content-Type': 'text/css'}, JSON.stringify(expectedAttributes)]
             );
 
@@ -1037,7 +1038,7 @@ describe('Api client', function () {
                 },
             };
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             this.api.file('read', {
                 module: 'Notes',
@@ -1062,7 +1063,7 @@ describe('Api client', function () {
 
             let stub = sinon.stub(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             this.api.file('read', {
                 module: 'Notes',
@@ -1088,7 +1089,7 @@ describe('Api client', function () {
 
             let stub = sinon.stub(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             const fileObject = new Blob(['I am a file']); // IE 11 and Edge don't support the File() constructor
             this.api.file(
@@ -1122,7 +1123,7 @@ describe('Api client', function () {
 
             let stub = sinon.stub(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             this.api.file('delete', {
                 module: 'Contacts',
@@ -1252,7 +1253,7 @@ describe('Api client', function () {
                 'ismobile': true,
             };
 
-            this.server.respondWith("POST", "/rest/v10/oauth2/token?platform=",
+            this.server.respondWith("POST", "/rest/v10/oauth2/token\\?platform=",
                 [200, {  "Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["/rest/v10/oauth2/token"].POST.response)]);
 
@@ -1317,7 +1318,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
@@ -1394,7 +1395,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
@@ -1445,7 +1446,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
@@ -1502,7 +1503,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             this.api.login({ username: 'a', password: 'b'}, null, this.callbacks);
 
@@ -1541,7 +1542,7 @@ describe('Api client', function () {
             let cspy = sinon.spy(this.callbacks, 'complete');
             let sspy = sinon.spy(this.callbacks, 'success');
 
-            let xhr = this.sandbox.useFakeServer();
+            let xhr = nise.fakeServer.create();
 
             this.api.records('read', 'Accounts', null, null, this.callbacks);
 
@@ -1687,7 +1688,7 @@ describe('Api client', function () {
 
             this.server.respondWith(
                 'POST',
-                '/rest/v10/Contacts/register?platform=',
+                '/rest/v10/Contacts/register\\?platform=',
                 [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
             );
 
