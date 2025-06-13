@@ -4,9 +4,9 @@
 
 const Api = require('../src/client');
 
-describe('Instantiation', function () {
+describe('Instantiation', function() {
 
-    beforeEach(function () {
+    beforeEach(function() {
         this.sandbox = sinon.createSandbox();
 
         this.storage = {
@@ -16,7 +16,7 @@ describe('Instantiation', function () {
         };
     });
 
-    it('should default to `/rest/v10` and not be authenticated', function () {
+    it('should default to `/rest/v10` and not be authenticated', function() {
 
         let api = Api.createInstance();
 
@@ -24,7 +24,7 @@ describe('Instantiation', function () {
         expect(api.isAuthenticated()).toBeFalsy();
     });
 
-    it('should assume to be authenticated if storage has `AuthAccessToken`', function () {
+    it('should assume to be authenticated if storage has `AuthAccessToken`', function() {
 
         let getStub = this.sandbox.stub(this.storage, 'get')
             .withArgs('AuthAccessToken').returns('xyz');
@@ -37,54 +37,54 @@ describe('Instantiation', function () {
         expect(getStub).toHaveBeenCalled();
     });
 
-    it('should throw error when store is invalid', function () {
+    it('should throw error when store is invalid', function() {
 
         const err = 'Failed to initialize Sugar API: key/value store provider is invalid';
 
         expect(function() {
-            Api.createInstance({ keyValueStore: {} });
+            Api.createInstance({keyValueStore: {}});
         }).toThrowError(Error, err);
 
         expect(function() {
-            Api.createInstance({ keyValueStore: {
+            Api.createInstance({keyValueStore: {
                 // no get
                 set() {},
                 cut() {},
-            } });
+            }});
         }).toThrowError(Error, err);
 
         expect(function() {
-            Api.createInstance({ keyValueStore: {
+            Api.createInstance({keyValueStore: {
                 get() {},
                 // no set
                 cut() {},
-            } });
+            }});
         }).toThrowError(Error, err);
 
         expect(function() {
-            Api.createInstance({ keyValueStore: {
+            Api.createInstance({keyValueStore: {
                 get() {},
                 set() {},
                 // no cut
-            } });
+            }});
         }).toThrowError(Error, err);
 
     });
 
-    it('should initialize asynchronously if keyValueStore has initAsync', function () {
+    it('should initialize asynchronously if keyValueStore has initAsync', function() {
 
         let storage = _.clone(this.storage);
         storage.initAsync = sinon.spy();
 
-        Api.createInstance({ keyValueStore: storage });
+        Api.createInstance({keyValueStore: storage});
         expect(storage.initAsync).toHaveBeenCalled();
     });
 
 });
 
-describe('Api client', function () {
+describe('Api client', function() {
 
-    beforeEach(function () {
+    beforeEach(function() {
 
         this.sandbox = sinon.createSandbox();
 
@@ -112,16 +112,16 @@ describe('Api client', function () {
         this.server = sinon.fakeServer.create();
 
         this.callbacks = {
-            success:function (data) {},
-            error:function (error) {},
-            complete: function() {}
+            success:function(data) {},
+            error:function(error) {},
+            complete: function() {},
         };
 
         //Override the normal app sync after refresh
         this.api.setRefreshTokenSuccessCallback(function(c){c();});
     });
 
-    afterEach(function () {
+    afterEach(function() {
         sinon.restore();
         if (this.callbacks.success.restore) this.callbacks.success.restore();
         if (this.callbacks.error.restore) this.callbacks.error.restore();
@@ -136,7 +136,7 @@ describe('Api client', function () {
         this.server.restore();
     });
 
-    describe('Security checks', function () {
+    describe('Security checks', function() {
         beforeEach(() => {
             window.__karma_unsafe__ = true;
         });
@@ -145,22 +145,22 @@ describe('Api client', function () {
             delete window.__karma_unsafe__;
         });
 
-        it("should throw an error if url contains a Path Traversal attack", function () {
+        it("should throw an error if url contains a Path Traversal attack", function() {
             const stubHttpErrorHandler = sinon.stub(),
                 api = Api.createInstance({
-                    defaultErrorHandler: stubHttpErrorHandler
+                    defaultErrorHandler: stubHttpErrorHandler,
                 });
             const url = '/rest/v10/oauth2/token/../../Administration/config';
             expect(() => api.call('create', url, null)).toThrow(new Error("Invalid URL: " + url));
         });
     });
 
-    describe('Fallback Error Handler', function () {
+    describe('Fallback Error Handler', function() {
 
-        it('should create instance taking an "on error" fallback http handler', function () {
+        it('should create instance taking an "on error" fallback http handler', function() {
             var stubHttpErrorHandler = sinon.stub(),
                 api = Api.createInstance({
-                    defaultErrorHandler: stubHttpErrorHandler
+                    defaultErrorHandler: stubHttpErrorHandler,
                 });
             expect(api.defaultErrorHandler).toEqual(stubHttpErrorHandler);
         });
@@ -168,7 +168,7 @@ describe('Api client', function () {
         it("should use default fallback http handler", function() {
             var stubHttpErrorHandler = sinon.stub(),
                 api = Api.createInstance({
-                    defaultErrorHandler: stubHttpErrorHandler
+                    defaultErrorHandler: stubHttpErrorHandler,
                 });
             var response = {"error": "invalid_grant", "error_description": "some desc"};
             this.server.respondWith(function(xhr) {
@@ -186,7 +186,7 @@ describe('Api client', function () {
             var stubHttpErrorHandler = sinon.stub(),
                 callbackError = sinon.stub(),
                 api = Api.createInstance({
-                    defaultErrorHandler: stubHttpErrorHandler
+                    defaultErrorHandler: stubHttpErrorHandler,
                 });
             var response = {"error": "invalid_grant", "error_description": "some desc"};
             this.server.respondWith(function(xhr) {
@@ -223,14 +223,14 @@ describe('Api client', function () {
 
     });
 
-    describe('Request Handler', function () {
+    describe('Request Handler', function() {
 
-        it('should make a request with the correct request url', function () {
+        it('should make a request with the correct request url', function() {
 
             let xhr = this.sandbox.useFakeServer();
 
             this.api.call('read', '/rest/v10/contact', {
-                date_modified: '2012-02-08 19:18:25'
+                date_modified: '2012-02-08 19:18:25',
             });
 
             expect(xhr.requests[0].url).toEqual('/rest/v10/contact');
@@ -238,7 +238,7 @@ describe('Api client', function () {
 
         });
 
-        it('should set the right method on request', function () {
+        it('should set the right method on request', function() {
             var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
@@ -254,7 +254,7 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should not set oauth header for auth requests', function () {
+        it('should not set oauth header for auth requests', function() {
             var spy = sinon.spy($, 'ajax'), args;
 
             this.api.call('create', '/rest/v10/oauth2/token');
@@ -266,7 +266,7 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should set the right options on request', function () {
+        it('should set the right options on request', function() {
             var spy = sinon.spy($, 'ajax'), args;
 
             //@arguments: method, URL, options
@@ -282,13 +282,13 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should handle successful responses', function () {
+        it('should handle successful responses', function() {
             var aContact = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 uri = "/rest/v10/Contacts/1234",
                 result;
 
             this.server.respondWith("GET", uri,
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(aContact)]);
             result = this.api.call('read', uri, null, null, this.callbacks);
             this.server.respond();
@@ -296,10 +296,10 @@ describe('Api client', function () {
             expect(result.xhr.responseText).toEqual(JSON.stringify(aContact));
         });
 
-        it('should fire error callbacks and return requests objects on error', function () {
+        it('should fire error callbacks and return requests objects on error', function() {
 
             this.server.respondWith("GET", "rest/v10/contacts/123",
-                [this.fixtures.responseErrors.fourhundred.code, { "Content-Type":"application/json" },
+                [this.fixtures.responseErrors.fourhundred.code, {"Content-Type":"application/json"},
                     this.fixtures.responseErrors.fourhundred.body]);
             var result = this.api.call('read', 'rest/v10/contacts/123', null, null, this.callbacks);
 
@@ -309,89 +309,87 @@ describe('Api client', function () {
         });
     });
 
-    describe('URL Builder', function () {
-        it('should build resource URLs for resources without ids', function () {
+    describe('URL Builder', function() {
+        it('should build resource URLs for resources without ids', function() {
             var url = this.api.buildURL("contacts", "create");
             expect(url).toEqual('/rest/v10/contacts');
         });
 
-        it('should build resource URLs for resources without ids if id exists in attributes', function () {
-            var attributes = { id: "1" },
+        it('should build resource URLs for resources without ids if id exists in attributes', function() {
+            var attributes = {id: "1"},
                 url = this.api.buildURL("contacts", "create", attributes);
 
             expect(url).toEqual('/rest/v10/contacts');
         });
 
-        it('should build resource URLs for resources with ID and standard actions', function () {
-            var attributes = { id:'1234' },
+        it('should build resource URLs for resources with ID and standard actions', function() {
+            var attributes = {id:'1234'},
                 url = this.api.buildURL("contacts", "update", attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234');
         });
 
-        it('should build resource URLs for resources with standard actions', function () {
+        it('should build resource URLs for resources with standard actions', function() {
             var module = "Contacts",
                 action = "",
-                attributes = { id:'1234' },
+                attributes = {id:'1234'},
                 url = this.api.buildURL(module, action, attributes);
 
             expect(url).toEqual('/rest/v10/Contacts/1234');
         });
 
-        it('should build resource URLs for resources with custom actions', function () {
-            var module = "Contacts",
-                action = "customAction",
-                attributes = { id:'1234' },
-                url = this.api.buildURL("contacts", "customAction", attributes);
+        it('should build resource URLs for resources with custom actions', function() {
+            const url = this.api.buildURL("contacts", "customAction", {id:'1234'});
 
             expect(url).toEqual('/rest/v10/contacts/1234/customAction');
         });
 
-        it('should build resource URLs for resources with link and related id', function () {
+        it('should build resource URLs for resources with link and related id', function() {
             var attributes = {
                     id:'1234',
-                    relatedId: '4567'
+                    relatedId: '4567',
                 },
                 url = this.api.buildURL("contacts", "opportunities", attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234/opportunities/4567');
         });
 
-        it('should build resource URLs for resources with link and link name', function () {
+        it('should build resource URLs for resources with link and link name', function() {
             var attributes = {
                     id:'1234',
-                    link: 'opportunities'
+                    link: 'opportunities',
                 },
                 url = this.api.buildURL("contacts", null, attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234/link/opportunities');
         });
 
-        it('should build resource URLs for resources to create links', function () {
+        it('should build resource URLs for resources to create links', function() {
             var attributes = {
                     id:'1234',
-                    link: true
+                    link: true,
                 },
                 url = this.api.buildURL("contacts", null, attributes);
 
             expect(url).toEqual('/rest/v10/contacts/1234/link');
         });
 
-        it('should build resource URLs for resources with custom params', function () {
+        it('should build resource URLs for resources with custom params', function() {
             var params = {
                     "fields": "first_name,last_name",
                     "timestamp": "NOW",
-                    "funky_param": "hello world/%"
+                    "funky_param": "hello world/%",
                 },
-                attributes = { id:'1234'},
+                attributes = {id:'1234'},
                 url = this.api.buildURL("contacts", "update", attributes, params);
-            expect(url).toEqual('/rest/v10/contacts/1234?fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello%20world%2F%25');
+            expect(url).toEqual('/rest/v10/contacts/1234?' +
+                'fields=first_name%2Clast_name&timestamp=NOW&funky_param=hello%20world%2F%25');
         });
 
         it('should build resource URLs for fetching a link', function() {
-            var params = { max_num: 20 },
-            attributes = { id:'seed_jim_id', link:'reportees', related: null, relatedId: undefined },
-            url = this.api.buildURL("Users", null, attributes, params);
+            var params = {max_num: 20},
+                attributes = {id:'seed_jim_id', link:'reportees', related: null, relatedId: undefined},
+                url = this.api.buildURL("Users", null, attributes, params);
             expect(url).toEqual('/rest/v10/Users/seed_jim_id/link/reportees?max_num=20');
         });
 
@@ -399,7 +397,7 @@ describe('Api client', function () {
             let fileFieldAttributes = {module: 'Notes', id: 'note_id', field: 'fileField'};
             let attributes = {module: 'Notes', id: 'note_id'};
 
-            it('should build resource URLs', function () {
+            it('should build resource URLs', function() {
                 let url = this.api.buildFileURL(fileFieldAttributes);
                 let options;
 
@@ -461,34 +459,35 @@ describe('Api client', function () {
                 this.sandbox.stub(this.storage, 'get')
                     .withArgs('DownloadToken').returns('token-to-download');
 
-                let url = this.api.buildFileURL(attributes, { passDownloadToken: true });
+                let url = this.api.buildFileURL(attributes, {passDownloadToken: true});
 
                 expect(url).toEqual('/rest/v10/Notes/note_id/file?download_token=token-to-download');
 
             });
 
-            it('should fall back to _platform set on instantiation if no platform arg is passed', function () {
+            it('should fall back to _platform set on instantiation if no platform arg is passed', function() {
                 let api = Api.createInstance({
                     platform: 'my-platform',
                 });
                 let url = api.buildFileURL(attributes, {});
-                expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=my-platform')
+                expect(url).toEqual('/rest/v10/Notes/note_id/file?platform=my-platform');
             });
         });
 
         it('should build resource URLs to access the Export API', function() {
             this.server.respondWith("POST", "/rest/v10/Accounts/record_list",
-                [200, { "Content-Type":"application/json" },
-                 '{"id":"12345-67890-11-12","records":["a","b","c"],"module_name":"Accounts"}']);
+                [200, {"Content-Type":"application/json"},
+                    '{"id":"12345-67890-11-12","records":["a","b","c"],"module_name":"Accounts"}']);
             var fileDownloadStub = sinon.stub(this.api, 'fileDownload');
-            var result = this.api.exportRecords(
+            this.api.exportRecords(
                 {
                     'module':'Accounts',
-                    'uid':['a','b','c']
+                    'uid':['a','b','c'],
                 },
                 'fakeEl',
                 'fakeCallbacks',
-                []);
+                []
+            );
 
             this.server.respond(); //tell server to respond to pending async call
 
@@ -498,9 +497,9 @@ describe('Api client', function () {
         });
 
         it('should build resource URLs for fetching a link with a filter definition', function() {
-            var params = { max_num: 20, filter: [{'name': 'Jim'}] },
-            attributes = { id:'guidguidguid', link:'contacts', related: null, relatedId: undefined },
-            url = this.api.buildURL("Accounts", null, attributes, params);
+            var params = {max_num: 20, filter: [{'name': 'Jim'}]},
+                attributes = {id:'guidguidguid', link:'contacts', related: null, relatedId: undefined},
+                url = this.api.buildURL("Accounts", null, attributes, params);
             expect(url).toEqual('/rest/v10/Accounts/guidguidguid/link/contacts?max_num=20&filter%5B0%5D%5Bname%5D=Jim');
         });
 
@@ -509,12 +508,13 @@ describe('Api client', function () {
             let attributes = {id: 'foobarbaz', field: 'invitees'};
             let url = this.api.buildURL('Calls', 'collection', attributes, params);
 
-            expect(url).toEqual('/rest/v10/Calls/foobarbaz/collection/invitees?module_list=Contacts%2CLeads%2CUsers&offset%5Bcontacts%5D=1&offset%5Busers%5D=2&offset%5Bleads%5D=2');
+            expect(url).toEqual('/rest/v10/Calls/foobarbaz/collection/invitees?' +
+                'module_list=Contacts%2CLeads%2CUsers&offset%5Bcontacts%5D=1&offset%5Busers%5D=2&offset%5Bleads%5D=2');
         });
 
         it('eliminates null and undefined params from the querystring', function() {
-            var params = { bad: null, worse: undefined},
-                attributes = { id:'1234' };
+            var params = {bad: null, worse: undefined},
+                attributes = {id:'1234'};
             var url = this.api.buildURL('Accounts','read',attributes,params);
             expect(url).toEqual('/rest/v10/Accounts/1234');
 
@@ -530,7 +530,7 @@ describe('Api client', function () {
                 options = {"":"","caf2f716-7fed-12fb-8ce7-5138c8999447":"3.14"};
 
             this.server.respondWith("GET", "/rest/v10/Bugs/enum/fixed_in_release",
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(options)]);
+                [200, {"Content-Type":"application/json"}, JSON.stringify(options)]);
 
             var request = this.api.enumOptions(module, field, this.callbacks);
             this.server.respond();
@@ -552,7 +552,7 @@ describe('Api client', function () {
             this.server.respondWith('GET', '/rest/v10/Contacts/foobarbaz/collection/collectionFieldName',
                 [200, {'Content-Type': 'application/json'}, JSON.stringify(records)]);
 
-            var request = this.api.collection(module, data, null, this.callbacks);
+            this.api.collection(module, data, null, this.callbacks);
             this.server.respond();
 
             sinon.assert.calledOnce(spy);
@@ -561,33 +561,35 @@ describe('Api client', function () {
         });
     });
 
-    describe('Record CRUD actions', function () {
+    describe('Record CRUD actions', function() {
 
-        it('search a module', function () {
+        it('search a module', function() {
             var spy = sinon.spy(this.callbacks, 'success'),
                 modules = "Contacts, Bugs, Leads",
                 query = "bob",
                 recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1],
                 fields = "first_name,last_name";
-                this.server.respondWith("GET", /.*\/rest\/v10\/globalsearch\?.*q=bob/,
-                [200, {  "Content-Type":"application/json"},
+            this.server.respondWith("GET", /.*\/rest\/v10\/globalsearch\?.*q=bob/,
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
-            this.api.search({q:query, module_list: modules, fields: fields, max_num:20}, this.callbacks, {useNewApi: true});
+            this.api.search(
+                {q:query, module_list: modules, fields: fields, max_num:20}, this.callbacks, {useNewApi: true}
+            );
             this.server.respond();
             sinon.assert.calledOnce(spy);
             sinon.assert.calledWith(spy, recordOne);
             spy.restore();
         });
 
-        it('should get the count', function () {
+        it('should get the count', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let module = 'Contacts';
 
             this.server.respondWith(
                 'GET',
                 '/rest/v10/Contacts/count',
-                [200, { 'Content-Type': 'application/json' }, '{"record_count": "5"}']
+                [200, {'Content-Type': 'application/json'}, '{"record_count": "5"}']
             );
 
             let request = this.api.count(module, {}, this.callbacks);
@@ -597,13 +599,13 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should get a record', function () {
+        it('should get a record', function() {
             var spy = sinon.spy(this.callbacks, 'success'),
                 attributes = {id:"1234", date_modified: "2012-02-08 19:18:25"},
                 recordOne = this.fixtures["rest/v10/contact"].GET.response.records[1];
 
             this.server.respondWith("GET", "/rest/v10/Contacts/1234",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(recordOne)]);
 
             this.api.records("read", "Contacts", attributes, null, this.callbacks);
@@ -615,14 +617,19 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should create record', function () {
+        it('should create record', function() {
             var spy = sinon.spy(this.callbacks, 'success'),
                 module = "Contacts", params = "", req = null,
-                attributes = {first_name:"Ronald", last_name:"McDonald", phone_work:"0980987", description:"This dude is cool."},
+                attributes = {
+                    first_name:"Ronald",
+                    last_name:"McDonald",
+                    phone_work:"0980987",
+                    description:"This dude is cool.",
+                },
                 postResponse = this.fixtures["rest/v10/contact"].POST.response;
 
             this.server.respondWith("POST", "/rest/v10/Contacts",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(postResponse)]);
 
             this.api.records("create", module, attributes, params, this.callbacks);
@@ -632,18 +639,19 @@ describe('Api client', function () {
             expect(spy.getCall(0).args[0]).toEqual(postResponse);
             req = this.server.requests[0];
             expect(req.responseText).toMatch(/^\{.guid/);
-            expect(req.requestBody).toEqual('{"first_name":"Ronald","last_name":"McDonald","phone_work":"0980987","description":"This dude is cool."}');
+            expect(req.requestBody).toEqual('{"first_name":"Ronald","last_name":"McDonald",' +
+                '"phone_work":"0980987","description":"This dude is cool."}');
             spy.restore();
         });
 
-        it('should get records', function () {
+        it('should get records', function() {
             var spy = sinon.spy(this.callbacks, 'success'),
                 module = "Contacts",
                 params = "", data = null, req = null, attributes = {},
                 records = this.fixtures["rest/v10/contact"].GET.response.records;
 
             this.server.respondWith("GET", "/rest/v10/Contacts",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(records)]);
 
             this.api.records("read", module, attributes, params, this.callbacks);
@@ -658,7 +666,7 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should update record', function () {
+        it('should update record', function() {
             let module = 'Contacts';
             let params = '';
             let attributes = {
@@ -666,7 +674,7 @@ describe('Api client', function () {
                 first_name: 'Ronald',
                 last_name: 'McDonald',
                 phone_work: '1234123',
-                description: 'This dude is cool.'
+                description: 'This dude is cool.',
             };
             let stringifiedAttributes = JSON.stringify(attributes);
             let spy = sinon.spy(this.callbacks, 'success');
@@ -675,7 +683,7 @@ describe('Api client', function () {
             this.server.respondWith(
                 'PUT',
                 '/rest/v10/Contacts/1',
-                [200, { 'Content-Type': 'application/json' }, stringifiedAttributes]
+                [200, {'Content-Type': 'application/json'}, stringifiedAttributes]
             );
 
             let request = this.api.records('update', module, attributes, params, this.callbacks);
@@ -690,7 +698,7 @@ describe('Api client', function () {
             cspy.restore();
         });
 
-        it('should delete record', function () {
+        it('should delete record', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let module = 'Contacts';
             let params = "";
@@ -711,7 +719,7 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should favorite record', function () {
+        it('should favorite record', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let module = 'Contacts';
             let id = '1234';
@@ -730,7 +738,7 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should unfavorite record', function () {
+        it('should unfavorite record', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let module = 'Contacts';
             let id = '1234';
@@ -739,7 +747,7 @@ describe('Api client', function () {
             this.server.respondWith(
                 'PUT',
                 '/rest/v10/Contacts/1234/unfavorite',
-                [200, { 'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
+                [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
             );
 
             let request = this.api.favorite(module, id, false, this.callbacks);
@@ -750,19 +758,19 @@ describe('Api client', function () {
         });
     });
 
-    describe('Relationship CRUD actions', function () {
+    describe('Relationship CRUD actions', function() {
 
-        it('should fetch relationships', function () {
+        it('should fetch relationships', function() {
             var spy = sinon.spy(this.callbacks, 'success'),
                 module = "opportunities", data = null,
                 attributes = {
                     id: "1",
-                    link: "contacts"
+                    link: "contacts",
                 },
                 respFixture = this.fixtures["rest/v10/opportunities/1/link/contacts"].GET.response;
 
             this.server.respondWith("GET", "/rest/v10/opportunities/1/link/contacts",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(respFixture)]);
 
             this.api.relationships("read", module, attributes, null, this.callbacks);
@@ -776,7 +784,7 @@ describe('Api client', function () {
         });
 
 
-        it('should create a relationship', function () {
+        it('should create a relationship', function() {
             var fixture = this.fixtures["rest/v10/opportunities/1/link/contacts"].POST.response,
                 spy = sinon.spy(this.callbacks, 'success'),
                 module = "opportunities",
@@ -787,12 +795,12 @@ describe('Api client', function () {
                     related: {
                         first_name: "Ronald",
                         last_name: "McDonald",
-                        opportunity_role: "Influencer"
-                    }
+                        opportunity_role: "Influencer",
+                    },
                 };
 
             this.server.respondWith("POST", "/rest/v10/opportunities/1/link/contacts",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(fixture)]);
 
             this.api.relationships("create", module, attributes, null, this.callbacks);
@@ -809,7 +817,7 @@ describe('Api client', function () {
         });
 
 
-        it('should update a relationship', function () {
+        it('should update a relationship', function() {
             var respFixture = this.fixtures["rest/v10/opportunities/1/link/contacts"].PUT.response,
                 module = "opportunities",
                 requestBody = null,
@@ -819,12 +827,12 @@ describe('Api client', function () {
                     link: "contacts",
                     relatedId: "2",
                     related: {
-                        opportunity_role: "Primary Decision Maker"
-                    }
+                        opportunity_role: "Primary Decision Maker",
+                    },
                 };
 
             this.server.respondWith("PUT", "/rest/v10/opportunities/1/link/contacts/2",
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(respFixture)]);
+                [200, {"Content-Type":"application/json"}, JSON.stringify(respFixture)]);
 
             this.api.relationships("update", module, attributes, null, this.callbacks);
 
@@ -835,18 +843,18 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should delete a relationship', function () {
+        it('should delete a relationship', function() {
             var fixture = this.fixtures["rest/v10/opportunities/1/link/contacts"],
                 module = "opportunities",
                 spy = sinon.spy(this.callbacks, 'success'),
                 attributes = {
                     id: '1',
                     link: "contacts",
-                    relatedId: "2"
+                    relatedId: "2",
                 };
 
             this.server.respondWith("DELETE", "/rest/v10/opportunities/1/link/contacts/2",
-                [200, {  "Content-Type":"application/json"}, JSON.stringify(fixture.DELETE.response)]);
+                [200, {"Content-Type":"application/json"}, JSON.stringify(fixture.DELETE.response)]);
 
             this.api.relationships("delete", module, attributes, null, this.callbacks);
 
@@ -857,19 +865,19 @@ describe('Api client', function () {
         });
     });
 
-    describe('relatedLeanCount GET action', function () {
+    describe('relatedLeanCount GET action', function() {
 
-        it('should fetch relatedLeanCount', function () {
+        it('should fetch relatedLeanCount', function() {
             var spy = sinon.spy(this.callbacks, 'success'),
                 module = "opportunities", data = null,
                 attributes = {
                     id: "1",
-                    link: "contacts"
+                    link: "contacts",
                 },
                 respFixture = this.fixtures["rest/v10/opportunities/1/link/contacts/leancount"].GET.response;
 
             this.server.respondWith("GET", "/rest/v10/opportunities/1/link/contacts/leancount",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(respFixture)]);
 
             this.api.relatedLeanCount(module, attributes, null, this.callbacks);
@@ -883,13 +891,13 @@ describe('Api client', function () {
         });
     });
 
-    describe('Password', function () {
+    describe('Password', function() {
 
-        it('should verify password', function () {
+        it('should verify password', function() {
             var callspy = sinon.spy(this.api, 'call');
 
             this.server.respondWith("POST", "/rest/v10/me/password",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify({current_user: {valid: true}})]);
             this.api.verifyPassword("passwordtocheck", null);
 
@@ -902,11 +910,11 @@ describe('Api client', function () {
             callspy.restore();
         });
 
-        it('should update password', function () {
+        it('should update password', function() {
             var callspy = sinon.spy(this.api, 'call');
 
             this.server.respondWith("PUT", "/rest/v10/me/password",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify({current_user: {valid: true}})]);
             this.api.updatePassword("old", "new", null);
 
@@ -922,7 +930,7 @@ describe('Api client', function () {
 
     });
 
-    describe('Metadata actions', function () {
+    describe('Metadata actions', function() {
 
         it('should log a deprecation warning if old signature is used', function() {
             sinon.stub(this.api, 'call');
@@ -937,21 +945,22 @@ describe('Api client', function () {
             expect(warnStub).not.toHaveBeenCalled();
         });
 
-        it('should delegate to the call method', function () {
+        it('should delegate to the call method', function() {
             var callspy = sinon.spy(this.api, 'call');
 
             this.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(this.fixtures.metadata.modules.Contacts)]);
             this.api.getMetadata({modules: ['Contacts'], callbacks: this.callbacks});
             this.server.respond();
 
             expect(callspy).toHaveBeenCalled();
-            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?module_filter=Contacts&module_dependencies=1");
+            expect(callspy.getCall(0).args[1]).toEqual("/rest/v10/metadata?" +
+                "module_filter=Contacts&module_dependencies=1");
             callspy.restore();
         });
 
-        it('should handle options params', function () {
+        it('should handle options params', function() {
             var callstub = sinon.stub(this.api, 'call');
 
             this.api.getMetadata({
@@ -961,21 +970,22 @@ describe('Api client', function () {
             });
 
             expect(callstub).toHaveBeenCalled();
-            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?lang=en_us&module_filter=Contacts&module_dependencies=1");
+            expect(callstub.getCall(0).args[1]).toEqual("/rest/v10/metadata?" +
+                "lang=en_us&module_filter=Contacts&module_dependencies=1");
             callstub.restore();
         });
 
-        it('should retrieve metadata', function () {
+        it('should retrieve metadata', function() {
             var modules = ["Contacts"],
                 spy = sinon.spy(this.callbacks, 'success');
             //this.api.debug=true;
             this.server.respondWith("GET", "/rest/v10/metadata?module_filter=Contacts&module_dependencies=1",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(this.fixtures.metadata.modules.Contacts)]);
 
             this.api.getMetadata({
                 modules: modules,
-                callbacks: this.callbacks
+                callbacks: this.callbacks,
             });
             this.server.respond(); //tell server to respond to pending async call
 
@@ -984,7 +994,7 @@ describe('Api client', function () {
             spy.restore();
         });
 
-        it('should retrieve public metadata', function () {
+        it('should retrieve public metadata', function() {
             let callstub = sinon.stub(this.api, 'call');
 
             this.api.getMetadata({
@@ -997,12 +1007,12 @@ describe('Api client', function () {
         });
     });
 
-    describe('CSS API', function () {
-        it('should request the desired theme for the specified platform', function () {
+    describe('CSS API', function() {
+        it('should request the desired theme for the specified platform', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let url = 'cache/themes/clients/my-platform/my-theme/styling.css';
             let expectedAttributes = {
-                url: [url]
+                url: [url],
             };
 
             this.server.respondWith(
@@ -1041,15 +1051,15 @@ describe('Api client', function () {
 
             this.api.file('read', {
                 module: 'Notes',
-                id: '1234'
+                id: '1234',
             }, null, this.callbacks);
 
             expect(xhr.requests[0].url).toMatch('/rest/v10/Notes/1234/file');
             expect(xhr.requests[0].method).toBe('GET');
             expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
-                'OAuth-Token': 'file-oauth-token'
+                'OAuth-Token': 'file-oauth-token',
             }));
-            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(response));
+            xhr.requests[0].respond(200, {'Content-Type':'application/json'}, JSON.stringify(response));
 
             expect(stub).toHaveBeenCalledOnce();
             sinon.assert.calledWith(stub, response);
@@ -1067,15 +1077,15 @@ describe('Api client', function () {
             this.api.file('read', {
                 module: 'Notes',
                 id: '1234',
-                field: 'filename'
+                field: 'filename',
             }, null, this.callbacks);
 
             expect(xhr.requests[0].url).toMatch('/rest/v10/Notes/1234/file');
             expect(xhr.requests[0].method).toBe('GET');
             expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
-                'OAuth-Token': 'file-oauth-token'
+                'OAuth-Token': 'file-oauth-token',
             }));
-            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, '{}');
+            xhr.requests[0].respond(200, {'Content-Type':'application/json'}, '{}');
 
             expect(stub).toHaveBeenCalledOnce();
             sinon.assert.calledWith(stub, {});
@@ -1096,7 +1106,7 @@ describe('Api client', function () {
                 {
                     module: 'Contacts',
                     id: '1',
-                    field: 'picture'
+                    field: 'picture',
                 },
                 [{files: [fileObject]}],
                 this.callbacks
@@ -1105,7 +1115,7 @@ describe('Api client', function () {
             expect(xhr.requests[0].url).toMatch('/rest/v10/Contacts/1/file/picture');
             expect(xhr.requests[0].method).toBe('POST');
             expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
-                'OAuth-Token': 'file-oauth-token'
+                'OAuth-Token': 'file-oauth-token',
             }));
             let resp = this.fixtures['rest/v10/Contacts/1/file/picture'].POST.response;
             xhr.requests[0].respond(200, {'Content-Type': 'application/json'}, JSON.stringify(resp));
@@ -1127,16 +1137,16 @@ describe('Api client', function () {
             this.api.file('delete', {
                 module: 'Contacts',
                 id: '1',
-                field: 'picture'
+                field: 'picture',
             }, null, this.callbacks);
 
             expect(xhr.requests[0].url).toMatch('/rest/v10/Contacts/1/file/picture');
             expect(xhr.requests[0].method).toBe('DELETE');
             expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({
-                'OAuth-Token': 'file-oauth-token'
+                'OAuth-Token': 'file-oauth-token',
             }));
             let resp = this.fixtures['rest/v10/Contacts/1/file/picture'].DELETE.response;
-            xhr.requests[0].respond(200, {  'Content-Type':'application/json'}, JSON.stringify(resp));
+            xhr.requests[0].respond(200, {'Content-Type':'application/json'}, JSON.stringify(resp));
 
             expect(stub).toHaveBeenCalled();
             sinon.assert.calledWith(stub, resp);
@@ -1148,12 +1158,12 @@ describe('Api client', function () {
 
             let resp = this.fixtures['rest/v10/Contacts/temp/file/picture'].POST.response;
             this.server.respondWith('POST', /rest\/v10\/Contacts\/temp\/file\/picture.*/,
-                [200, {  'Content-Type':'application/json'}, JSON.stringify(resp)]);
+                [200, {'Content-Type':'application/json'}, JSON.stringify(resp)]);
 
             this.api.file('create', {
                 module: 'Contacts',
                 id: 'temp',
-                field: 'picture'
+                field: 'picture',
             }, null, this.callbacks);
             this.server.respond();
             expect(stub).toHaveBeenCalled();
@@ -1169,11 +1179,11 @@ describe('Api client', function () {
             var spy = sinon.spy(this.callbacks, 'success');
 
             this.server.respondWith("GET", /\/rest\/v10\/ServerInfo.*/,
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify({
-                      "flavor": "ENT",
-                      "version": "6.6"
-                    })
+                        "flavor": "ENT",
+                        "version": "6.6",
+                    }),
                 ]);
 
             this.api.info(this.callbacks);
@@ -1190,7 +1200,7 @@ describe('Api client', function () {
             this.server.respondWith(
                 'GET',
                 /.*\/rest\/v10\/ping/,
-                [200, { 'Content-Type': 'application/json'}, '"pong"']
+                [200, {'Content-Type': 'application/json'}, '"pong"']
             );
 
             this.api.ping(null, this.callbacks);
@@ -1232,13 +1242,17 @@ describe('Api client', function () {
             expect(this.api.needRefreshAuthToken("/rest/v10/Accounts/xyz", "need_login")).toBeFalsy();
             expect(this.api.needRefreshAuthToken("Accounts/xyz", "conflict")).toBeFalsy();
             expect(this.api.needRefreshAuthToken("/rest/v10/oauth2/token", "invalid_grant")).toBeFalsy();
-            expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/oauth2/logout", "invalid_grant")).toBeFalsy();
-            expect(this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/Contacts", "invalid_grant")).toBeTruthy();
+            expect(
+                this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/oauth2/logout", "invalid_grant")
+            ).toBeFalsy();
+            expect(
+                this.api.needRefreshAuthToken("http://localhost:8888/sugarcrm/rest/v10/Contacts", "invalid_grant")
+            ).toBeTruthy();
             expect(this.api.needRefreshAuthToken("../sugarcrm/rest/v10/search", "invalid_grant")).toBeTruthy();
 
         });
 
-        it('should login users with correct credentials', function () {
+        it('should login users with correct credentials', function() {
 
             let spy = this.sandbox.spy(this.callbacks, 'success');
             let setStub = this.sandbox.stub(this.storage, 'set');
@@ -1253,10 +1267,10 @@ describe('Api client', function () {
             };
 
             this.server.respondWith("POST", "/rest/v10/oauth2/token?platform=",
-                [200, {  "Content-Type":"application/json"},
+                [200, {"Content-Type":"application/json"},
                     JSON.stringify(this.fixtures["/rest/v10/oauth2/token"].POST.response)]);
 
-            this.api.login({ username: "admin", password: "password" }, extraInfo, this.callbacks);
+            this.api.login({username: "admin", password: "password"}, extraInfo, this.callbacks);
             this.server.respond();
 
             expect(spy).toHaveBeenCalled();
@@ -1273,16 +1287,16 @@ describe('Api client', function () {
             expect(requestBody.username).toEqual('admin');
         });
 
-        it('should not login users with incorrect credentials', function () {
+        it('should not login users with incorrect credentials', function() {
 
             let spy = sinon.spy(this.callbacks, 'error');
             let cutSpy = sinon.spy(this.storage, 'cut');
 
             let response = {"error": "need_login", "error_description": "some desc"};
             this.server.respondWith("POST", /.*\/oauth2\/token.*/,
-                [401, {  "Content-Type":"application/json"}, JSON.stringify(response) ]);
+                [401, {"Content-Type":"application/json"}, JSON.stringify(response) ]);
 
-            var request = this.api.login({ username:"invalid", password:"invalid" }, null, this.callbacks);
+            var request = this.api.login({username:"invalid", password:"invalid"}, null, this.callbacks);
             var rspy = sinon.spy(request, "execute");
 
             this.server.respond();
@@ -1326,7 +1340,7 @@ describe('Api client', function () {
             let request3 = this.api.records('read', 'Calls', null, null, this.callbacks);
             let rspy3 = sinon.spy(request3, 'execute');
 
-            let headers = { 'Content-Type': 'application/json' };
+            let headers = {'Content-Type': 'application/json'};
             let invalidBody = JSON.stringify({
                 error: 'invalid_grant',
                 error_description: 'some desc',
@@ -1382,7 +1396,8 @@ describe('Api client', function () {
             rspy3.restore();
         });
 
-        it('should pass error to original callback in case of invalid_grant response happens and the original request fails', function() {
+        it('should pass error to original callback ' +
+            'in case of invalid_grant response happens and the original request fails', function() {
 
             this.sandbox.stub(this.storage, 'get')
                 .withArgs('AuthAccessToken').returns('xyz')
@@ -1399,7 +1414,7 @@ describe('Api client', function () {
             let request = this.api.records('read', 'Accounts', null, null, this.callbacks);
             let rspy = sinon.spy(request, 'execute');
 
-            let headers = { 'Content-Type': 'application/json' };
+            let headers = {'Content-Type': 'application/json'};
             let invalidBody = JSON.stringify({
                 error: 'invalid_grant',
                 error_description: 'some desc',
@@ -1410,7 +1425,7 @@ describe('Api client', function () {
             xhr.requests[0].respond(401, headers, invalidBody);
 
             expect(xhr.requests[1].url).toBe('/rest/v10/oauth2/token?platform=');
-            xhr.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(
+            xhr.requests[1].respond(200, {'Content-Type': 'application/json'}, JSON.stringify(
                 this.fixtures['/rest/v10/oauth2/token'].POST.response
             ));
 
@@ -1428,14 +1443,15 @@ describe('Api client', function () {
             sinon.assert.calledOnce(cspy);
             sinon.assert.notCalled(sspy);
             sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
-            sinon.assert.calledWith(espy, sinon.match({ status: 404 }));
+            sinon.assert.calledWith(espy, sinon.match({status: 404}));
 
             espy.restore();
             cspy.restore();
             sspy.restore();
         });
 
-        it('should handle multiple requests and stop refreshing in case of invalid_grant response happens more than once in a row', function() {
+        it('should handle multiple requests and stop refreshing ' +
+            'in case of invalid_grant response happens more than once in a row', function() {
 
             this.sandbox.stub(this.storage, 'get')
                 .withArgs('AuthAccessToken').returns('xyz')
@@ -1454,7 +1470,7 @@ describe('Api client', function () {
             let request3 = this.api.records('read', 'Meetings', null, null, this.callbacks);
             let rspy3 = sinon.spy(request3, 'execute');
 
-            let headers = { 'Content-Type': 'application/json' };
+            let headers = {'Content-Type': 'application/json'};
             let invalidBody = JSON.stringify({
                 error: 'invalid_grant',
                 error_description: 'some desc',
@@ -1484,7 +1500,7 @@ describe('Api client', function () {
             sinon.assert.callCount(cspy, 3);
             sinon.assert.notCalled(sspy);
             sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
-            sinon.assert.calledWith(espy, sinon.match({ status: 401 }));
+            sinon.assert.calledWith(espy, sinon.match({status: 401}));
 
             espy.restore();
             cspy.restore();
@@ -1504,10 +1520,10 @@ describe('Api client', function () {
 
             let xhr = this.sandbox.useFakeServer();
 
-            this.api.login({ username: 'a', password: 'b'}, null, this.callbacks);
+            this.api.login({username: 'a', password: 'b'}, null, this.callbacks);
 
             expect(xhr.requests[0].url).toBe('/rest/v10/oauth2/token?platform=');
-            xhr.requests[0].respond(400, { 'Content-Type': 'application/json' }, JSON.stringify({
+            xhr.requests[0].respond(400, {'Content-Type': 'application/json'}, JSON.stringify({
                 error: 'invalid_grant',
                 error_description: 'some desc',
             }));
@@ -1521,7 +1537,7 @@ describe('Api client', function () {
             sinon.assert.calledOnce(cspy);
             sinon.assert.notCalled(sspy);
             sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
-            sinon.assert.calledWith(espy, sinon.match({ status: 400 }));
+            sinon.assert.calledWith(espy, sinon.match({status: 400}));
 
             espy.restore();
             cspy.restore();
@@ -1547,13 +1563,13 @@ describe('Api client', function () {
 
             expect(xhr.requests[0].url).toBe('/rest/v10/Accounts');
             expect(xhr.requests[0].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
-            xhr.requests[0].respond(401, { 'Content-Type': 'application/json' }, JSON.stringify({
+            xhr.requests[0].respond(401, {'Content-Type': 'application/json'}, JSON.stringify({
                 error: 'invalid_grant',
                 error_description: 'some desc',
             }));
 
             expect(xhr.requests[1].url).toBe('/rest/v10/oauth2/token?platform=');
-            xhr.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(
+            xhr.requests[1].respond(200, {'Content-Type': 'application/json'}, JSON.stringify(
                 this.fixtures['/rest/v10/oauth2/token'].POST.response
             ));
 
@@ -1563,7 +1579,7 @@ describe('Api client', function () {
             // simulate invalid_grant again
             expect(xhr.requests[2].url).toBe('/rest/v10/Accounts');
             expect(xhr.requests[2].requestHeaders).toEqual(jasmine.objectContaining({'OAuth-Token': 'xyz'}));
-            xhr.requests[2].respond(401, { 'Content-Type': 'application/json' }, JSON.stringify({
+            xhr.requests[2].respond(401, {'Content-Type': 'application/json'}, JSON.stringify({
                 error: 'invalid_grant',
                 error_description: 'some desc',
             }));
@@ -1577,14 +1593,14 @@ describe('Api client', function () {
             sinon.assert.calledOnce(cspy);
             sinon.assert.notCalled(sspy);
             sinon.assert.calledWith(espy, sinon.match.instanceOf(Api.HttpError));
-            sinon.assert.calledWith(espy, sinon.match({ status: 401 }));
+            sinon.assert.calledWith(espy, sinon.match({status: 401}));
 
             espy.restore();
             cspy.restore();
             sspy.restore();
         });
 
-        it('should log user out', function () {
+        it('should log user out', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let cutSpy = sinon.spy(this.storage, 'cut');
 
@@ -1608,8 +1624,8 @@ describe('Api client', function () {
             cutSpy.restore();
         });
 
-        describe('External logins', function () {
-            it('should let you set the external login status', function () {
+        describe('External logins', function() {
+            it('should let you set the external login status', function() {
                 let originalExternalLogin = this.api.isExternalLogin();
                 let newExternalLogin = !originalExternalLogin;
                 this.api.setExternalLogin(newExternalLogin);
@@ -1617,21 +1633,21 @@ describe('Api client', function () {
                 this.api.setExternalLogin(originalExternalLogin);
             });
 
-            it('should call the externalLoginUICallback against the provided error url', function () {
+            it('should call the externalLoginUICallback against the provided error url', function() {
                 let callback = sinon.spy();
                 let api = Api.createInstance({
                     externalLoginUICallback: callback,
                 });
                 let error = {
                     payload: {
-                        url: 'http://example.com'
-                    }
+                        url: 'http://example.com',
+                    },
                 };
                 api.handleExternalLogin(new Api.HttpRequest({}), error, $.noop);
                 sinon.assert.calledWith(callback, error.payload.url);
             });
 
-            it('should call onError but stop before _refreshTokenSuccess if auth failed', function () {
+            it('should call onError but stop before _refreshTokenSuccess if auth failed', function() {
                 let onErrorStub = sinon.stub();
                 let successStub = sinon.stub();
 
@@ -1646,14 +1662,14 @@ describe('Api client', function () {
                     this.api.setRefreshTokenSuccessCallback(successStub);
                     this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
 
-                    window.postMessage(JSON.stringify({ access_token: null, external_login: true }), '*');
+                    window.postMessage(JSON.stringify({access_token: null, external_login: true}), '*');
                 }).then(() => {
                     expect(onErrorStub).toHaveBeenCalled();
                     expect(successStub).not.toHaveBeenCalled();
                 });
             });
 
-            it('should not call onError and return if not external login', function () {
+            it('should not call onError and return if not external login', function() {
                 let onErrorStub = sinon.stub();
 
                 return new Promise((resolve) => {
@@ -1666,7 +1682,7 @@ describe('Api client', function () {
 
                     this.api.handleExternalLogin(new Api.HttpRequest({}), {}, onErrorStub);
 
-                    window.postMessage(JSON.stringify({ some_token: null }), '*');
+                    window.postMessage(JSON.stringify({some_token: null}), '*');
                 }).then(() => {
                     sinon.assert.callCount(onErrorStub, 0);
                 });
@@ -1674,15 +1690,15 @@ describe('Api client', function () {
         });
     });
 
-    describe('signup', function () {
-        it('should register a contact', function () {
+    describe('signup', function() {
+        it('should register a contact', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let firstName = 'John';
             let lastName = 'Doe';
             let expectedAttributes = {
                 first_name: firstName,
                 last_name: lastName,
-                id: '22'
+                id: '22',
             };
 
             this.server.respondWith(
@@ -1691,7 +1707,7 @@ describe('Api client', function () {
                 [200, {'Content-Type': 'application/json'}, JSON.stringify(expectedAttributes)]
             );
 
-            let request = this.api.signup({ first_name: firstName, last_name: lastName }, {}, this.callbacks);
+            let request = this.api.signup({first_name: firstName, last_name: lastName}, {}, this.callbacks);
             this.server.respond();
 
             sinon.assert.calledWith(spy, expectedAttributes, request);
@@ -1699,8 +1715,8 @@ describe('Api client', function () {
         });
     });
 
-    describe('Following', function () {
-        it('should subscribe or unsubscribe as appropriate', function () {
+    describe('Following', function() {
+        it('should subscribe or unsubscribe as appropriate', function() {
             let module = 'Accounts';
             let id = '1234';
             let spy = sinon.spy(this.callbacks, 'success');
@@ -1715,13 +1731,13 @@ describe('Api client', function () {
                     followed: false,
                     method: 'DELETE',
                     action: 'unsubscribe',
-                }
+                },
             ];
-            _.each(data, function (option) {
+            _.each(data, function(option) {
                 this.server.respondWith(
                     option.method,
                     ['/rest/v10', module, id, option.action].join('/'),
-                    [200, { 'Content-Type': 'application/json' }, 'true']
+                    [200, {'Content-Type': 'application/json'}, 'true']
                 );
 
                 let request = this.api.follow(module, id, option.followed, this.callbacks);
@@ -1734,8 +1750,8 @@ describe('Api client', function () {
         });
     });
 
-    describe('Me API', function () {
-        it('should read my information', function () {
+    describe('Me API', function() {
+        it('should read my information', function() {
             let spy = sinon.spy(this.callbacks, 'success');
             let myInfo = this.fixtures['/rest/v10/me'].GET.response;
 
@@ -1757,22 +1773,22 @@ describe('Api client', function () {
 
     describe("HttpError", function() {
 
-        describe('toString', function () {
-            it('should display details of the error', function () {
+        describe('toString', function() {
+            it('should display details of the error', function() {
                 let error = new Api.HttpError({
                     xhr: {
                         status: 401,
-                        responseText: '{ "error": "forbidden", "error_message": "this is forbidden" }',
-                        getResponseHeader: () => { return 'application/json' },
+                        responseText: '{"error": "forbidden", "error_message": "this is forbidden" }',
+                        getResponseHeader: () => {return 'application/json'; },
                     },
                 }, 'my text status', 'my error');
                 expect(error.toString()).toEqual([
                     'HTTP error: 401',
                     'type: my text status',
                     'error: my error',
-                    'response: { "error": "forbidden", "error_message": "this is forbidden" }',
+                    'response: {"error": "forbidden", "error_message": "this is forbidden" }',
                     'code: forbidden',
-                    'message: this is forbidden'
+                    'message: this is forbidden',
                 ].join('\n'));
             });
         });
@@ -1781,10 +1797,10 @@ describe('Api client', function () {
             var xhr = {
                 status: 404,
                 responseText: "response text",
-                getResponseHeader: function() { return "application/json" }
+                getResponseHeader: function() {return "application/json"; },
             };
 
-            var error = new Api.HttpError({ xhr: xhr }, "text status", "error thrown");
+            var error = new Api.HttpError({xhr: xhr}, "text status", "error thrown");
             expect(error.status).toEqual(404);
             expect(error.responseText).toEqual("response text");
             expect(error.textStatus).toEqual("text status");
@@ -1797,10 +1813,10 @@ describe('Api client', function () {
             xhr = {
                 status: 401,
                 responseText: JSON.stringify({"error": "invalid_grant", "error_message": "some message"}),
-                getResponseHeader: function() { return "application/json"; }
+                getResponseHeader: function() {return "application/json"; },
             };
 
-            error = new Api.HttpError({ xhr: xhr }, "text status", "error thrown");
+            error = new Api.HttpError({xhr: xhr}, "text status", "error thrown");
             expect(error.status).toEqual(401);
             expect(error.code).toEqual("invalid_grant");
             expect(error.message).toEqual("some message");
@@ -1808,10 +1824,10 @@ describe('Api client', function () {
             xhr = {
                 status: 500,
                 responseText: "Something really bad happened",
-                getResponseHeader: function() { return "text/html; charset=iso-8859-1"; }
+                getResponseHeader: function() {return "text/html; charset=iso-8859-1"; },
             };
 
-            error = new Api.HttpError({ xhr: xhr }, "text status", "error thrown");
+            error = new Api.HttpError({xhr: xhr}, "text status", "error thrown");
             expect(error.status).toEqual(500);
             expect(error.code).toBeUndefined();
             expect(error.description).toBeUndefined();
@@ -1822,12 +1838,12 @@ describe('Api client', function () {
     describe("HttpRequest", function() {
         let spy, request;
 
-        beforeEach(function () {
+        beforeEach(function() {
             spy = sinon.spy($, 'ajax');
             request = new Api.HttpRequest({});
         });
 
-        afterEach(function () {
+        afterEach(function() {
             spy.restore();
         });
 
@@ -1838,12 +1854,12 @@ describe('Api client', function () {
             expect(request.xhr).toBeDefined();
         });
 
-        it('should be able to set metadata hash', function () {
+        it('should be able to set metadata hash', function() {
             request.execute('something', 'my-metadata-hash');
             expect(request.params.headers['X-Metadata-Hash']).toEqual('my-metadata-hash');
         });
 
-        it('should be able to set userpref hash', function () {
+        it('should be able to set userpref hash', function() {
             request.execute('something', 'my-metadata-hash', 'my-userpref-hash');
             expect(request.params.headers['X-Userpref-Hash']).toEqual('my-userpref-hash');
         });
@@ -1898,8 +1914,8 @@ describe('Api client', function () {
         });
     });
 
-    describe('File Downloads', function () {
-        it('should ping before using the iframe hack', function () {
+    describe('File Downloads', function() {
+        it('should ping before using the iframe hack', function() {
             let callStub = sinon.stub(this.api, 'call');
             this.api.fileDownload('myfile');
             sinon.assert.calledWith(callStub, 'read', '/rest/v10/ping');
@@ -1907,27 +1923,27 @@ describe('Api client', function () {
         });
     });
 
-    describe('State properties', function () {
-       it('should store and clear state', function () {
-           this.api.resetState();
-           this.api.setStateProperty('my key', 'my value');
-           expect(this.api.getStateProperty('my key')).toEqual('my value');
-           this.api.clearStateProperty('my key');
-           expect(this.api.getStateProperty('my key')).toBeUndefined();
-       });
+    describe('State properties', function() {
+        it('should store and clear state', function() {
+            this.api.resetState();
+            this.api.setStateProperty('my key', 'my value');
+            expect(this.api.getStateProperty('my key')).toEqual('my value');
+            this.api.clearStateProperty('my key');
+            expect(this.api.getStateProperty('my key')).toBeUndefined();
+        });
     });
 
-    describe("Bulk Requests", function () {
-        it('should not request if bulk calls are disabled', function () {
-            let api = Api.createInstance({ disableBulkApi: true });
-            api.call('read', '/rest/v10/ping', null, null, { bulk: true });
+    describe("Bulk Requests", function() {
+        it('should not request if bulk calls are disabled', function() {
+            let api = Api.createInstance({disableBulkApi: true});
+            api.call('read', '/rest/v10/ping', null, null, {bulk: true});
             let callStub = sinon.stub(api, 'call');
             api.triggerBulkCall();
             expect(callStub.called).toBeFalsy();
             callStub.restore();
         });
 
-        it('should not request if there is no queue', function () {
+        it('should not request if there is no queue', function() {
             // FIXME: we also need to test that we should throw an error
             this.api.clearBulkQueue();
             let callStub = sinon.stub(this.api, 'call');
@@ -1937,11 +1953,11 @@ describe('Api client', function () {
         });
 
         describe('bulk method', function() {
-            it('should make a bulk call with the provided arguments', function () {
+            it('should make a bulk call with the provided arguments', function() {
                 let callStub = sinon.stub(this.api, 'call');
-                let data = { requests: ['test request'] };
-                let callbacks = { myCallback: $.noop };
-                let options = { async: true };
+                let data = {requests: ['test request']};
+                let callbacks = {myCallback: $.noop};
+                let options = {async: true};
                 this.api.bulk(data, callbacks, options);
                 sinon.assert.calledWith(callStub, 'create', '/rest/v10/bulk', data, callbacks, options);
                 callStub.restore();
@@ -1967,7 +1983,7 @@ describe('Api client', function () {
                     xhr.respond(200, {"Content-Type": "application/json"}, JSON.stringify([{
                         contents: "pong",
                         headers: {},
-                        status: 200
+                        status: 200,
                     }]));
                 } else {
                     xhr.respond(404, {"Content-Type": "application/json"}, "");
@@ -1975,7 +1991,7 @@ describe('Api client', function () {
             });
             var response = "";
             this.api.call("read", "/rest/v10/ping", null, {success:function(o){
-               response = o;
+                response = o;
             }}, {bulk:true});
             this.api.triggerBulkCall();
             this.server.respond();
@@ -1991,10 +2007,10 @@ describe('Api client', function () {
                         contents: "pong",
                         headers: {
                             "Cache-Control": "max-age=0, private",
-                            "ETag": "28b71fa23e3bb1239251291fd518610b"
+                            "ETag": "28b71fa23e3bb1239251291fd518610b",
                         },
                         status: 200,
-                        status_text: "OK"
+                        status_text: "OK",
                     }]));
                 } else {
                     xhr.respond(404, {"Content-Type": "application/json"}, "");
@@ -2017,7 +2033,7 @@ describe('Api client', function () {
                 complete: function(req) {
                     complete = true;
                     expect(req.status).toEqual("success");
-                }
+                },
             }, {bulk: true});
             this.api.triggerBulkCall();
             this.server.respond();
@@ -2032,7 +2048,7 @@ describe('Api client', function () {
             this.api.clearBulkQueue();
             var payload = {
                 error: "no_method",
-                error_message: "Could not find a route with 1 elements"
+                error_message: "Could not find a route with 1 elements",
             };
             this.server.respondWith(function(xhr) {
                 if (xhr.url == "/rest/v10/bulk") {
@@ -2040,10 +2056,10 @@ describe('Api client', function () {
                         contents: payload,
                         headers: {
                             "Cache-Control": "no-store",
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
                         },
                         status: 404,
-                        status_text: "Not Found"
+                        status_text: "Not Found",
                     }]));
                 } else {
                     xhr.respond(500, {"Content-Type": "application/json"}, "");
@@ -2071,7 +2087,7 @@ describe('Api client', function () {
                 complete: function(req) {
                     complete = true;
                     expect(req.status).toEqual("error");
-                }
+                },
             }, {bulk: true});
             this.api.triggerBulkCall();
             this.server.respond();
@@ -2082,8 +2098,8 @@ describe('Api client', function () {
         });
     });
 
-    describe("'call' method for 'read' (GET) requests", function () {
-        beforeEach(function () {
+    describe("'call' method for 'read' (GET) requests", function() {
+        beforeEach(function() {
             this.api.clearBulkQueue();
             this.server.respondWith(function(xhr) {
                 if (xhr.url === "/rest/v10/bulk") {
@@ -2098,7 +2114,7 @@ describe('Api client', function () {
             this.api.call("read", "/rest/v10/ping", null, {
                 complete: function(req) {
                     expect(req.xhr.responseText).toEqual("NON-BULK");
-                }
+                },
             });
             this.server.respond();
         });
@@ -2109,7 +2125,7 @@ describe('Api client', function () {
             this.api.call("read", "/rest/v10/ping?" + veryLongQueryString, null, {
                 complete: function(req) {
                     expect(req.xhr.responseText).toEqual("BULK");
-                }
+                },
             });
             this.server.respond();
         });

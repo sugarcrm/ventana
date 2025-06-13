@@ -4,15 +4,15 @@
 
 var _instance;
 var _methodsToRequest = {
-        'read': 'GET',
-        'update': 'PUT',
-        'create': 'POST',
-        'delete': 'DELETE'
-    };
+    'read': 'GET',
+    'update': 'PUT',
+    'create': 'POST',
+    'delete': 'DELETE',
+};
 var _baseActions = ['read', 'update', 'create', 'delete'];
 var _refreshTokenSuccess = function(c) {c();};
-var _bulkQueues = { };
-var _state = { };
+var _bulkQueues = {};
+var _state = {};
 
 /**
  * Represents AJAX error.
@@ -127,7 +127,7 @@ _.extend(HttpError.prototype, {
             '\nresponse: ' + this.responseText +
             '\ncode: ' + this.code +
             '\nmessage: ' + this.message;
-    }
+    },
 
 });
 
@@ -226,7 +226,7 @@ _.extend(HttpRequest.prototype, {
          * @instance
          */
         this.xhr = $.ajax(this.params);
-    }
+    },
 });
 
 /**
@@ -261,7 +261,7 @@ _.extend(bulkXHR.prototype, {
         return _.reduce(this.headers, function(str, value, key) {
             return str.concat(key + ': ' + value + '\n');
         }, '');
-    }
+    },
 });
 
 /**
@@ -457,14 +457,14 @@ function SugarApi(args) {
                             }
                         });
                     },
-                    error: onError
+                    error: onError,
                 };
 
                 if (!('crosstab' in window) || !crosstab.supported) {
                     self.login(null, {refresh: true}, {
                         complete: refreshCallbacks.complete,
                         success: refreshCallbacks.success,
-                        error: refreshCallbacks.error
+                        error: refreshCallbacks.error,
                     });
                     return;
                 }
@@ -641,7 +641,7 @@ function SugarApi(args) {
                 dataType: 'json',
                 headers: {},
                 timeout: options.timeout || this.timeout,
-                contentType: 'application/json'
+                contentType: 'application/json',
             };
 
             // if we dont have a url from options take arg url
@@ -710,7 +710,7 @@ function SugarApi(args) {
             args = [
                 token,
                 options.skipMetadataHash ? null : this.getMetadataHash(),
-                options.skipMetadataHash ? null : this.getUserprefHash()
+                options.skipMetadataHash ? null : this.getUserprefHash(),
             ];
             // Login request doesn't need auth token
             if (this.isLoginRequest(url)) {
@@ -724,7 +724,7 @@ function SugarApi(args) {
                 }
                 bulkQueue.push({
                     request: request,
-                    args: args
+                    args: args,
                 });
 
                 if (triggerBulkRequest) {
@@ -813,7 +813,7 @@ function SugarApi(args) {
                             request.params.complete.call(request.params, request);
                         }
                     });
-                }
+                },
             });
             _bulkQueues[bulkId] = null;
         },
@@ -1102,7 +1102,7 @@ function SugarApi(args) {
                 method = 'public';
             } else {
                 options.callbacks = options.callbacks || {};
-                options.callbacks.success = _.wrap(options.callbacks.success, function (success, data, status) {
+                options.callbacks.success = _.wrap(options.callbacks.success, function(success, data, status) {
                     if (data) {
                         this._serverInfo = data.server_info;
                     }
@@ -1228,7 +1228,7 @@ function SugarApi(args) {
          */
         favorite: function(module, id, favorite, callbacks, options) {
             var action = favorite ? 'favorite' : 'unfavorite';
-            var url = this.buildURL(module, action, { id: id });
+            var url = this.buildURL(module, action, {id: id});
             return this.call('update', url, null, callbacks, options);
         },
 
@@ -1250,7 +1250,7 @@ function SugarApi(args) {
             options = options || {};
             var method = followed ? 'create' : 'delete',
                 action = followed ? 'subscribe' : 'unsubscribe',
-                url = this.buildURL(module, action, { id: id });
+                url = this.buildURL(module, action, {id: id});
             return this.call(method, url, null, callbacks, options);
         },
 
@@ -1362,11 +1362,11 @@ function SugarApi(args) {
 
                     if (typeof File === 'function') {
                         blob = new File([this.response], fileName, {
-                            type: contentType
+                            type: contentType,
                         });
                     } else {
                         blob = new Blob([this.response], {
-                            type: contentType
+                            type: contentType,
                         });
                     }
 
@@ -1393,7 +1393,7 @@ function SugarApi(args) {
 
                         // perform cleanup of removing the anchor element from the DOM
                         // as well as revoking the ObjectURL to prevent minor memory leak
-                        setTimeout(function () {
+                        setTimeout(function() {
                             URL.revokeObjectURL(downloadUrl);
                         }, 100);
                     }
@@ -1568,9 +1568,9 @@ function SugarApi(args) {
                         self.fileDownload(
                             self.buildURL(response.module_name, 'export', {relatedId: response.id}, params),
                             callbacks,
-                            { iframe: $el }
+                            {iframe: $el}
                         );
-                    }
+                    },
                 }
             );
         },
@@ -1666,7 +1666,7 @@ function SugarApi(args) {
                     client_id: this.clientID,
                     client_secret: '',
                     refresh_token: this.getRefreshToken(),
-                    platform: _platform ? _platform : 'base'
+                    platform: _platform ? _platform : 'base',
                 }, data);
             } else {
                 payload = _.extend({
@@ -1675,19 +1675,19 @@ function SugarApi(args) {
                     password: credentials.password,
                     client_id: this.clientID,
                     platform: _platform ? _platform : 'base',
-                    client_secret: ''
+                    client_secret: '',
                 }, data);
                 payload.client_info = data;
             }
 
             method = 'create';
             url = this.buildURL('oauth2', 'token', payload, {
-                platform: _platform
+                platform: _platform,
             });
             return this.call(method, url, payload, {
                 success: success,
                 error: error,
-                complete: callbacks.complete
+                complete: callbacks.complete,
             });
         },
 
@@ -1721,7 +1721,7 @@ function SugarApi(args) {
         css: function(platform, themeName, callbacks) {
             var params = {
                 platform: platform,
-                themeName: themeName
+                themeName: themeName,
             };
             var url = this.buildURL('css', 'read', {}, params);
             return this.call('read', url, {}, callbacks);
@@ -1735,7 +1735,7 @@ function SugarApi(args) {
          * @memberOf Api
          * @instance
          */
-        logout: function (callbacks, options) {
+        logout: function(callbacks, options) {
 
             callbacks = callbacks || {};
 
@@ -1754,7 +1754,7 @@ function SugarApi(args) {
             var url = this.buildURL('oauth2', 'logout', payload);
 
             var originalComplete = callbacks.complete;
-            callbacks.complete = function () {
+            callbacks.complete = function() {
                 _resetAuth();
                 if (originalComplete) originalComplete();
             };
@@ -1779,12 +1779,12 @@ function SugarApi(args) {
             return this.call(
                 'read',
                 this.buildURL('ping', action, null, {
-                    platform: _platform
+                    platform: _platform,
                 }),
                 null,
                 callbacks,
                 _.extend({
-                    skipMetadataHash: true
+                    skipMetadataHash: true,
                 }, options || {})
             );
         },
@@ -1808,7 +1808,7 @@ function SugarApi(args) {
 
             var method = 'create';
             var url = this.buildURL('Contacts', 'register', payload, {
-                platform: _platform
+                platform: _platform,
             });
             return this.call(method, url, payload, callbacks);
         },
@@ -1834,7 +1834,7 @@ function SugarApi(args) {
          */
         verifyPassword: function(password, callbacks) {
             var payload = {
-                password_to_verify: password
+                password_to_verify: password,
             };
             var method = 'create'; //POST so we don't require query params
             var url = this.buildURL('me/password', method);
@@ -1854,7 +1854,7 @@ function SugarApi(args) {
         updatePassword: function(oldPassword, newPasword, callbacks) {
             var payload = {
                 new_password: newPasword,
-                old_password: oldPassword
+                old_password: oldPassword,
             };
             var method = 'update';
             var url = this.buildURL('me/password', method);
@@ -2125,7 +2125,7 @@ function SugarApi(args) {
          */
         resetState: function() {
             _state = {};
-        }
+        },
     };
 }
 
@@ -2172,7 +2172,7 @@ module.exports = {
 
                 var self = this;
 
-                this.login(null, { refresh: true }, {
+                this.login(null, {refresh: true}, {
                     complete: function() {
                         crosstab.broadcast('auth:refresh:complete', 'complete');
                     },
@@ -2183,7 +2183,7 @@ module.exports = {
                     error: function() {
                         delete self._runningRefreshToken;
                         crosstab.broadcast('auth:refresh:complete', 'error');
-                    }
+                    },
                 });
             }, _instance));
         });
@@ -2203,5 +2203,5 @@ module.exports = {
      *
      * @type {HttpRequest}
      */
-    HttpRequest: HttpRequest
+    HttpRequest: HttpRequest,
 };

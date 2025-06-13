@@ -2698,17 +2698,17 @@ eslint-import-resolver-node@^0.3.9:
     is-core-module "^2.13.0"
     resolve "^1.22.4"
 
-eslint-module-utils@^2.9.0:
+eslint-module-utils@^2.12.0:
   version "2.12.0"
   resolved "https://registry.yarnpkg.com/eslint-module-utils/-/eslint-module-utils-2.12.0.tgz#fe4cfb948d61f49203d7b08871982b65b9af0b0b"
   integrity sha512-wALZ0HFoytlyh/1+4wuZ9FJCD/leWHQzzrxJ8+rebyReSLk7LApMyd3WJaLVoN+D5+WIdJyDK1c6JnE65V4Zyg==
   dependencies:
     debug "^3.2.7"
 
-eslint-plugin-import@^2.29.1:
-  version "2.30.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.30.0.tgz#21ceea0fc462657195989dd780e50c92fe95f449"
-  integrity sha512-/mHNE9jINJfiD2EKkg1BKyPyUk4zdnT54YgbOgfjSakWT5oyX/qQLVNTkehyfpcMxZXMy1zyonZ2v7hZTX43Yw==
+eslint-plugin-import@2.31.0:
+  version "2.31.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.31.0.tgz#310ce7e720ca1d9c0bb3f69adfd1c6bdd7d9e0e7"
+  integrity sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==
   dependencies:
     "@rtsao/scc" "^1.1.0"
     array-includes "^3.1.8"
@@ -2718,7 +2718,7 @@ eslint-plugin-import@^2.29.1:
     debug "^3.2.7"
     doctrine "^2.1.0"
     eslint-import-resolver-node "^0.3.9"
-    eslint-module-utils "^2.9.0"
+    eslint-module-utils "^2.12.0"
     hasown "^2.0.2"
     is-core-module "^2.15.1"
     is-glob "^4.0.3"
@@ -2727,6 +2727,7 @@ eslint-plugin-import@^2.29.1:
     object.groupby "^1.0.3"
     object.values "^1.2.0"
     semver "^6.3.1"
+    string.prototype.trimend "^1.0.8"
     tsconfig-paths "^3.15.0"
 
 eslint-restricted-globals@^0.1.1:
@@ -4038,10 +4039,10 @@ jest-worker@^27.4.5:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jquery-migrate@3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-3.4.1.tgz#6a7114626b80e0d9e1cb77f170623efd85c5fc9c"
-  integrity sha512-6RaV23lLAYccu8MtLfy2sIxOvx+bulnWHm/pvffAi7KOzPk1sN9IYglpkl1ZNCj1FSgSNDPS2fSZ1hWsXc200Q==
+jquery-migrate@3.5.2:
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-3.5.2.tgz#c9631702e1a5c93c5e7a0bbba54b82883c4ac47d"
+  integrity sha512-GGvcVWK3aei2/98r7pA4UkOYvs4xVeCGvquNXADFUp9+Sr6VeOw0ktlQ9z4YlBbEFpsXBlRioAgpH/fLWinj4Q==
 
 jquery@^3.7.1:
   version "3.7.1"
