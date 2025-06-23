@@ -28,7 +28,7 @@ module.exports = [
         },
       ],
       'import/prefer-default-export': 'off',
-      'no-console': 'warn',
+      'no-console': 'off',
       'semi': ['error', 'always'],
       'indent': [
         'error',
@@ -41,6 +41,7 @@ module.exports = [
         'error',
         {
           'args': 'none',
+          'caughtErrors': 'none',
         },
       ],
       'comma-dangle': [
