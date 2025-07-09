@@ -460,7 +460,16 @@ function SugarApi(args) {
                     error: onError,
                 };
 
+                // prevents concurrent events from multiple tabs asking for a
+                // refresh token
                 if (!('crosstab' in window) || !crosstab.supported) {
+                    console.log('------_handleErrorAndRefreshToken-------');
+                    //console.log(localStorage.getItem('authInprogress'));
+                    console.log('----------' + Date.now() + '----------');
+                    // if (localStorage.getItem('authInprogress') === '1') {
+                    //     return;
+                    // }
+                    //localStorage.setItem('authInprogress', 1);
                     self.login(null, {refresh: true}, {
                         complete: refreshCallbacks.complete,
                         success: refreshCallbacks.success,
@@ -474,12 +483,21 @@ function SugarApi(args) {
                         var status = event.data;
                         switch (status) {
                             case 'success':
+                                console.log('------_handleErrorAndRefreshToken-success------');
+                                console.log('----------' + Date.now() + '----------');
+                                //localStorage.setItem('authInprogress', 0);
                                 refreshCallbacks.success();
                                 break;
                             case 'error':
+                                console.log('------_handleErrorAndRefreshToken-error------');
+                                console.log('----------' + Date.now() + '----------');
+                                //localStorage.setItem('authInprogress', 0);
                                 refreshCallbacks.error();
                                 break;
                             case 'complete':
+                                console.log('------_handleErrorAndRefreshToken-complete------');
+                                console.log('----------' + Date.now() + '----------');
+                                //localStorage.setItem('authInprogress', 0);
                                 refreshCallbacks.complete();
                                 crosstab.off('auth:refresh:complete');
                                 break;
@@ -2153,6 +2171,7 @@ module.exports = {
      */
     createInstance: function(args) {
         _instance = new SugarApi(args);
+        //localStorage.setItem('authInprogress', 0);
 
         if (!('crosstab' in window) || !crosstab.supported) {
             return _instance;
@@ -2165,6 +2184,9 @@ module.exports = {
 
                 // prevents concurrent events from multiple tabs asking for a
                 // refresh token
+                console.log('------createInstance-------');
+                console.log(this._runningRefreshToken);
+                console.log('----------' + Date.now() + '----------');
                 if (this._runningRefreshToken) {
                     return;
                 }
