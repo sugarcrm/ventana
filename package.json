@@ -51,7 +51,7 @@
     "sinon": "20.0.0",
     "taffydb": "2.7.3",
     "underscore": "^1.13.0",
-    "webpack": "5.92.0"
+    "webpack": "5.99.7"
   },
   "peerDependencies": {
     "jquery": "3.6.0",
