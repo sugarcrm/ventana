@@ -424,8 +424,15 @@ function SugarApi(args) {
                     self.resetAuth();
                     return;
                 }
-                _rqueue.push(request);
 
+                // Atomic check-and-set to prevent race conditions
+                if (_refreshingToken) {
+                    // Another request already started refresh, just queue this one
+                    _rqueue.push(request);
+                    return;
+                }
+
+                _rqueue.push(request);
                 self.setRefreshingToken(true);
 
                 var refreshCallbacks = {
@@ -486,7 +493,10 @@ function SugarApi(args) {
                         }
                     });
 
-                    crosstab.broadcastMaster('auth:refresh');
+                    // Only broadcast if we're not already refreshing, otherwise the request is already queued above
+                    if (!_refreshingToken) {
+                        crosstab.broadcastMaster('auth:refresh');
+                    }
                 });
 
             } else if (self.needQueue(request.params.url)) {
@@ -2165,7 +2175,7 @@ module.exports = {
 
                 // prevents concurrent events from multiple tabs asking for a
                 // refresh token
-                if (this._runningRefreshToken) {
+                if (this._runningRefreshToken || _refreshingToken) {
                     return;
                 }
                 this._runningRefreshToken = true;
