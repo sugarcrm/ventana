@@ -996,6 +996,23 @@ function SugarApi(args) {
         },
 
         /**
+         * Get token from key/value storage if _keyValueStore is defined.
+         * Otherwise it returns local token
+         *
+         * @param tokenStorageKey
+         * @param localToken
+         * @returns {null|string}
+         * @private
+         */
+        _getToken: function (tokenStorageKey, localToken) {
+            if (_keyValueStore) {
+                localToken = _keyValueStore.get(tokenStorageKey);
+            }
+
+            return localToken;
+        },
+
+        /**
          * Returns the current access token.
          *
          * @return {string} The current access token.
@@ -1003,7 +1020,9 @@ function SugarApi(args) {
          * @instance
          */
         getOAuthToken: function() {
-            return _keyValueStore ? _keyValueStore.get('AuthAccessToken') || _accessToken : _accessToken;
+            _accessToken = this._getToken('AuthAccessToken', _accessToken);
+
+            return _accessToken;
         },
 
         /**
@@ -1014,7 +1033,9 @@ function SugarApi(args) {
          * @instance
          */
         getRefreshToken: function() {
-            return _keyValueStore ? _keyValueStore.get('AuthRefreshToken') || _refreshToken : _refreshToken;
+            _refreshToken = this._getToken('AuthRefreshToken', _refreshToken);
+
+            return _refreshToken;
         },
 
         /**
