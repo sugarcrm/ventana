@@ -1257,7 +1257,11 @@ describe('Api client', function() {
         it('should login users with correct credentials', function() {
 
             let spy = this.sandbox.spy(this.callbacks, 'success');
-            let setStub = this.sandbox.stub(this.storage, 'set');
+            let stored = {};
+            let setStub = this.sandbox.stub(this.storage, 'set').callsFake((key, value) => {
+                stored[key] = value;
+            });
+            this.sandbox.stub(this.storage, 'get').callsFake((key) => stored[key]);
             let requestBody;
             let extraInfo = {
                 'uuid': 'xyz',
@@ -1690,6 +1694,842 @@ describe('Api client', function() {
                 });
             });
         });
+    });
+
+    describe('Token refresh during QRR (SUS-1163)', function() {
+        let json = {'Content-Type': 'application/json'};
+        let invalidGrant = JSON.stringify({error: 'invalid_grant', error_description: 'expired'});
+        let qrrBody = JSON.stringify({error: 'qrr_in_progress', error_message: 'maintenance'});
+        let tokenUrl = '/rest/v10/oauth2/token?platform=';
+
+        let headers = function(extra) {
+            return _.extend({}, json, extra || {});
+        };
+
+        let tokenRequests = function(xhr) {
+            return _.filter(xhr.requests, function(r) {
+                return r.url === tokenUrl;
+            });
+        };
+
+        let fakeCrosstab = function(deliverToMaster, deferReady) {
+            let handlers = {};
+            let ready = [];
+            let ct = function(cb) {
+                if (deferReady) {
+                    ready.push(cb);
+                } else {
+                    cb();
+                }
+            };
+            ct.becomeReady = function() {
+                _.each(ready.splice(0), function(cb) {
+                    cb();
+                });
+            };
+            ct.count = function(e) {
+                return (handlers[e] || []).length;
+            };
+            ct.supported = true;
+            ct.sent = [];
+            ct.masterSent = [];
+            ct.on = function(e, h) {
+                (handlers[e] = handlers[e] || []).push(h);
+            };
+            ct.off = function(e, h) {
+                if (arguments.length < 2) {
+                    delete handlers[e];
+                    return;
+                }
+                handlers[e] = _.without(handlers[e] || [], h);
+            };
+            ct.broadcast = function(e, d) {
+                ct.sent.push([e, d]);
+                _.each((handlers[e] || []).slice(), function(h) {
+                    h({data: d});
+                });
+            };
+            ct.emit = function(e, d) {
+                _.each((handlers[e] || []).slice(), function(h) {
+                    h({data: d});
+                });
+            };
+            // A new master was promoted (the old one closed).
+            ct.promote = function() {
+                ct.emit('tabPromoted', 'tab2');
+            };
+            ct.broadcastMaster = function(e, d) {
+                ct.masterSent.push([e, d]);
+                if (deliverToMaster) {
+                    _.each((handlers[e] || []).slice(), function(h) {
+                        h({data: d});
+                    });
+                }
+            };
+            return ct;
+        };
+
+        beforeEach(function() {
+            this.clock = sinon.useFakeTimers();
+            sinon.stub(Math, 'random').returns(0);
+            this.sandbox.stub(this.storage, 'get')
+                .withArgs('AuthAccessToken').returns('xyz')
+                .withArgs('AuthRefreshToken').returns('qwe');
+            this.cutSpy = this.sandbox.spy(this.storage, 'cut');
+            this.sandbox.stub(this.storage, 'set');
+            this.xhr = nise.fakeServer.create();
+            this.cb = {success: sinon.spy(), error: sinon.spy(), complete: sinon.spy()};
+            this.hadCrosstab = 'crosstab' in window;
+            this.originalCrosstab = window.crosstab;
+        });
+
+        afterEach(function() {
+            this.xhr.restore();
+            this.clock.restore();
+            if (this.hadCrosstab) {
+                window.crosstab = this.originalCrosstab;
+            } else {
+                delete window.crosstab;
+            }
+        });
+
+        it('R1: keeps the queue through a 503 qrr_in_progress refresh and replays it once', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+
+            expect(this.xhr.requests[1].url).toBe(tokenUrl);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '10'}), qrrBody);
+
+            sinon.assert.notCalled(this.cutSpy);
+            sinon.assert.notCalled(this.cb.error);
+            sinon.assert.notCalled(this.cb.complete);
+
+            this.clock.tick(9999);
+            expect(this.xhr.requests.length).toBe(2);
+            this.clock.tick(1);
+            expect(this.xhr.requests[2].url).toBe(tokenUrl);
+            this.xhr.requests[2].respond(200, json,
+                JSON.stringify(this.fixtures['/rest/v10/oauth2/token'].POST.response));
+
+            expect(this.xhr.requests[3].url).toBe('/rest/v10/Accounts');
+            this.xhr.requests[3].respond(200, json, JSON.stringify(this.fixtures['/rest/v10/Accounts'].GET.response));
+
+            expect(this.xhr.requests.length).toBe(4);
+            sinon.assert.calledOnce(this.cb.success);
+            sinon.assert.calledOnce(this.cb.complete);
+            sinon.assert.notCalled(this.cb.error);
+            sinon.assert.notCalled(this.cutSpy);
+        });
+
+        it('R1b: queues requests that 401 while the refresh is waiting to retry', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '10'}), qrrBody);
+
+            this.api.records('read', 'Bugs', null, null, this.cb);
+            this.xhr.requests[2].respond(401, json, invalidGrant);
+            expect(tokenRequests(this.xhr).length).toBe(1);
+
+            this.clock.tick(10000);
+            expect(tokenRequests(this.xhr).length).toBe(2);
+        });
+
+        it('R2: login(refresh) keeps the tokens on a 503 qrr_in_progress and retries', function() {
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(503, json, qrrBody);
+
+            sinon.assert.notCalled(this.cutSpy);
+            sinon.assert.notCalled(this.cb.error);
+            this.clock.tick(5000);
+            expect(this.xhr.requests.length).toBe(2);
+        });
+
+        it('R3: login(refresh) clears the tokens on invalid_grant and does not retry', function() {
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(400, headers({'Retry-After': '1'}), invalidGrant);
+
+            sinon.assert.called(this.cutSpy);
+            sinon.assert.calledOnce(this.cb.error);
+            this.clock.tick(60000);
+            expect(this.xhr.requests.length).toBe(1);
+        });
+
+        it('R4: retries a 429 carrying Retry-After', function() {
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(429, headers({'Retry-After': '2'}), JSON.stringify({error: 'too_many'}));
+
+            sinon.assert.notCalled(this.cb.error);
+            this.clock.tick(2000);
+            expect(this.xhr.requests.length).toBe(2);
+        });
+
+        it('R5: a 500 without a hint keeps the tokens and fails the queue once', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(500, json, JSON.stringify({error: 'fatal_error'}));
+
+            sinon.assert.notCalled(this.cutSpy);
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledWith(this.cb.error, sinon.match({status: 500}));
+            sinon.assert.calledOnce(this.cb.complete);
+            this.clock.tick(60000);
+            expect(this.xhr.requests.length).toBe(2);
+        });
+
+        it('R6: gives up after the 300 s budget and delivers the 503 once', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+
+            for (let i = 0; i < 20; i++) {
+                let pending = _.find(tokenRequests(this.xhr), function(r) {
+                    return r.readyState !== 4;
+                });
+                if (!pending) {
+                    break;
+                }
+                pending.respond(503, headers({'Retry-After': '60'}), qrrBody);
+                this.clock.tick(60000);
+            }
+
+            // attempts at 0, 60, 120, 180, 240 and 300 s; a 7th would end past the budget
+            expect(tokenRequests(this.xhr).length).toBe(6);
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledWith(this.cb.error, sinon.match({status: 503, code: 'qrr_in_progress'}));
+            sinon.assert.calledOnce(this.cb.complete);
+            sinon.assert.notCalled(this.cb.success);
+            sinon.assert.notCalled(this.cutSpy);
+        });
+
+        it('R7: clamps Retry-After to 60 s', function() {
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(503, headers({'Retry-After': '3600'}), qrrBody);
+
+            this.clock.tick(59999);
+            expect(this.xhr.requests.length).toBe(1);
+            this.clock.tick(1);
+            expect(this.xhr.requests.length).toBe(2);
+        });
+
+        it('R11: a failed password login clears the stored tokens even on a 503', function() {
+            this.api.login({username: 'u', password: 'p'}, null, this.cb);
+            this.xhr.requests[0].respond(503, json, qrrBody);
+
+            sinon.assert.called(this.cutSpy);
+            sinon.assert.calledOnce(this.cb.error);
+        });
+
+        it('R12: a refresh refused with 403 clears the tokens and does not retry', function() {
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(403, json, JSON.stringify({error: 'not_authorized'}));
+
+            sinon.assert.called(this.cutSpy);
+            sinon.assert.calledOnce(this.cb.error);
+            this.clock.tick(60000);
+            expect(this.xhr.requests.length).toBe(1);
+        });
+
+        it('R13: logout cancels a pending refresh retry, revokes the tokens and completes', function() {
+            let logoutDone = sinon.spy();
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '10'}), qrrBody);
+
+            this.api.logout({complete: logoutDone});
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledWith(this.cb.error, sinon.match({status: 0, textStatus: 'abort'}));
+            sinon.assert.notCalled(this.cutSpy);
+            expect(JSON.parse(_.last(this.xhr.requests).requestBody).refresh_token).toBe('qwe');
+            sinon.assert.calledOnce(this.cb.complete);
+
+            let logoutRequest = _.last(this.xhr.requests);
+            expect(logoutRequest.url).toContain('/oauth2/logout');
+            logoutRequest.respond(200, json, '{}');
+            sinon.assert.calledOnce(logoutDone);
+
+            this.clock.tick(60000);
+            expect(tokenRequests(this.xhr).length).toBe(1);
+        });
+
+        it('R14: a retry whose stored refresh token changed ends as a cancel, sending nothing', function() {
+            let stored = 'qwe';
+            this.storage.get.withArgs('AuthRefreshToken').callsFake(function() {
+                return stored;
+            });
+            let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: this.storage});
+            api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(503, headers({'Retry-After': '1'}), qrrBody);
+
+            // A rotation and another user's sign-in look the same: the
+            // queue may no longer be this session's.
+            stored = 'rotated';
+            this.clock.tick(1000);
+            expect(this.xhr.requests.length).toBe(1);
+            sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+        });
+
+        it('R15: a logout while a retry is in flight aborts it; no tokens are written', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '1'}), qrrBody);
+            this.clock.tick(1000);
+            let inFlight = tokenRequests(this.xhr)[1];
+
+            this.api.logout({});
+            sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+            sinon.assert.calledOnce(this.cb.complete);
+
+            // aborted, so it can never deliver tokens
+            expect(inFlight.aborted).toBe(true);
+            sinon.assert.neverCalledWith(this.storage.set, 'AuthAccessToken', '55000555');
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledOnce(this.cb.complete);
+            sinon.assert.notCalled(this.cb.success);
+        });
+
+        it('R16: another auth request failing during the wait keeps requests queued', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '10'}), qrrBody);
+
+            this.api.call('create', '/rest/v10/oauth2/sudo/admin', {}, {});
+            _.last(this.xhr.requests).respond(500, json, JSON.stringify({error: 'fatal_error'}));
+
+            this.api.records('read', 'Bugs', null, null, this.cb);
+            _.last(this.xhr.requests).respond(401, json, invalidGrant);
+            expect(tokenRequests(this.xhr).length).toBe(1);
+        });
+
+        it('R20: a retry that finds no stored token ends the refresh; later requests go out', function() {
+            let stored = 'qwe';
+            this.storage.get.withArgs('AuthRefreshToken').callsFake(function() {
+                return stored;
+            });
+            let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: this.storage});
+            api.setRefreshTokenSuccessCallback(function(c) {
+                c();
+            });
+            api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '1'}), qrrBody);
+
+            stored = null;
+            this.clock.tick(1000);
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledWith(this.cb.error, sinon.match({status: 401, code: 'invalid_grant'}));
+            sinon.assert.calledOnce(this.cb.complete);
+
+            let count = this.xhr.requests.length;
+            api.records('read', 'Bugs', null, null, {});
+            expect(this.xhr.requests.length).toBe(count + 1);
+
+            api.resetAuth();
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledOnce(this.cb.complete);
+        });
+
+        it('R21: a refresh refused with 403 reports the original 401 to queued requests', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(403, json, JSON.stringify({error: 'not_authorized'}));
+
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledWith(this.cb.error, sinon.match({status: 401, code: 'invalid_grant'}));
+        });
+
+        it('R22: cancelling a retry aborts the attempt in flight', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '1'}), qrrBody);
+            this.clock.tick(1000);
+            let inFlight = tokenRequests(this.xhr)[1];
+
+            this.api.resetAuth();
+            expect(inFlight.aborted).toBe(true);
+            sinon.assert.calledOnce(this.cb.error);
+            sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+        });
+
+        it('R23: a retry of an explicit refresh_token gives up once storage is cleared', function() {
+            let stored = 'qwe';
+            this.storage.get.withArgs('AuthRefreshToken').callsFake(function() {
+                return stored;
+            });
+            let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: this.storage});
+            api.login(null, {refresh: true, refresh_token: 'explicit'}, this.cb);
+            this.xhr.requests[0].respond(503, headers({'Retry-After': '1'}), qrrBody);
+
+            stored = null;
+            this.clock.tick(1000);
+            expect(this.xhr.requests.length).toBe(1);
+            sinon.assert.calledOnce(this.cb.error);
+        });
+
+        it('R24: queued requests get the refresh failure on their own request', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(500, json, JSON.stringify({error: 'fatal_error'}));
+
+            let reported = this.cb.error.getCall(0).args[0];
+            expect(reported.status).toBe(500);
+            expect(reported.code).toBe('fatal_error');
+            expect(reported instanceof Api.HttpError).toBe(true);
+            expect(reported.request.params.url).toBe('/rest/v10/Accounts');
+            expect(reported.request.xhr.status).toBe(500);
+        });
+
+        it('R25: a malformed Retry-After is no hint', function() {
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(503, headers({'Retry-After': '1.5'}), JSON.stringify({error: 'maintenance'}));
+
+            sinon.assert.calledOnce(this.cb.error);
+            this.clock.tick(60000);
+            expect(this.xhr.requests.length).toBe(1);
+        });
+
+        it('R28: jitter still spreads retries at the 60 s cap', function() {
+            Math.random.returns(1);
+            let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: this.storage});
+            api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(503, headers({'Retry-After': '120'}), qrrBody);
+
+            this.clock.tick(45000);
+            expect(this.xhr.requests.length).toBe(2);
+        });
+
+        it('R30: a request finishing during the wait still gets its complete callback', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '10'}), qrrBody);
+
+            let other = {complete: sinon.spy()};
+            this.api.call('read', '/rest/v10/ping', null, other);
+            _.last(this.xhr.requests).respond(200, json, '"pong"');
+            sinon.assert.calledOnce(other.complete);
+        });
+
+        it('R31: Retry-After equal to the cap is not retried early', function() {
+            Math.random.returns(1);
+            this.api.login(null, {refresh: true}, this.cb);
+            this.xhr.requests[0].respond(503, headers({'Retry-After': '60'}), qrrBody);
+
+            this.clock.tick(59999);
+            expect(this.xhr.requests.length).toBe(1);
+            this.clock.tick(1);
+            expect(this.xhr.requests.length).toBe(2);
+        });
+
+        it('R32: a refresh attempt aborted from outside ends the refresh', function() {
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.xhr.requests[1].respond(503, headers({'Retry-After': '1'}), qrrBody);
+            this.clock.tick(1000);
+
+            let api = this.api;
+            let uid = _.find(_.range(0, 200), function(id) {
+                let r = api.getRequest(id);
+                return r && /oauth2\/token/.test(r.params.url);
+            });
+            expect(uid).toBeDefined();
+            api.abortRequest(uid);
+
+            expect(this.api.needQueue('/rest/v10/Bugs')).toBe(false);
+            sinon.assert.calledOnce(this.cb.complete);
+            sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+        });
+
+        describe('cross-tab master outcomes', function() {
+            beforeEach(function() {
+                window.crosstab = fakeCrosstab(true);
+                this.ctApi = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: this.storage});
+                this.ctApi.setRefreshTokenSuccessCallback(function(c) {
+                    c();
+                });
+                this.ctApi.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+            });
+
+            it('R17: the master retries a 429 carrying Retry-After; followers keep waiting', function() {
+                tokenRequests(this.xhr)[0].respond(429, headers({'Retry-After': '2'}), JSON.stringify({error: 'x'}));
+                sinon.assert.notCalled(this.cb.error);
+                this.clock.tick(2000);
+                expect(tokenRequests(this.xhr).length).toBe(2);
+            });
+
+            it('R18: past the budget the master fails its queue once as 9c8fcd8 (F1), keeping tokens', function() {
+                for (let i = 0; i < 20; i++) {
+                    let pending = _.find(tokenRequests(this.xhr), function(r) {
+                        return r.readyState !== 4;
+                    });
+                    if (!pending) {
+                        break;
+                    }
+                    pending.respond(503, headers({'Retry-After': '60'}), qrrBody);
+                    this.clock.tick(60000);
+                }
+                expect(tokenRequests(this.xhr).length).toBe(6);
+                sinon.assert.calledOnce(this.cb.error);
+                // The legacy `error` carries no outcome: the queue gets its 401.
+                sinon.assert.calledWith(this.cb.error, sinon.match({status: 401}));
+                expect(_.pluck(_.filter(window.crosstab.sent, function(m) {
+                    return m[0] === 'auth:refresh:complete';
+                }), 1)).toEqual(['error', 'complete']);
+                sinon.assert.calledOnce(this.cb.complete);
+                sinon.assert.notCalled(this.cutSpy);
+            });
+
+            it('R19: the master getting invalid_grant signs followers out without retry', function() {
+                tokenRequests(this.xhr)[0].respond(400, json, invalidGrant);
+                sinon.assert.called(this.cutSpy);
+                sinon.assert.calledOnce(this.cb.error);
+                sinon.assert.calledWith(this.cb.error, sinon.match({code: 'invalid_grant'}));
+                this.clock.tick(60000);
+                expect(tokenRequests(this.xhr).length).toBe(1);
+            });
+
+            it('R36: signing in again in the master ends the refresh with the legacy error, complete', function() {
+                tokenRequests(this.xhr)[0].respond(503, headers({'Retry-After': '10'}), qrrBody);
+                this.ctApi.login({username: 'u', password: 'p'}, null, {});
+                let legacy = _.filter(window.crosstab.sent, function(m) {
+                    return m[0] === 'auth:refresh:complete';
+                });
+                expect(_.pluck(legacy, 1)).toEqual(['error', 'complete']);
+                sinon.assert.calledOnce(this.cb.error);
+                sinon.assert.calledOnce(this.cb.complete);
+                // The refresh is not retried after the sign-in.
+                let sent = tokenRequests(this.xhr).length;
+                this.clock.tick(20000);
+                expect(tokenRequests(this.xhr).length).toBe(sent);
+            });
+        });
+
+        describe('cross-tab unchanged from 9c8fcd8', function() {
+            let tokens = JSON.stringify({access_token: 'a2', refresh_token: 'r2', download_token: 'd2'});
+            let legacySent = function(ct) {
+                return _.pluck(_.filter(ct.sent, function(m) {
+                    return m[0] === 'auth:refresh:complete';
+                }), 1);
+            };
+            let otherSent = function(ct) {
+                return _.filter(ct.sent, function(m) {
+                    return m[0] !== 'auth:refresh:complete';
+                });
+            };
+            let master = function(test) {
+                window.crosstab = fakeCrosstab(true);
+                let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: test.storage});
+                window.crosstab.emit('auth:refresh');
+                return api;
+            };
+            let follower = function(test) {
+                window.crosstab = fakeCrosstab(false);
+                let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: test.storage});
+                api.setRefreshTokenSuccessCallback(function(c) {
+                    c();
+                });
+                api.records('read', 'Accounts', null, null, test.cb);
+                test.xhr.requests[0].respond(401, json, invalidGrant);
+                return api;
+            };
+
+            it('P1: the master broadcasts success, complete and nothing else on a refresh', function() {
+                master(this);
+                tokenRequests(this.xhr)[0].respond(200, json, tokens);
+                expect(legacySent(window.crosstab)).toEqual(['success', 'complete']);
+                expect(otherSent(window.crosstab)).toEqual([]);
+            });
+
+            it('P2: the master broadcasts error, complete on invalid_grant', function() {
+                master(this);
+                tokenRequests(this.xhr)[0].respond(400, json, invalidGrant);
+                expect(legacySent(window.crosstab)).toEqual(['error', 'complete']);
+                expect(otherSent(window.crosstab)).toEqual([]);
+            });
+
+            it('P3: a follower asks with a bare auth:refresh and adds only the legacy listener', function() {
+                follower(this);
+                expect(window.crosstab.masterSent).toEqual([['auth:refresh', undefined]]);
+                expect(window.crosstab.count('auth:refresh:complete')).toBe(1);
+                expect(window.crosstab.count('auth:refresh:result')).toBe(0);
+                expect(window.crosstab.count('tabPromoted')).toBe(0);
+            });
+
+            it('P4: a follower replays its queue on legacy success, complete', function() {
+                follower(this);
+                window.crosstab.emit('auth:refresh:complete', 'success');
+                window.crosstab.emit('auth:refresh:complete', 'complete');
+                let replay = _.last(this.xhr.requests);
+                expect(replay.url).toBe('/rest/v10/Accounts');
+                replay.respond(200, json, '{}');
+                sinon.assert.calledOnce(this.cb.success);
+                sinon.assert.calledOnce(this.cb.complete);
+                expect(window.crosstab.count('auth:refresh:complete')).toBe(0);
+            });
+
+            it('P5: a follower fails its queue with its 401 on legacy error, complete (F1)', function() {
+                follower(this);
+                window.crosstab.emit('auth:refresh:complete', 'error');
+                window.crosstab.emit('auth:refresh:complete', 'complete');
+                sinon.assert.calledOnce(this.cb.error);
+                sinon.assert.calledWith(this.cb.error, sinon.match({status: 401}));
+                sinon.assert.calledOnce(this.cb.complete);
+                expect(window.crosstab.count('auth:refresh:complete')).toBe(0);
+            });
+
+            it('P6: a refused master refresh past the budget leaves the follower not stuck', function() {
+                let api = follower(this);
+                // The master retried for its whole budget, then gave up.
+                this.clock.tick(400000);
+                window.crosstab.emit('auth:refresh:complete', 'error');
+                window.crosstab.emit('auth:refresh:complete', 'complete');
+                sinon.assert.calledOnce(this.cb.error);
+                sinon.assert.calledOnce(this.cb.complete);
+                // Not stuck: the next 401 asks the master again.
+                api.records('read', 'Bugs', null, null, {});
+                _.last(this.xhr.requests).respond(401, json, invalidGrant);
+                expect(window.crosstab.masterSent.length).toBe(2);
+            });
+        });
+
+        describe('single-tab session binding', function() {
+            let tokens = JSON.stringify({access_token: 'a2', refresh_token: 'r2', download_token: 'd2'});
+            let replaysOf = function(xhr, url) {
+                return _.filter(xhr.requests, function(r) {
+                    return r.url === url;
+                });
+            };
+
+            it('CC1b: a dropped deferred replay settles each request once, even after a newer refresh drained it',
+                function() {
+                    let replays = [];
+                    this.api.setRefreshTokenSuccessCallback(function(c) {
+                        replays.push(c);
+                    });
+                    this.api.records('read', 'Accounts', null, null, this.cb);
+                    this.xhr.requests[0].respond(401, json, invalidGrant);
+                    tokenRequests(this.xhr)[0].respond(200, json, tokens);
+                    let bugs = {success: sinon.spy(), error: sinon.spy(), complete: sinon.spy()};
+                    this.api.records('read', 'Bugs', null, null, bugs);
+                    _.last(this.xhr.requests).respond(401, json, invalidGrant);
+                    _.last(tokenRequests(this.xhr)).respond(200, json, tokens);
+                    // The newer refresh replays first and drains the queue.
+                    replays[1]();
+                    _.each(replaysOf(this.xhr, '/rest/v10/Accounts').concat(replaysOf(this.xhr, '/rest/v10/Bugs')),
+                        function(r) {
+                            if (r.readyState !== 4) {
+                                r.respond(200, json, '{}');
+                            }
+                        });
+                    // A sign-in happens; the older replay callback runs late.
+                    this.storage.get.withArgs('AuthAccessToken').returns('b-token');
+                    replays[0]();
+                    sinon.assert.notCalled(this.cb.error);
+                    sinon.assert.calledOnce(this.cb.complete);
+                    sinon.assert.notCalled(bugs.error);
+                    sinon.assert.calledOnce(bugs.complete);
+                });
+
+            it('EL1: a refresh diverted to external login keeps the queue until the popup posts tokens', function() {
+                delete window.crosstab;
+                // Earlier external-login tests leave their popup listeners.
+                $(window).off('message');
+                this.api.setExternalLogin(true);
+                this.api.setRefreshTokenSuccessCallback(function(c) {
+                    c();
+                });
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(401, json,
+                    JSON.stringify({error: 'need_login', url: 'http://idp', platform: ''}));
+                sinon.assert.notCalled(this.cb.complete);
+                $(window).trigger($.Event('message', {originalEvent: {
+                    origin: window.location.origin,
+                    data: JSON.stringify({external_login: true, access_token: 'a2', refresh_token: 'r2'}),
+                }}));
+                let replays = replaysOf(this.xhr, '/rest/v10/Accounts');
+                expect(replays.length).toBe(2);
+                replays[1].respond(200, json, '{}');
+                sinon.assert.calledOnce(this.cb.success);
+                sinon.assert.calledOnce(this.cb.complete);
+            });
+
+            it('T9s: a refresh success is not written when the stored refresh token changed mid-attempt', function() {
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                this.storage.get.withArgs('AuthRefreshToken').returns('user-b');
+                tokenRequests(this.xhr)[0].respond(200, json, tokens);
+                sinon.assert.neverCalledWith(this.storage.set, 'AuthAccessToken', 'a2');
+                sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+                expect(replaysOf(this.xhr, '/rest/v10/Accounts').length).toBe(1);
+            });
+
+            it('R40s: a queued request gets the refusal on its own request, with xhr, headers and message', function() {
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(500, headers({'Retry-After': '7'}),
+                    JSON.stringify({error: 'fatal_error', error_message: 'boom'}));
+                let err = this.cb.error.getCall(0).args[0];
+                expect(err.status).toBe(500);
+                expect(err.code).toBe('fatal_error');
+                expect(err.message).toBe('boom');
+                expect(err.request.params.url).toBe('/rest/v10/Accounts');
+                expect(err.request.xhr.getResponseHeader('Retry-After')).toBe('7');
+                sinon.assert.notCalled(this.cutSpy);
+            });
+
+            it('DD1: login({refresh}) with the same token joins the refresh in flight', function() {
+                let first = {success: sinon.spy()};
+                let second = {success: sinon.spy()};
+                this.api.login(null, {refresh: true}, first);
+                this.api.login(null, {refresh: true}, second);
+                expect(tokenRequests(this.xhr).length).toBe(1);
+                tokenRequests(this.xhr)[0].respond(200, json, tokens);
+                sinon.assert.calledOnce(first.success);
+                sinon.assert.calledOnce(second.success);
+            });
+            it('S1: a user switch between retry attempts cancels instead of refreshing as the new user', function() {
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(503, headers({'Retry-After': '10'}), qrrBody);
+                this.storage.get.withArgs('AuthRefreshToken').returns('user-b');
+                this.clock.tick(20000);
+                expect(tokenRequests(this.xhr).length).toBe(1);
+                sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+            });
+
+            it('S2: a refresh superseding one from another session does not inherit its queue', function() {
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                this.storage.get.withArgs('AuthRefreshToken').returns('user-b');
+                this.api.login(null, {refresh: true}, {});
+                sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+                _.last(tokenRequests(this.xhr)).respond(200, json, tokens);
+                let replays = _.filter(this.xhr.requests, function(r) {
+                    return r.url === '/rest/v10/Accounts';
+                });
+                expect(replays.length).toBe(1);
+            });
+
+
+            it('S4: a user switch before an async replay callback runs drops the queue', function() {
+                let replay;
+                this.api.setRefreshTokenSuccessCallback(function(c) {
+                    replay = c;
+                });
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(200, json, tokens);
+                this.storage.get.withArgs('AuthAccessToken').returns('b-token');
+                replay();
+                let replays = _.filter(this.xhr.requests, function(r) {
+                    return r.url === '/rest/v10/Accounts' && r.requestHeaders['OAuth-Token'] === 'b-token';
+                });
+                expect(replays.length).toBe(0);
+                sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+                sinon.assert.calledOnce(this.cb.complete);
+
+                // The dropped queue is gone: a later refresh replays none of it.
+                let before = this.xhr.requests.length;
+                this.api.records('read', 'Bugs', null, null, {});
+                _.last(this.xhr.requests).respond(401, json, invalidGrant);
+                _.last(tokenRequests(this.xhr)).respond(200, json, tokens);
+                replay();
+                let accounts = _.filter(this.xhr.requests.slice(before), function(r) {
+                    return r.url === '/rest/v10/Accounts';
+                });
+                expect(accounts.length).toBe(0);
+            });
+
+
+            it('Y1: a plain refresh does not join a refresh sent with another session\'s token', function() {
+                delete window.crosstab;
+                let admin = {success: sinon.spy(), error: sinon.spy(), complete: sinon.spy()};
+                this.api.login(null, {refresh: true, refresh_token: 'admin'}, admin);
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                replaysOf(this.xhr, '/rest/v10/Accounts')[0].respond(401, json, invalidGrant);
+                expect(tokenRequests(this.xhr).length).toBe(1);
+                expect(tokenRequests(this.xhr)[0].aborted).toBeFalsy();
+                sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+                tokenRequests(this.xhr)[0].respond(200, json, tokens);
+                sinon.assert.calledOnce(admin.success);
+                expect(replaysOf(this.xhr, '/rest/v10/Accounts').length).toBe(1);
+            });
+
+
+            it('Y2: a refresh diverted to external login ends its chain', function() {
+                delete window.crosstab;
+                this.api.setExternalLogin(true);
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(401, json,
+                    JSON.stringify({error: 'need_login', url: 'http://idp', platform: ''}));
+                this.api.login(null, {refresh: true}, {});
+                expect(tokenRequests(this.xhr).length).toBe(2);
+            });
+
+            it('Y3: login({refresh}) joining a refresh between retries returns a request', function() {
+                delete window.crosstab;
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(503, headers({'Retry-After': '10'}), qrrBody);
+                let joined = this.api.login(null, {refresh: true}, {});
+                expect(joined).not.toBeNull();
+                expect(joined.uid).toBeDefined();
+            });
+
+
+            it('V1: a refresh with a caller-given token of another session does not take over the queue', function() {
+                delete window.crosstab;
+                this.api.records('read', 'Accounts', null, null, this.cb);
+                this.xhr.requests[0].respond(401, json, invalidGrant);
+                tokenRequests(this.xhr)[0].respond(503, headers({'Retry-After': '10'}), qrrBody);
+                // finish-impersonation: the admin's token; the impersonated one is stored.
+                this.api.login(null, {refresh: true, refresh_token: 'admin'}, {});
+                sinon.assert.calledWith(this.cb.error, sinon.match({textStatus: 'abort'}));
+                _.last(tokenRequests(this.xhr)).respond(200, json, tokens);
+                expect(replaysOf(this.xhr, '/rest/v10/Accounts').length).toBe(1);
+            });
+
+
+        });
+
+        it('R39: each queued request gets the refresh failure on its own request', function() {
+            let bugs = {success: sinon.spy(), error: sinon.spy(), complete: sinon.spy()};
+            this.api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            this.api.records('read', 'Bugs', null, null, bugs);
+            _.last(this.xhr.requests).respond(401, json, invalidGrant);
+            tokenRequests(this.xhr)[0].respond(500, json, JSON.stringify({error: 'fatal_error'}));
+
+            expect(this.cb.error.getCall(0).args[0].request.params.url).toBe('/rest/v10/Accounts');
+            expect(bugs.error.getCall(0).args[0].request.params.url).toBe('/rest/v10/Bugs');
+        });
+
+        it('R42: a replay rejected again does not cancel a second refresh in progress', function() {
+            window.crosstab = fakeCrosstab(true);
+            let api = Api.createInstance({serverUrl: '/rest/v10', keyValueStore: this.storage});
+            api.setRefreshTokenSuccessCallback(function(c) {
+                c();
+            });
+            api.records('read', 'Accounts', null, null, this.cb);
+            this.xhr.requests[0].respond(401, json, invalidGrant);
+            tokenRequests(this.xhr)[0].respond(200, json,
+                JSON.stringify({access_token: 'a2', refresh_token: 'r2', download_token: 'd2'}));
+            let replay = _.last(this.xhr.requests);
+            // Another request starts a second refresh before the replay answers.
+            api.records('read', 'Bugs', null, null, {});
+            _.last(this.xhr.requests).respond(401, json, invalidGrant);
+            _.last(tokenRequests(this.xhr)).respond(503, headers({'Retry-After': '10'}), qrrBody);
+            replay.respond(401, json, invalidGrant);
+
+            let statuses = _.map(window.crosstab.sent, function(s) {
+                return s[1];
+            });
+            // The replay waits for the second refresh instead of ending it.
+            expect(statuses).not.toContain('cancel');
+            sinon.assert.notCalled(this.cb.error);
+            sinon.assert.notCalled(this.cutSpy);
+        });
+
     });
 
     describe('signup', function() {

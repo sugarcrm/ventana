@@ -15,6 +15,158 @@ var _bulkQueues = {};
 var _state = {};
 
 /**
+ * Defaults for retrying a refused token refresh (see `login()`).
+ *
+ * `budget` is the total wall time, from the first attempt, that a refresh may
+ * keep retrying; `maxDelay` caps a single wait (the `Retry-After` hint is
+ * clamped to it); `defaultDelay` is used when the server sends no hint;
+ * `jitter` spreads a wait by at most that fraction of it.
+ *
+ * @type {Object}
+ */
+var _refreshRetryDefaults = {
+    budget: 300000,
+    maxDelay: 60000,
+    defaultDelay: 5000,
+    jitter: 0.5,
+};
+
+/**
+ * Whether a refused token refresh leaves the stored tokens valid.
+ *
+ * Throttling (429), server errors and maintenance (5xx), timeouts, aborts and
+ * network failures (status 0) say nothing about the tokens; any other 4xx --
+ * including a 403 for a deactivated or locked-out user -- means they are no
+ * good.
+ *
+ * @param {HttpError} error The error.
+ * @return {boolean} `true` when the tokens must be kept.
+ */
+var _refreshKeepsTokens = function(error) {
+    var status = Number(error && error.status) || 0;
+    return status === 0 || status === 429 || status >= 500;
+};
+
+/**
+ * The `Retry-After` hint of an error, in milliseconds: delta-seconds or an
+ * HTTP-date. Anything else is no hint.
+ *
+ * @param {HttpError} error The error.
+ * @return {number|null} The hint, or `null` when there is none to read.
+ */
+var _retryAfterMs = function(error) {
+    var xhr = error && error.request && error.request.xhr;
+    var value = xhr && _.isFunction(xhr.getResponseHeader) ? xhr.getResponseHeader('Retry-After') : null;
+    if (value === null || value === undefined || value === '') {
+        return null;
+    }
+    if (/^\s*\d+\s*$/.test(value)) {
+        return parseInt(value, 10) * 1000;
+    }
+    // Date.parse would also accept junk such as "1.5" as a date long past.
+    if (!/^\s*[A-Za-z]{3},\s/.test(value) || !/GMT\s*$/.test(value)) {
+        return null;
+    }
+    var at = Date.parse(value);
+    return isNaN(at) ? null : Math.max(0, at - Date.now());
+};
+
+/**
+ * Whether a refused token refresh is worth retrying: the Quick Repair &
+ * Rebuild gate, or a throttle/maintenance response that says when to retry.
+ * A 400/401 is never retried, whatever headers it carries.
+ *
+ * @param {HttpError} error The error.
+ * @return {boolean} `true` when the refresh should be retried.
+ */
+var _isRetryableRefreshError = function(error) {
+    var status = String(error && error.status);
+    if (status === '503' && error.code === 'qrr_in_progress') {
+        return true;
+    }
+    return (status === '503' || status === '429') && _retryAfterMs(error) !== null;
+};
+
+/**
+ * Callbacks that call `first`'s, then `second`'s, for each event.
+ *
+ * @param {Object} first Callbacks.
+ * @param {Object} second Callbacks.
+ * @return {Object} The joined callbacks.
+ * @private
+ */
+var _joinCallbacks = function(first, second) {
+    var joined = {};
+    // A side without `cancel` is failed as aborted, as `login()` would.
+    var cancelOf = function(cb) {
+        if (cb.cancel) {
+            cb.cancel();
+            return;
+        }
+        if (cb.error) {
+            cb.error(_syntheticError(0, null, 'abort'));
+        }
+        if (cb.complete) {
+            cb.complete();
+        }
+    };
+    joined.cancel = function() {
+        cancelOf(first);
+        cancelOf(second);
+    };
+    _.each(['success', 'error', 'complete'], function(name) {
+        if (!first[name] && !second[name]) {
+            return;
+        }
+        joined[name] = function() {
+            if (first[name]) {
+                first[name].apply(this, arguments);
+            }
+            if (second[name]) {
+                second[name].apply(this, arguments);
+            }
+        };
+    });
+    return joined;
+};
+
+/**
+ * Builds an error the server did not send: a refresh that ended because the
+ * session did (`401 invalid_grant`), or one that was cancelled (`0`, abort).
+ *
+ * @param {number} status The HTTP status to report.
+ * @param {string} [code] The error code to report.
+ * @param {string} [textStatus] The jQuery text status.
+ * @param {Object} [extra] What else to report.
+ * @param {string} [extra.message] The error message.
+ * @param {string} [extra.retryAfter] The `Retry-After` header.
+ * @param {Object} [extra.headers] Other response headers, by name.
+ * @return {HttpError} The error.
+ * @private
+ */
+var _syntheticError = function(status, code, textStatus, extra) {
+    extra = extra || {};
+    var body = _.omit({error: code, error_message: extra.message}, function(v) {
+        return !v;
+    });
+    return new HttpError({
+        xhr: {
+            status: status,
+            responseText: _.isEmpty(body) ? '' : JSON.stringify(body),
+            getResponseHeader: function(h) {
+                if (h === 'Content-Type') {
+                    return 'application/json';
+                }
+                if (h === 'Retry-After' && extra.retryAfter) {
+                    return extra.retryAfter;
+                }
+                return (extra.headers && extra.headers[h]) || null;
+            },
+        },
+    }, textStatus || 'error');
+};
+
+/**
  * Represents AJAX error.
  *
  * See Jquery/Zepto documentation for details.
@@ -330,6 +482,9 @@ function SugarApi(args) {
     _timeout = ((args && args.timeout) || 30) * 1000;
     _externalLogin = false;
     _allowBulk = !(args && args.disableBulkApi);
+    var _refreshRetry = _.extend({}, _refreshRetryDefaults, args && args.refreshRetry);
+    // Cancels the token refresh in progress in `login()`, if any.
+    var _cancelRefreshRetry = null;
 
     if (args && args.externalLoginUICallback && _.isFunction(args.externalLoginUICallback)) {
         _externalLoginUICallback = args.externalLoginUICallback;
@@ -394,22 +549,50 @@ function SugarApi(args) {
                 return;
             }
             var error = new HttpError(request, textStatus, errorThrown);
-            var onError = function() {
-                // Either regular request failed or token refresh failed
+            var onError = function(refreshError) {
+                // Either regular request failed or token refresh failed.
+                // A refresh that left the tokens valid (maintenance,
+                // throttling, a server error) is what callers must see; one
+                // that cleared them reports the original 401, which is what
+                // sends the user to sign in.
+                var keepsTokens = refreshError && _refreshKeepsTokens(refreshError);
+                var reportFor = function(req) {
+                    if (!keepsTokens) {
+                        return error;
+                    }
+                    // The caller's own request (never the token request and
+                    // its refresh token), answered by the refresh response,
+                    // so its status and Retry-After/X-RateLimit-* headers read
+                    // consistently. Built per request: each queued caller
+                    // gets its own.
+                    var answered = Object.create(req);
+                    answered.xhr = refreshError.request && refreshError.request.xhr;
+                    return _.extend(Object.create(HttpError.prototype), _.pick(refreshError,
+                        'status', 'responseText', 'textStatus', 'errorThrown', 'payload', 'code', 'message'
+                    ), {request: answered});
+                };
+
                 // Call original error callback
                 if (!_rqueue.length || self.refreshingToken(request.params.url) || !self.isRequestInQueue(request)) {
                     if (callbacks.error) {
-                        callbacks.error(error);
+                        callbacks.error(reportFor(request));
                     }
                     else if ($.isFunction(self.defaultErrorHandler)) {
-                        self.defaultErrorHandler(error);
+                        self.defaultErrorHandler(reportFor(request));
                     }
                 } else {
                     // Token refresh failed
                     // Call original error callback for all queued requests
                     for (var i = 0; i < _rqueue.length; ++i) {
-                        if (_rqueue[i]._oerror) _rqueue[i]._oerror(error);
+                        if (_rqueue[i]._oerror) _rqueue[i]._oerror(reportFor(_rqueue[i]));
                     }
+                }
+
+                // A refresh still in progress in `login()` -- this is its
+                // attempt that is being retried, or another auth request
+                // (sudo, BWC login, ...) failing meanwhile -- must not end it.
+                if (error.refreshRetryScheduled || _cancelRefreshRetry) {
+                    return;
                 }
                 // duplicated due to other types of authentication
                 self.setRefreshingToken(false);
@@ -452,7 +635,14 @@ function SugarApi(args) {
                     success: function() {
                         self.setRefreshingToken(false);
                         refreshFailed = false;
+                        var refreshed = self.getOAuthToken();
                         _refreshTokenSuccess(function() {
+                            // The app may call back later: a sign-in in
+                            // between makes the queue another user's.
+                            if (self.getOAuthToken() !== refreshed) {
+                                refreshCallbacks.cancel();
+                                return;
+                            }
                             // Repeat original requests
                             r = _rqueue.shift();
                             while (r) {
@@ -463,6 +653,25 @@ function SugarApi(args) {
                         });
                     },
                     error: onError,
+                    // The refresh was cancelled (sign-in, sign-out, reset):
+                    // fail the queued requests as aborted, so callers
+                    // waiting on success/error settle, then complete them.
+                    cancel: function() {
+                        self.setRefreshingToken(false);
+                        // Drained by `complete`, even after a success whose
+                        // replay was dropped: nothing of it may replay later.
+                        refreshFailed = true;
+                        var queued = _rqueue.slice();
+                        _.each(queued, function(q) {
+                            if (q._oerror) {
+                                // Not the queued request's own 401 response.
+                                var aborted = Object.create(q);
+                                aborted.xhr = {status: 0};
+                                q._oerror(new HttpError(aborted, 'abort', 'abort'));
+                            }
+                        });
+                        refreshCallbacks.complete();
+                    },
                 };
 
                 if (!('crosstab' in window) || !crosstab.supported) {
@@ -470,6 +679,7 @@ function SugarApi(args) {
                         complete: refreshCallbacks.complete,
                         success: refreshCallbacks.success,
                         error: refreshCallbacks.error,
+                        cancel: refreshCallbacks.cancel,
                     });
                     return;
                 }
@@ -663,9 +873,11 @@ function SugarApi(args) {
 
                 _requests[request.uid] = null;
 
-                // Do not call complete callback if we are in token refresh loop
-                // We'll call complete callback once the refresh completes
-                if (!_refreshingToken && callbacks.complete) {
+                // Do not call complete callback for a request queued by the
+                // token refresh loop: it is called once the refresh completes.
+                // Others finishing meanwhile (a refresh may wait minutes)
+                // complete as usual.
+                if (callbacks.complete && (!_refreshingToken || _rqueue.indexOf(request) === -1)) {
                     callbacks.complete(request);
                 }
             };
@@ -1650,15 +1862,53 @@ function SugarApi(args) {
          * @param {Object} [data] extra data to be passed in login request
          *   such as client user agent, etc.
          * @param {Object} [callbacks] callback object.
+         *   For a refresh (`data.refresh`) refused by maintenance or a
+         *   throttle that says when to retry, the refresh is retried within
+         *   a budget and the callbacks fire once, for the final attempt.
+         *   A refused refresh clears the tokens only when the server rejected
+         *   them (a 4xx other than 429); a failed sign-in always does.
+         *   `callbacks.cancel()`, when given, is called instead of `error`
+         *   and `complete` if the refresh is cancelled (see
+         *   `cancelRefreshRetry()`). The returned request is the latest
+         *   attempt (for a refresh that joined or was released by one in
+         *   progress, that one's): stop a retrying refresh with
+         *   `cancelRefreshRetry()`.
          * @return {HttpRequest} The AJAX request.
          * @memberOf Api
          * @instance
          */
         login: function(credentials, data, callbacks) {
             var payload, success, error, method, url, self = this;
+            var isRefresh = !!(data && data.refresh);
 
             credentials = credentials || {};
             callbacks = callbacks || {};
+
+            // A new sign-in or refresh supersedes a refresh in progress.
+            if (isRefresh) {
+                if (_cancelRefreshRetry) {
+                    // The session is that of the token this refresh sends,
+                    // not the stored one: finish-impersonation passes the
+                    // admin's while the impersonated user's is stored.
+                    var sends = data.refresh_token || this.getRefreshToken();
+                    // Same session: join the refresh in flight rather than
+                    // restart it -- an aborted attempt may already have
+                    // rotated the token server-side.
+                    if (_cancelRefreshRetry.token() === sends) {
+                        return _cancelRefreshRetry.join(callbacks);
+                    }
+                    // The running refresh sends another session's token than
+                    // the stored one (finish-impersonation): it goes on, and
+                    // this one, of the session being left, is released.
+                    if (_cancelRefreshRetry.switching && _cancelRefreshRetry.token() !== this.getRefreshToken()) {
+                        return _cancelRefreshRetry.refuse(callbacks);
+                    }
+                    // Another session's queue is not this refresh's to answer.
+                    _cancelRefreshRetry();
+                }
+            } else {
+                this.cancelRefreshRetry();
+            }
 
             success = function(data) {
                 _resetAuth(data);
@@ -1680,7 +1930,12 @@ function SugarApi(args) {
             };
 
             error = function(error) {
-                _resetAuth();
+                // A failed sign-in always clears what is stored. A refused
+                // refresh keeps the tokens through maintenance, throttling,
+                // server errors and timeouts: they say nothing about them.
+                if (!isRefresh || !_refreshKeepsTokens(error)) {
+                    _resetAuth();
+                }
                 if (callbacks.error) callbacks.error(error);
             };
 
@@ -1708,11 +1963,201 @@ function SugarApi(args) {
             url = this.buildURL('oauth2', 'token', payload, {
                 platform: _platform,
             });
-            return this.call(method, url, payload, {
-                success: success,
-                error: error,
-                complete: callbacks.complete,
-            });
+
+            if (!isRefresh) {
+                return this.call(method, url, payload, {
+                    success: success,
+                    error: error,
+                    complete: callbacks.complete,
+                });
+            }
+
+            // A refresh refused by the Quick Repair & Rebuild gate, or by a
+            // throttle that says when to come back, is retried within the
+            // budget. Callbacks fire once, for the final attempt only, so the
+            // request queue is neither flushed early nor completed twice.
+            var deadline = Date.now() + _refreshRetry.budget;
+            var retryScheduled = false;
+            var cancelled = false;
+            var timer = null;
+            var inFlight = null;
+            var lastRequest = null;
+            var cancel;
+            var endChain = function() {
+                if (_cancelRefreshRetry === cancel) {
+                    _cancelRefreshRetry = null;
+                }
+            };
+            var giveUp = function(err) {
+                endChain();
+                retryScheduled = false;
+                err.refreshRetryScheduled = false;
+                error(err);
+                if (callbacks.complete) callbacks.complete();
+            };
+            // Cancelled by sign-in, sign-out, a reset or another refresh:
+            // stop waiting, abort an attempt in flight (so a late response
+            // can't write tokens back), and release the queue.
+            cancel = function() {
+                cancelled = true;
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                if (inFlight) {
+                    self.abortRequest(inFlight.uid);
+                    inFlight = null;
+                }
+                endChain();
+                retryScheduled = false;
+                // The caller's way of releasing its queue without errors
+                // (the session it served is over); otherwise fail as aborted.
+                if (callbacks.cancel) {
+                    callbacks.cancel();
+                } else {
+                    giveUp(_syntheticError(0, null, 'abort'));
+                }
+            };
+            // The stored refresh token this refresh, and its queue, belong to.
+            var startStored = self.getRefreshToken();
+            // The session of a refresh is that of the token it sends.
+            cancel.token = function() {
+                return payload.refresh_token;
+            };
+            // Started with a caller-given token of another session.
+            cancel.switching = payload.refresh_token !== startStored;
+            cancel.join = function(more) {
+                callbacks = _joinCallbacks(callbacks, more);
+                return lastRequest;
+            };
+            // Released as cancelled, or failed as aborted, without touching
+            // this refresh.
+            cancel.refuse = function(other) {
+                if (other.cancel) {
+                    other.cancel();
+                } else {
+                    if (other.error) other.error(_syntheticError(0, null, 'abort'));
+                    if (other.complete) other.complete();
+                }
+                return lastRequest;
+            };
+            _cancelRefreshRetry = cancel;
+
+            var attempt = function(lastError) {
+                retryScheduled = false;
+                if (lastError) {
+                    // Read the stored token per attempt: another tab may
+                    // have rotated it, or signed out, while this one waited.
+                    var stored = self.getRefreshToken();
+                    if (!stored) {
+                        giveUp(_syntheticError(401, 'invalid_grant'));
+                        return;
+                    }
+                    // Another tab signed in or rotated it: the queue may be
+                    // another user's now, so end rather than refresh as them.
+                    if (stored !== startStored) {
+                        cancel();
+                        return;
+                    }
+                }
+                var answered = false;
+                inFlight = self.call(method, url, payload, {
+                    success: function(response) {
+                        answered = true;
+                        inFlight = null;
+                        if (cancelled) return;
+                        // The session changed while this attempt was out
+                        // (sign-in or sign-out in another tab): its tokens
+                        // and its queue belong to a session that is over.
+                        if (_keyValueStore && self.getRefreshToken() !== startStored) {
+                            cancel();
+                            return;
+                        }
+                        endChain();
+                        success(response);
+                    },
+                    error: function(err) {
+                        answered = true;
+                        inFlight = null;
+                        if (cancelled) return;
+                        var delay = _isRetryableRefreshError(err) ? self.refreshRetryDelay(err) : null;
+                        if (delay !== null && Date.now() + delay <= deadline) {
+                            retryScheduled = true;
+                            err.refreshRetryScheduled = true;
+                            timer = setTimeout(function() {
+                                timer = null;
+                                attempt(err);
+                            }, delay);
+                            return;
+                        }
+                        endChain();
+                        error(err);
+                    },
+                    complete: function(request) {
+                        // Aborted from outside the chain (abortRequest): the
+                        // error handler skips aborts, so end the refresh here
+                        // as a cancellation rather than leave it running.
+                        if (!cancelled && !retryScheduled && request &&
+                            (request.aborted || (request.xhr && request.xhr.aborted))) {
+                            cancel();
+                            return;
+                        }
+                        if (cancelled || retryScheduled) {
+                            return;
+                        }
+                        inFlight = null;
+                        endChain();
+                        // Diverted (external login): neither success nor
+                        // error came. The popup replays or fails the queue,
+                        // as in 9c8fcd8, so it is not completed here.
+                        if (!answered) return;
+                        if (callbacks.complete) callbacks.complete(request);
+                    },
+                });
+                lastRequest = inFlight;
+                return inFlight;
+            };
+            return attempt();
+        },
+
+        /**
+         * Cancels a token refresh in progress (waiting to retry or in
+         * flight), failing its queue as aborted. Called on sign-in, sign-out
+         * and `resetAuth()`, so a refresh can neither outlive the session nor
+         * write tokens back after it ended.
+         *
+         * @memberOf Api
+         * @instance
+         */
+        cancelRefreshRetry: function() {
+            if (_cancelRefreshRetry) {
+                _cancelRefreshRetry();
+            }
+        },
+
+        /**
+         * How long to wait before retrying a refused token refresh.
+         *
+         * The server's `Retry-After` hint (or `refreshRetry.defaultDelay`
+         * without one), clamped to 1 s .. `refreshRetry.maxDelay`, spread
+         * upward by `refreshRetry.jitter` -- downward at the cap, so clients
+         * told to wait longer don't all retry at the same instant.
+         *
+         * @param {HttpError} error The refused refresh.
+         * @return {number} The delay in milliseconds.
+         * @memberOf Api
+         * @instance
+         * @private
+         */
+        refreshRetryDelay: function(error) {
+            var hint = _retryAfterMs(error);
+            var base = hint === null ? _refreshRetry.defaultDelay : hint;
+            base = Math.min(Math.max(base, 1000), _refreshRetry.maxDelay);
+            var spread = base * _refreshRetry.jitter * Math.random();
+            if (hint !== null && hint > _refreshRetry.maxDelay) {
+                return Math.round(base - spread / 2);
+            }
+            return Math.min(Math.round(base + spread), _refreshRetry.maxDelay);
         },
 
         /**
@@ -1776,6 +2221,9 @@ function SugarApi(args) {
             }
 
             var url = this.buildURL('oauth2', 'logout', payload);
+
+            // After the payload is read: the server must still revoke them.
+            this.cancelRefreshRetry();
 
             var originalComplete = callbacks.complete;
             callbacks.complete = function() {
@@ -1916,6 +2364,7 @@ function SugarApi(args) {
          * @instance
          */
         resetAuth: function() {
+            this.cancelRefreshRetry();
             _resetAuth();
         },
 
